@@ -10,7 +10,7 @@ Instal into a virtual environment
 
 Create virual environment
 
-`virtuaenv -p python3 venv`
+`virtualenv -p python3 venv`
 
 
 Activate virtual environment
