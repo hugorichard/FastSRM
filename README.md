@@ -8,9 +8,13 @@ Install
 
 Instal into a virtual environment
 
+Move into FastSRM directory
+
+``cd FastSRM``
+
 Create virual environment
 
-`virtuaenv -p python3 venv`
+`virtualenv -p python3 venv`
 
 
 Activate virtual environment
