@@ -26,4 +26,4 @@ Install FastSRM
 Docs
 ------
 
-Docs are available in 
+Docs are available at https://hugorichard.github.io/FastSRM/generated/html/  
