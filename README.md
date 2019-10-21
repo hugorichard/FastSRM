@@ -8,7 +8,8 @@ Install
 
 Instal into a virtual environment
 
-Go into FastSRM directory
+Move into FastSRM directory
+
 ``cd FastSRM``
 
 Create virual environment
