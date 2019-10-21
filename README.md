@@ -6,8 +6,6 @@ See https://arxiv.org/pdf/1909.12537.pdf
 Install
 ---------
 
-Instal into a virtual environment
-
 Move into FastSRM directory
 
 ``cd FastSRM``
