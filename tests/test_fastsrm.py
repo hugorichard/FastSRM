@@ -6,11 +6,16 @@ import pytest
 from numpy.testing import assert_array_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from fastsrm.fastsrm import (
-    FastSRM, _compute_and_save_corr_mat, _compute_and_save_subject_basis,
-    _compute_basis_subject_online, _reduced_space_compute_shared_response,
-    check_atlas, check_imgs, check_shared_response, create_temp_dir, fast_srm,
-    reduce_data, safe_load)
+from fastsrm.fastsrm import (FastSRM, _compute_and_save_corr_mat,
+                             _compute_and_save_subject_basis,
+                             _compute_basis_subject_online,
+                             _reduced_space_compute_shared_response,
+                             check_atlas, check_imgs, check_shared_response,
+                             create_temp_dir, fast_srm, reduce_data, safe_load)
+
+n_voxels = 10
+n_subjects = 5
+n_components = 3  # number of components used for SRM model
 
 
 def to_path(X, dirpath):
@@ -80,7 +85,9 @@ def generate_data(n_voxels,
 
     # create paths such that paths[i, j] contains data
     # of subject i during session j
-    paths = to_path(X, datadir)
+    if datadir is not None:
+        paths = to_path(X, datadir)
+
     S = [(S[:, s] - np.mean(S[:, s], axis=1, keepdims=True))
          for s in slices_timeframes]
 
@@ -646,11 +653,6 @@ def test_fastsrm_class():
         assert not os.path.exists(srm.temp_dir)
 
 
-n_voxels = 10
-n_subjects = 5
-n_components = 3  # number of components used for SRM model
-
-
 def apply_aggregate(shared_response, aggregate, input_format):
     if aggregate is None:
         if input_format == "list_of_array":
@@ -816,3 +818,29 @@ def test_class_srm_inverse_transform(input_format, low_ram, tempdir, atlas,
                 for j in range(len(X[i])):
                     assert_array_almost_equal(reconstructed_data[i][j],
                                               safe_load(X[i][j]))
+
+
+@pytest.mark.parametrize(
+    "tempdir", (True, False))
+def test_addsubs_wo_fit(tempdir):
+
+    with tempfile.TemporaryDirectory() as datadir:
+        X, W, S = generate_data(n_voxels, [24, 25], n_subjects,
+                                n_components, datadir, 0, "list_of_list")
+
+        if tempdir:
+            temp_dir = datadir
+        else:
+            temp_dir = None
+
+        srm = FastSRM(
+                      n_components=n_components,
+                      n_iter=10,
+                      temp_dir=temp_dir,
+                      verbose=True,
+                      )
+
+        srm.add_subjects(X, S)
+
+        for i in range(len(W)):
+            assert_array_almost_equal(safe_load(srm.basis_list[i]), W[i])

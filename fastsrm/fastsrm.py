@@ -1355,7 +1355,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
         self.aggregate = aggregate
 
-        self.basis_list = None
+        self.basis_list = []
 
         if temp_dir is None:
             if self.verbose == "warn" or self.verbose is True:
@@ -1385,8 +1385,7 @@ is not needed anymore.
                         os.remove(os.path.join(root, name))
                 os.rmdir(self.temp_dir)
 
-        if self.basis_list is not None:
-            self.basis_list is None
+        self.basis_list = []
 
     def fit(self, imgs):
         """Computes basis across subjects from input imgs
@@ -1563,7 +1562,7 @@ element i, j is the projection of data of subject i collected \
 during session j in shared space.
          """
         aggregate = self.aggregate
-        if self.basis_list is None:
+        if self.basis_list == []:
             raise NotFittedError("The model fit has not been run yet.")
 
         atlas_shape = check_atlas(self.atlas, self.n_components)
@@ -1723,6 +1722,10 @@ self.aggregate=None: shared response is a list of list of array, \
 element i, j is the projection of data of subject i collected \
 during session j in shared space.
         """
+        if self.basis_list == []:
+            self.clean()
+            create_temp_dir(self.temp_dir)
+
         atlas_shape = check_atlas(self.atlas, self.n_components)
         reshaped_input, imgs, shapes = check_imgs(
             imgs,
