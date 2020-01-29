@@ -929,11 +929,12 @@ def _compute_subject_basis(corr_mat):
     return U.dot(V)
 
 
-def fast_srm(reduced_data_list,
-             n_iter=10,
-             n_components=None,
-             low_ram=False,
-             seed=0):
+def fast_srm(
+        reduced_data_list,
+        n_iter=10,
+        n_components=None,
+        low_ram=False,
+):
     """Computes shared response and basis in reduced space
 
     Parameters
@@ -1296,9 +1297,6 @@ errors when the number of subjects and/or sessions is large
 disk. This increases the number of IO but reduces memory complexity when \
 the number of subject and/or sessions is large
 
-    seed : int
-        Seed used for random sampling.
-
     n_jobs : int, optional, default=1
         The number of CPUs to use to do the computation. \
 -1 means all CPUs, -2 all CPUs but one, and so on.
@@ -1338,12 +1336,10 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
                  n_iter=100,
                  temp_dir=None,
                  low_ram=False,
-                 seed=None,
                  n_jobs=1,
                  verbose="warn",
                  aggregate="mean"):
 
-        self.seed = seed
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.n_components = n_components
@@ -1433,11 +1429,12 @@ at the object level.
             logger.info("[FastSRM.fit] Finds shared "
                         "response using reduced data")
 
-        shared_response_list = fast_srm(reduced_data,
-                                        n_iter=self.n_iter,
-                                        n_components=self.n_components,
-                                        low_ram=self.low_ram,
-                                        seed=self.seed)
+        shared_response_list = fast_srm(
+            reduced_data,
+            n_iter=self.n_iter,
+            n_components=self.n_components,
+            low_ram=self.low_ram,
+        )
 
         if self.verbose is True:
             logger.info("[FastSRM.fit] Finds basis using "
@@ -1567,7 +1564,10 @@ during session j in shared space.
 
         atlas_shape = check_atlas(self.atlas, self.n_components)
         reshaped_input, imgs, shapes = check_imgs(
-            imgs, n_components=self.n_components, atlas_shape=atlas_shape)
+            imgs,
+            n_components=self.n_components,
+            atlas_shape=atlas_shape,
+            ignore_nsubjects=True)
         check_indexes(subjects_indexes, "subjects_indexes")
         if subjects_indexes is None:
             subjects_indexes = np.arange(len(imgs))

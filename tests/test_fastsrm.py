@@ -13,97 +13,11 @@ from fastsrm.fastsrm import (FastSRM, _compute_and_save_corr_mat,
                              check_atlas, check_imgs, check_shared_response,
                              create_temp_dir, fast_srm, reduce_data, safe_load)
 
+from fastsrm.utils import to_path, generate_data
+
 n_voxels = 10
 n_subjects = 5
 n_components = 3  # number of components used for SRM model
-
-
-def to_path(X, dirpath):
-    """
-    Save list of list of array to path and returns the path_like array
-    Parameters
-    ----------
-    X: list of list of array
-        input data
-    dirpath: str
-        dirpath
-    Returns
-    -------
-    paths: array of str
-        path arrays where all data are stored
-    """
-    paths = []
-    for i, sessions in enumerate(X):
-        sessions_path = []
-        for j, session in enumerate(sessions):
-            pth = "%i_%i" % (i, j)
-            np.save(os.path.join(dirpath, pth), session)
-            sessions_path.append(os.path.join(dirpath, pth + ".npy"))
-        paths.append(sessions_path)
-    return np.array(paths)
-
-
-def generate_data(n_voxels,
-                  n_timeframes,
-                  n_subjects,
-                  n_components,
-                  datadir,
-                  noise_level=0.1,
-                  input_format="array"):
-    n_sessions = len(n_timeframes)
-    cumsum_timeframes = np.cumsum([0] + n_timeframes)
-    slices_timeframes = [
-        slice(cumsum_timeframes[i], cumsum_timeframes[i + 1])
-        for i in range(n_sessions)
-    ]
-
-    # Create a Shared response S with K = 3
-    theta = np.linspace(-4 * np.pi, 4 * np.pi, int(np.sum(n_timeframes)))
-    z = np.linspace(-2, 2, int(np.sum(n_timeframes)))
-    r = z**2 + 1
-    x = r * np.sin(theta)
-    y = r * np.cos(theta)
-
-    S = np.vstack((x, y, z))
-
-    # Generate fake data
-    W = []
-    X = []
-    for subject in range(n_subjects):
-        Q, R = np.linalg.qr(np.random.random((n_voxels, n_components)))
-        W.append(Q.T)
-        X_ = []
-        for session in range(n_sessions):
-            S_s = S[:, slices_timeframes[session]]
-            S_s = S_s - np.mean(S_s, axis=1, keepdims=True)
-            noise = noise_level * np.random.random(
-                (n_voxels, n_timeframes[session]))
-            noise = noise - np.mean(noise, axis=1, keepdims=True)
-            data = Q.dot(S_s) + noise
-            X_.append(data)
-        X.append(X_)
-
-    # create paths such that paths[i, j] contains data
-    # of subject i during session j
-    if datadir is not None:
-        paths = to_path(X, datadir)
-
-    S = [(S[:, s] - np.mean(S[:, s], axis=1, keepdims=True))
-         for s in slices_timeframes]
-
-    if input_format == "array":
-        return paths, W, S
-
-    elif input_format == "list_of_list":
-        return X, W, S
-
-    elif input_format == "list_of_array":
-        return [
-            np.concatenate([X[i][j].T for j in range(n_sessions)]).T
-            for i in range(n_subjects)
-        ], W, S
-    else:
-        raise ValueError("Wrong input_format")
 
 
 def test_generated_data():
@@ -710,15 +624,16 @@ def test_fastsrm_class_correctness(input_format, low_ram, tempdir, atlas,
         else:
             temp_dir = None
 
-        srm = FastSRM(atlas=atlas,
-                      n_components=n_components,
-                      n_iter=10,
-                      temp_dir=temp_dir,
-                      low_ram=low_ram,
-                      verbose=True,
-                      n_jobs=n_jobs,
-                      aggregate=aggregate,
-                      seed=0)
+        srm = FastSRM(
+            atlas=atlas,
+            n_components=n_components,
+            n_iter=10,
+            temp_dir=temp_dir,
+            low_ram=low_ram,
+            verbose=True,
+            n_jobs=n_jobs,
+            aggregate=aggregate,
+        )
 
         # Check that there is no difference between fit_transform
         # and fit then transform
@@ -778,15 +693,16 @@ def test_class_srm_inverse_transform(input_format, low_ram, tempdir, atlas,
         else:
             temp_dir = None
 
-        srm = FastSRM(atlas=atlas,
-                      n_components=n_components,
-                      n_iter=10,
-                      temp_dir=temp_dir,
-                      low_ram=low_ram,
-                      verbose=True,
-                      n_jobs=n_jobs,
-                      aggregate=aggregate,
-                      seed=0)
+        srm = FastSRM(
+            atlas=atlas,
+            n_components=n_components,
+            n_iter=10,
+            temp_dir=temp_dir,
+            low_ram=low_ram,
+            verbose=True,
+            n_jobs=n_jobs,
+            aggregate=aggregate,
+        )
 
         srm.fit(X)
         shared_response_raw = srm.transform(X)
@@ -820,13 +736,12 @@ def test_class_srm_inverse_transform(input_format, low_ram, tempdir, atlas,
                                               safe_load(X[i][j]))
 
 
-@pytest.mark.parametrize(
-    "tempdir", (True, False))
+@pytest.mark.parametrize("tempdir", (True, False))
 def test_addsubs_wo_fit(tempdir):
 
     with tempfile.TemporaryDirectory() as datadir:
-        X, W, S = generate_data(n_voxels, [24, 25], n_subjects,
-                                n_components, datadir, 0, "list_of_list")
+        X, W, S = generate_data(n_voxels, [24, 25], n_subjects, n_components,
+                                datadir, 0, "list_of_list")
 
         if tempdir:
             temp_dir = datadir
@@ -834,11 +749,11 @@ def test_addsubs_wo_fit(tempdir):
             temp_dir = None
 
         srm = FastSRM(
-                      n_components=n_components,
-                      n_iter=10,
-                      temp_dir=temp_dir,
-                      verbose=True,
-                      )
+            n_components=n_components,
+            n_iter=10,
+            temp_dir=temp_dir,
+            verbose=True,
+        )
 
         srm.add_subjects(X, S)
 
