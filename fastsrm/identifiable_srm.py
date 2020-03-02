@@ -580,7 +580,7 @@ at the object level.
             # Compute rotation matrix and apply
             r = ica_find_rotation(basis, n_subjects_ica=self.n_subjects_ica)
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(r, b) for b in basis
+                delayed(apply_rotation)(b, r) for b in basis
             )
 
         if self.identifiability == "decorr":
@@ -595,7 +595,7 @@ at the object level.
 
             r = decorr_find_rotation(shared)
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(r, b) for b in basis
+                delayed(apply_rotation)(b, r) for b in basis
             )
 
 
