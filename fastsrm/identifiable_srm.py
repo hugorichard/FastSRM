@@ -39,19 +39,31 @@ from sklearn.decomposition import FastICA
 logger = logging.getLogger(__name__)
 
 
-def apply_rotation(basis, rotation):
+def apply_rotation(basis, rotation, temp_dir):
     """
     Apply rotation to matrix
     Parameters
     ----------
     basis: array of shape [n_components, n_voxels]
+
     rotation: array of shape [n_components, n_components]
+
+    temp_dir : str or None
+        Path to dir where temporary results are stored. If None \
+temporary results will be stored in memory. This can results in memory \
+errors when the number of subjects and/or sessions is large
+
     Returns
     -------
     rotated_basis: array of shape [n_components, n_voxels]
-    rotated_basis = rotation.dot(basis)
+        rotated_basis = rotation.dot(basis)
     """
-    return rotation.dot(basis)
+    if isinstance(basis, np.ndarray):
+        return rotation.dot(basis)
+    else:
+        name = basis.split(".npy")[0]
+        np.save(name, rotation.dot(safe_load(basis)))
+        return basis
 
 
 def check_voxel_centered(data):
@@ -251,7 +263,10 @@ or list of arrays
     )
 
     reduced_basis = [None] * n_subjects
-    for _ in range(n_iter):
+
+    past_shared = None
+
+    for iteration in range(n_iter):
         for n in range(n_subjects):
             cov = None
             for m in range(n_sessions):
@@ -540,6 +555,7 @@ at the object level.
                 basis_i = _compute_basis_subject_online(
                     sessions, shared_response_list
                 )
+
                 if self.temp_dir is None:
                     basis.append(basis_i)
                 else:
@@ -547,6 +563,7 @@ at the object level.
                     np.save(path, basis_i)
                     basis.append(path + ".npy")
                 del basis_i
+
         else:
             if self.temp_dir is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
@@ -580,7 +597,7 @@ at the object level.
             # Compute rotation matrix and apply
             r = ica_find_rotation(basis, n_subjects_ica=self.n_subjects_ica)
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(b, r) for b in basis
+                delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
             )
 
         if self.identifiability == "decorr":
@@ -592,10 +609,11 @@ at the object level.
                 subjects_indexes=None,
                 aggregate="mean",
             )
+            shared = np.concatenate(shared, axis=1)
 
             r = decorr_find_rotation(shared)
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(b, r) for b in basis
+                delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
             )
 
 
