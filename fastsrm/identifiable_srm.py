@@ -39,17 +39,33 @@ from sklearn.decomposition import FastICA
 logger = logging.getLogger(__name__)
 
 
+def apply_rotation(basis, rotation):
+    """
+    Apply rotation to matrix
+    Parameters
+    ----------
+    basis: array of shape [n_components, n_voxels]
+    rotation: array of shape [n_components, n_components]
+    Returns
+    -------
+    rotated_basis: array of shape [n_components, n_voxels]
+    rotated_basis = rotation.dot(basis)
+    """
+    return rotation.dot(basis)
+
+
 def check_voxel_centered(data):
     """
     Check that data are voxel centered
 
     Parameters
     ----------
-    data: array of shape [n_timeframes, n_voxels]
+    data: array of shape [n_voxels, n_timeframes]
     """
-    if np.max(np.abs(np.mean(data, axis=0))) > 1e-6:
-        raise ValueError("Input data should be voxel-centered when "
-                         "identifiability = ica")
+    if np.max(np.abs(np.mean(data, axis=1))) > 1e-6:
+        raise ValueError(
+            "Input data should be voxel-centered when " "identifiability = ica"
+        )
 
 
 def _compute_basis_subject_online(sessions, shared_response_list):
@@ -91,7 +107,7 @@ def _compute_basis_subject_online(sessions, shared_response_list):
     return _compute_subject_basis(basis_i)
 
 
-def ica_find_rotation(basis, n_subjects_ica, transpose=False):
+def ica_find_rotation(basis, n_subjects_ica):
     """
     Finds rotation r such that
     r.dot(srm.basis_list[0]) is the appropriate basis
@@ -109,28 +125,33 @@ def ica_find_rotation(basis, n_subjects_ica, transpose=False):
         if True: basis[i] has shape [n_voxels, n_components]
     """
     if n_subjects_ica == 0:
-        raise ValueError("ICA is used to find optimal rotation but \
-        n_subjects_ica == 0. Please set a positive value for n_subjects_ica")
+        raise ValueError(
+            "ICA is used to find optimal rotation but \
+        n_subjects_ica == 0. Please set a positive value for n_subjects_ica"
+        )
 
     if n_subjects_ica is None:
-        logger.warning("n_subjects_ica has been set to %i. To remove"
-                       " this warning please set it manually" % len(basis))
+        logger.warning(
+            "n_subjects_ica has been set to %i. To remove"
+            " this warning please set it manually" % len(basis)
+        )
         index = np.arange(len(basis))
         n_subjects_ica = len(basis)
     else:
-        index = np.random.choice(np.arange(len(basis)),
-                                 size=n_subjects_ica,
-                                 replace=False)
+        index = np.random.choice(
+            np.arange(len(basis)), size=n_subjects_ica, replace=False
+        )
 
-    if transpose:
-        used_basis = np.concatenate([basis[i].T for i in index],
-                                    axis=1) / np.sqrt(n_subjects_ica)
-    else:
-        used_basis = np.concatenate([basis[i] for i in index],
-                                    axis=1) / np.sqrt(n_subjects_ica)
-    ica2 = FastICA()
-    ica2.fit(used_basis.T)
-    return ica2.components_
+    used_basis = np.concatenate(
+            [safe_load(basis[i]) for i in index], axis=1
+    ) / np.sqrt(n_subjects_ica)
+
+    used_basis = used_basis.T
+    n_samples, n_features = used_basis.shape
+    used_basis = used_basis * np.sqrt(n_samples)
+    ica = FastICA(whiten=False)
+    ica.fit(used_basis)
+    return ica.components_
 
 
 def decorr_find_rotation(shared_response):
@@ -141,19 +162,14 @@ def decorr_find_rotation(shared_response):
     Parameters
     ----------
 
-    shared_response: np array of shape [n_timeframes, n_components]
+    shared_response: np array of shape [n_components, n_timeframes]
     """
-    U, S, V = np.linalg.svd(shared_response)
-    return V
+    U, _, _ = np.linalg.svd(shared_response)
+    return U.T
 
 
 def fast_srm(
-        reduced_data_list,
-        n_iter=10,
-        n_components=None,
-        low_ram=False,
-        n_subjects_ica=0,
-        identifiability=None,
+    reduced_data_list, n_iter=10, n_components=None, low_ram=False,
 ):
     """Computes shared response and basis in reduced space
 
@@ -179,16 +195,6 @@ def fast_srm(
     n_components : int or None
         number of components
 
-    n_subjects_ica: int
-        Number of randomly selected subject used to fit ica
-        (only used if identifiability = "ica")
-
-    identifiability: str
-        Possible values:
-        - "ica": performs a linear ICA on spatial maps
-        - "decorr": shared response has diagonal covariance (diagonal values \
-are sorted)
-
     Returns
     -------
 
@@ -197,18 +203,14 @@ are sorted)
         shared response, element i is the shared response during session i
     """
     if low_ram:
-        return lowram_srm(reduced_data_list, n_iter, n_components,
-                          identifiability, n_subjects_ica)
+        return lowram_srm(reduced_data_list, n_iter, n_components)
     else:
-        return det_srm(reduced_data_list, n_iter, n_components,
-                       identifiability, n_subjects_ica)
+        return det_srm(reduced_data_list, n_iter, n_components,)
 
 
-def det_srm(reduced_data_list,
-            n_iter=10,
-            n_components=None,
-            identifiability=None,
-            n_subjects_ica=0):
+def det_srm(
+    reduced_data_list, n_iter=10, n_components=None,
+):
     """Computes shared response and basis in reduced space
 
     Parameters
@@ -234,16 +236,6 @@ or list of arrays
     n_components : int or None
         number of components
 
-    identifiability: str
-        Possible values:
-        - "ica": performs a linear ICA on spatial maps
-        - "decorr": shared response has diagonal covariance (diagonal values \
-are sorted)
-
-    n_subjects_ica: int
-        Number of randomly selected subject used to fit ica
-        (only used if identifiability = "ica")
-
     Returns
     -------
 
@@ -255,7 +247,8 @@ are sorted)
     n_subjects = len(reduced_data_list)
     n_sessions = len(reduced_data_list[0])
     shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components)
+        reduced_data_list, None, n_components
+    )
 
     reduced_basis = [None] * n_subjects
     for _ in range(n_iter):
@@ -264,11 +257,6 @@ are sorted)
             for m in range(n_sessions):
                 data_nm = reduced_data_list[n, m]
 
-                # if we use ica identifiability data should
-                # be voxel-centered
-                if identifiability == "ica":
-                    check_voxel_centered(data_nm)
-
                 if cov is None:
                     cov = shared_response[m].T.dot(data_nm)
                 else:
@@ -276,25 +264,15 @@ are sorted)
             reduced_basis[n] = _compute_subject_basis(cov)
 
         shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components)
-
-    if identifiability == "ica":
-        r = ica_find_rotation(reduced_basis, n_subjects_ica)
-        # r is the rotation such that r W_i.T = W_i*_T
-        return [s.dot(r.T) for s in shared_response]
-
-    if identifiability == "decorr":
-        r = decorr_find_rotation(np.concatenate(shared_response, axis=0))
-        return [s.dot(r.T) for s in shared_response]
+            reduced_data_list, reduced_basis, n_components
+        )
 
     return shared_response
 
 
-def lowram_srm(reduced_data_list,
-               n_iter=10,
-               n_components=None,
-               identifiability=None,
-               n_subjects_ica=0):
+def lowram_srm(
+    reduced_data_list, n_iter=10, n_components=None,
+):
     """Computes shared response and basis in reduced space
 
     Parameters
@@ -316,16 +294,6 @@ def lowram_srm(reduced_data_list,
     n_components : int or None
         number of components
 
-    identifiability: str
-        Possible values:
-        - "ica": performs a linear ICA on spatial maps
-        - "decorr": shared response has diagonal covariance (diagonal values \
-are sorted)
-
-    n_subjects_ica: int
-        Number of randomly selected subject used to fit ica
-        (only used if identifiability = "ica")
-
     Returns
     -------
 
@@ -336,7 +304,8 @@ are sorted)
 
     n_subjects, n_sessions = reduced_data_list.shape[:2]
     shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components)
+        reduced_data_list, None, n_components
+    )
 
     reduced_basis = [None] * n_subjects
     for _ in range(n_iter):
@@ -344,11 +313,6 @@ are sorted)
             cov = None
             for m in range(n_sessions):
                 data_nm = np.load(reduced_data_list[n, m])
-
-                # if we use ica identifiability data should
-                # be voxel-centered
-                if identifiability == "ica":
-                    check_voxel_centered(data_nm)
 
                 if cov is None:
                     cov = shared_response[m].T.dot(data_nm)
@@ -358,16 +322,8 @@ are sorted)
             reduced_basis[n] = _compute_subject_basis(cov)
 
         shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components)
-
-    if identifiability == "ica":
-        r = ica_find_rotation(reduced_basis, n_subjects_ica)
-        # r is the rotation such that r W_i.T = W_i*_T
-        return [s.dot(r.T) for s in shared_response]
-
-    if identifiability == "decorr":
-        r = decorr_find_rotation(np.concatenate(shared_response, axis=0))
-        return [s.dot(r.T) for s in shared_response]
+            reduced_data_list, reduced_basis, n_components
+        )
 
     return shared_response
 
@@ -454,18 +410,19 @@ shape [n_components, n_voxels].
 Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
     """
+
     def __init__(
-            self,
-            atlas=None,
-            n_components=20,
-            n_iter=100,
-            temp_dir=None,
-            low_ram=False,
-            n_jobs=1,
-            verbose="warn",
-            aggregate="mean",
-            identifiability="decorr",
-            n_subjects_ica=None,
+        self,
+        atlas=None,
+        n_components=20,
+        n_iter=100,
+        temp_dir=None,
+        low_ram=False,
+        n_jobs=1,
+        verbose="warn",
+        aggregate="mean",
+        identifiability="decorr",
+        n_subjects_ica=None,
     ):
 
         self.n_jobs = n_jobs
@@ -485,18 +442,21 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
         if temp_dir is None:
             if self.verbose == "warn" or self.verbose is True:
-                logger.warning("temp_dir has value None. "
-                               "All basis (spatial maps) and reconstructed "
-                               "data will therefore be kept in memory."
-                               "This can lead to memory errors when the "
-                               "number of subjects "
-                               "and/or sessions is large.")
+                logger.warning(
+                    "temp_dir has value None. "
+                    "All basis (spatial maps) and reconstructed "
+                    "data will therefore be kept in memory."
+                    "This can lead to memory errors when the "
+                    "number of subjects "
+                    "and/or sessions is large."
+                )
             self.temp_dir = None
             self.low_ram = False
 
         if temp_dir is not None:
-            self.temp_dir = os.path.join(temp_dir,
-                                         "fastsrm" + str(uuid.uuid4()))
+            self.temp_dir = os.path.join(
+                temp_dir, "fastsrm" + str(uuid.uuid4())
+            )
             self.low_ram = low_ram
 
     def clean(self):
@@ -542,39 +502,44 @@ at the object level.
         """
         atlas_shape = check_atlas(self.atlas, self.n_components)
         reshaped_input, imgs, shapes = check_imgs(
-            imgs, n_components=self.n_components, atlas_shape=atlas_shape)
+            imgs, n_components=self.n_components, atlas_shape=atlas_shape
+        )
         self.clean()
         create_temp_dir(self.temp_dir)
 
         if self.verbose is True:
             logger.info("[FastSRM.fit] Reducing data")
 
-        reduced_data = reduce_data(imgs,
-                                   atlas=self.atlas,
-                                   n_jobs=self.n_jobs,
-                                   low_ram=self.low_ram,
-                                   temp_dir=self.temp_dir)
+        reduced_data = reduce_data(
+            imgs,
+            atlas=self.atlas,
+            n_jobs=self.n_jobs,
+            low_ram=self.low_ram,
+            temp_dir=self.temp_dir,
+        )
 
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Finds shared "
-                        "response using reduced data")
+            logger.info(
+                "[FastSRM.fit] Finds shared " "response using reduced data"
+            )
         shared_response_list = fast_srm(
             reduced_data,
-            n_subjects_ica=self.n_subjects_ica,
-            identifiability=self.identifiability,
             n_iter=self.n_iter,
             n_components=self.n_components,
             low_ram=self.low_ram,
         )
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Finds basis using "
-                        "full data and shared response")
+            logger.info(
+                "[FastSRM.fit] Finds basis using "
+                "full data and shared response"
+            )
 
         if self.n_jobs == 1:
             basis = []
             for i, sessions in enumerate(imgs):
                 basis_i = _compute_basis_subject_online(
-                    sessions, shared_response_list)
+                    sessions, shared_response_list
+                )
                 if self.temp_dir is None:
                     basis.append(basis_i)
                 else:
@@ -586,17 +551,53 @@ at the object level.
             if self.temp_dir is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_basis_subject_online)(
-                        sessions, shared_response_list) for sessions in imgs)
+                        sessions, shared_response_list
+                    )
+                    for sessions in imgs
+                )
             else:
                 Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir)
-                    for j in range(len(imgs[0])) for i in range(len(imgs)))
+                        imgs[i][j], shared_response_list[j], self.temp_dir
+                    )
+                    for j in range(len(imgs[0]))
+                    for i in range(len(imgs))
+                )
 
                 basis = Parallel(n_jobs=self.n_jobs)(
-                    delayed(_compute_and_save_subject_basis)(i, sessions,
-                                                             self.temp_dir)
-                    for i, sessions in enumerate(imgs))
+                    delayed(_compute_and_save_subject_basis)(
+                        i, sessions, self.temp_dir
+                    )
+                    for i, sessions in enumerate(imgs)
+                )
+
+        if self.identfiability == "ica":
+            # check that data are voxel-centered
+            for i in range(len(imgs)):
+                for j in range(len(imgs[i])):
+                    check_voxel_centered(safe_load(imgs[i][j]))
+
+            # Compute rotation matrix and apply
+            r = ica_find_rotation(basis, n_subjects_ica=self.n_subjects_ica)
+            basis = Parallel(n_jobs=self.n_jobs)(
+                delayed(apply_rotation)(r, b) for b in basis
+            )
+
+        if self.identifiability == "decorr":
+            shared = _compute_shared_response_online(
+                imgs,
+                self.basis_list,
+                self.temp_dir,
+                self.n_jobs,
+                subjects_indexes,
+                aggregate,
+            )
+
+            r = decorr_find_rotation(shared)
+            basis = Parallel(n_jobs=self.n_jobs)(
+                delayed(apply_rotation)(r, b) for b in basis
+            )
+
 
         self.basis_list = basis
         return self
@@ -697,7 +698,8 @@ during session j in shared space.
             imgs,
             n_components=self.n_components,
             atlas_shape=atlas_shape,
-            ignore_nsubjects=True)
+            ignore_nsubjects=True,
+        )
         check_indexes(subjects_indexes, "subjects_indexes")
         if subjects_indexes is None:
             subjects_indexes = np.arange(len(imgs))
@@ -706,19 +708,27 @@ during session j in shared space.
 
         # Transform specific checks
         if len(subjects_indexes) < len(imgs):
-            raise ValueError("Input data imgs has len %i whereas "
-                             "subject_indexes has len %i. "
-                             "The number of basis used to compute "
-                             "the shared response should be equal "
-                             "to the number of subjects in imgs" %
-                             (len(imgs), len(subjects_indexes)))
+            raise ValueError(
+                "Input data imgs has len %i whereas "
+                "subject_indexes has len %i. "
+                "The number of basis used to compute "
+                "the shared response should be equal "
+                "to the number of subjects in imgs"
+                % (len(imgs), len(subjects_indexes))
+            )
 
-        assert_valid_index(subjects_indexes, len(self.basis_list),
-                           "subjects_indexes")
+        assert_valid_index(
+            subjects_indexes, len(self.basis_list), "subjects_indexes"
+        )
 
         shared_response = _compute_shared_response_online(
-            imgs, self.basis_list, self.temp_dir, self.n_jobs,
-            subjects_indexes, aggregate)
+            imgs,
+            self.basis_list,
+            self.temp_dir,
+            self.n_jobs,
+            subjects_indexes,
+            aggregate,
+        )
 
         # If shared response has only 1 session we need to reshape it
         if reshaped_input:
@@ -732,10 +742,7 @@ during session j in shared space.
         return shared_response
 
     def inverse_transform(
-            self,
-            shared_response,
-            subjects_indexes=None,
-            sessions_indexes=None,
+        self, shared_response, subjects_indexes=None, sessions_indexes=None,
     ):
         """From shared response and basis from training data
         reconstruct subject's data
@@ -778,7 +785,8 @@ subject_indexes[i] as an np array of shape n_voxels, n_timeframes
 
         """
         added_session, shared = check_shared_response(
-            shared_response, self.aggregate, n_components=self.n_components)
+            shared_response, self.aggregate, n_components=self.n_components
+        )
         n_subjects = len(self.basis_list)
         n_sessions = len(shared)
 
@@ -861,13 +869,15 @@ during session j in shared space.
             imgs,
             n_components=self.n_components,
             atlas_shape=atlas_shape,
-            ignore_nsubjects=True)
+            ignore_nsubjects=True,
+        )
 
         _, shared_response_list = check_shared_response(
             shared_response,
             n_components=self.n_components,
             aggregate=self.aggregate,
-            input_shapes=shapes)
+            input_shapes=shapes,
+        )
 
         # we need to transpose shared_response_list to be consistent with
         # other functions
@@ -879,12 +889,14 @@ during session j in shared space.
             basis = []
             for i, sessions in enumerate(imgs):
                 basis_i = _compute_basis_subject_online(
-                    sessions, shared_response_list)
+                    sessions, shared_response_list
+                )
                 if self.temp_dir is None:
                     basis.append(basis_i)
                 else:
                     path = os.path.join(
-                        self.temp_dir, "basis_%i" % (len(self.basis_list) + i))
+                        self.temp_dir, "basis_%i" % (len(self.basis_list) + i)
+                    )
                     np.save(path, basis_i)
                     basis.append(path + ".npy")
                 del basis_i
@@ -892,16 +904,24 @@ during session j in shared space.
             if self.temp_dir is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_basis_subject_online)(
-                        sessions, shared_response_list) for sessions in imgs)
+                        sessions, shared_response_list
+                    )
+                    for sessions in imgs
+                )
             else:
                 Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir)
-                    for j in range(len(imgs[0])) for i in range(len(imgs)))
+                        imgs[i][j], shared_response_list[j], self.temp_dir
+                    )
+                    for j in range(len(imgs[0]))
+                    for i in range(len(imgs))
+                )
 
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_subject_basis)(
-                        len(self.basis_list) + i, sessions, self.temp_dir)
-                    for i, sessions in enumerate(imgs))
+                        len(self.basis_list) + i, sessions, self.temp_dir
+                    )
+                    for i, sessions in enumerate(imgs)
+                )
 
         self.basis_list += basis
