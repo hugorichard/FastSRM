@@ -571,7 +571,7 @@ at the object level.
                     for i, sessions in enumerate(imgs)
                 )
 
-        if self.identfiability == "ica":
+        if self.identifiability == "ica":
             # check that data are voxel-centered
             for i in range(len(imgs)):
                 for j in range(len(imgs[i])):
