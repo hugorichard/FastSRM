@@ -586,7 +586,7 @@ at the object level.
         if self.identifiability == "decorr":
             shared = _compute_shared_response_online(
                 imgs,
-                self.basis_list,
+                basis,
                 self.temp_dir,
                 self.n_jobs,
                 subjects_indexes=None,

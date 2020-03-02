@@ -1324,8 +1324,17 @@ def _compute_shared_response_online(
         or element i, j is the shared response of subject i during session j
     """
 
+    print("bla")
+    print("subjects", len(imgs))
+    print("sessions", len(imgs[0]))
+    print("shape", imgs[0] [0].shape)
+
+    print("basis len", len(basis_list))
+
     if subjects_indexes is None:
         subjects_indexes = np.arange(len(imgs))
+
+    print(subjects_indexes)
 
     n_subjects = len(subjects_indexes)
     n_sessions = len(imgs[0])
