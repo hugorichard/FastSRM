@@ -381,3 +381,4 @@ def test_recover_decorr_basis():
     srm.basis_list = align_basis(srm.basis_list, W)
     for i in range(len(srm.basis_list)):
         assert_array_almost_equal(srm.basis_list[i], W[i], 2)
+

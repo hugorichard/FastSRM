@@ -589,8 +589,8 @@ at the object level.
                 self.basis_list,
                 self.temp_dir,
                 self.n_jobs,
-                subjects_indexes,
-                aggregate,
+                subjects_indexes=None,
+                aggregate="mean",
             )
 
             r = decorr_find_rotation(shared)

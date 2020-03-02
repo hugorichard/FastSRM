@@ -68,8 +68,9 @@ def assert_non_empty_list(input_list, list_name):
         Name of the list
     """
     if len(input_list) == 0:
-        raise ValueError("%s is a list of length 0 which is not valid" %
-                         list_name)
+        raise ValueError(
+            "%s is a list of length 0 which is not valid" % list_name
+        )
 
 
 def assert_array_2axis(array, name_array):
@@ -83,13 +84,16 @@ def assert_array_2axis(array, name_array):
     """
 
     if not isinstance(array, np.ndarray):
-        raise ValueError("%s should be of type "
-                         "np.ndarray but is of type %s" %
-                         (name_array, type(array)))
+        raise ValueError(
+            "%s should be of type "
+            "np.ndarray but is of type %s" % (name_array, type(array))
+        )
 
     if len(array.shape) != 2:
-        raise ValueError("%s must have exactly 2 axes "
-                         "but has %i axes" % (name_array, len(array.shape)))
+        raise ValueError(
+            "%s must have exactly 2 axes "
+            "but has %i axes" % (name_array, len(array.shape))
+        )
 
 
 def assert_valid_index(indexes, max_value, name_indexes):
@@ -99,9 +103,11 @@ def assert_valid_index(indexes, max_value, name_indexes):
     """
     for i, ind_i in enumerate(indexes):
         if ind_i < 0 or ind_i >= max_value:
-            raise ValueError("Index %i of %s has value %i "
-                             "whereas value should be between 0 and %i" %
-                             (i, name_indexes, ind_i, max_value - 1))
+            raise ValueError(
+                "Index %i of %s has value %i "
+                "whereas value should be between 0 and %i"
+                % (i, name_indexes, ind_i, max_value - 1)
+            )
 
 
 def _check_imgs_list(imgs):
@@ -119,10 +125,11 @@ def _check_imgs_list(imgs):
     # Check that all input have same type
     for i in range(len(imgs)):
         if not isinstance(imgs[i], type(imgs[0])):
-            raise ValueError("imgs[%i] has type %s whereas "
-                             "imgs[%i] has type %s. "
-                             "This is inconsistent." %
-                             (i, type(imgs[i]), 0, type(imgs[0])))
+            raise ValueError(
+                "imgs[%i] has type %s whereas "
+                "imgs[%i] has type %s. "
+                "This is inconsistent." % (i, type(imgs[i]), 0, type(imgs[0]))
+            )
 
 
 def _check_imgs_list_list(imgs):
@@ -157,10 +164,12 @@ def _check_imgs_list_list(imgs):
         if n_sessions is None:
             n_sessions = len(imgs[i])
         if n_sessions != len(imgs[i]):
-            raise ValueError("imgs[%i] has length %i whereas imgs[%i] "
-                             "has length %i. All subjects should have "
-                             "the same number of sessions." %
-                             (i, len(imgs[i]), 0, len(imgs[0])))
+            raise ValueError(
+                "imgs[%i] has length %i whereas imgs[%i] "
+                "has length %i. All subjects should have "
+                "the same number of sessions."
+                % (i, len(imgs[i]), 0, len(imgs[0]))
+            )
 
     shapes = np.zeros((n_subjects, n_sessions, 2))
     # Run array-level checks
@@ -236,11 +245,15 @@ def _check_imgs_array(imgs):
     shapes = np.zeros((n_subjects, n_sessions, 2))
     for i in range(n_subjects):
         for j in range(n_sessions):
-            if not (isinstance(imgs[i, j], str) or isinstance(
-                    imgs[i, j], np.str_) or isinstance(imgs[i, j], np.str)):
-                raise ValueError("imgs[%i, %i] is stored using "
-                                 "type %s which is not a str" %
-                                 (i, j, type(imgs[i, j])))
+            if not (
+                isinstance(imgs[i, j], str)
+                or isinstance(imgs[i, j], np.str_)
+                or isinstance(imgs[i, j], np.str)
+            ):
+                raise ValueError(
+                    "imgs[%i, %i] is stored using "
+                    "type %s which is not a str" % (i, j, type(imgs[i, j]))
+                )
             shapes[i, j, :] = get_shape(imgs[i, j])
     return shapes
 
@@ -249,29 +262,30 @@ def _check_shapes_components(n_components, n_timeframes):
     """Check that n_timeframes is greater than number of components"""
 
 
-def _check_shapes_atlas_compatibility(n_voxels,
-                                      n_timeframes,
-                                      n_components=None,
-                                      atlas_shape=None):
+def _check_shapes_atlas_compatibility(
+    n_voxels, n_timeframes, n_components=None, atlas_shape=None
+):
     if n_components is not None:
         if np.sum(n_timeframes) < n_components:
-            raise ValueError("Total number of timeframes is shorter than "
-                             "number of components (%i < %i)" %
-                             (np.sum(n_timeframes), n_components))
+            raise ValueError(
+                "Total number of timeframes is shorter than "
+                "number of components (%i < %i)"
+                % (np.sum(n_timeframes), n_components)
+            )
 
     if atlas_shape is not None:
         n_supervoxels, n_atlas_voxels = atlas_shape
         if n_atlas_voxels != n_voxels:
             raise ValueError(
                 "Number of voxels in the atlas is not the same "
-                "as the number of voxels in input data (%i != %i)" %
-                (n_atlas_voxels, n_voxels))
+                "as the number of voxels in input data (%i != %i)"
+                % (n_atlas_voxels, n_voxels)
+            )
 
 
-def _check_shapes(shapes,
-                  n_components=None,
-                  atlas_shape=None,
-                  ignore_nsubjects=False):
+def _check_shapes(
+    shapes, n_components=None, atlas_shape=None, ignore_nsubjects=False
+):
     """Check that number of voxels is the same for each subjects. Number of
     timeframes can vary between sessions but must be consistent across
     subjects
@@ -297,17 +311,22 @@ def _check_shapes(shapes,
                 n_voxels = shapes[m, n, 0]
 
             if n_timeframes_list[m] != shapes[n, m, 1]:
-                raise ValueError("Subject %i Session %i does not have the "
-                                 "same number of timeframes "
-                                 "as Subject %i Session %i" % (n, m, 0, m))
+                raise ValueError(
+                    "Subject %i Session %i does not have the "
+                    "same number of timeframes "
+                    "as Subject %i Session %i" % (n, m, 0, m)
+                )
 
             if n_voxels != shapes[n, m, 0]:
-                raise ValueError("Subject %i Session %i"
-                                 " does not have the same number of voxels as "
-                                 "Subject %i Session %i." % (n, m, 0, 0))
+                raise ValueError(
+                    "Subject %i Session %i"
+                    " does not have the same number of voxels as "
+                    "Subject %i Session %i." % (n, m, 0, 0)
+                )
 
-    _check_shapes_atlas_compatibility(n_voxels, np.sum(n_timeframes_list),
-                                      n_components, atlas_shape)
+    _check_shapes_atlas_compatibility(
+        n_voxels, np.sum(n_timeframes_list), n_components, atlas_shape
+    )
 
 
 def check_atlas(atlas, n_components=None):
@@ -335,11 +354,16 @@ def check_atlas(atlas, n_components=None):
     if atlas is None:
         return None
 
-    if not (isinstance(atlas, np.ndarray) or isinstance(atlas, str)
-            or isinstance(atlas, np.str_) or isinstance(atlas, np.str)):
-        raise ValueError("Atlas is stored using "
-                         "type %s which is neither np.ndarray or str" %
-                         type(atlas))
+    if not (
+        isinstance(atlas, np.ndarray)
+        or isinstance(atlas, str)
+        or isinstance(atlas, np.str_)
+        or isinstance(atlas, np.str)
+    ):
+        raise ValueError(
+            "Atlas is stored using "
+            "type %s which is neither np.ndarray or str" % type(atlas)
+        )
 
     if isinstance(atlas, np.ndarray):
         shape = atlas.shape
@@ -354,28 +378,30 @@ def check_atlas(atlas, n_components=None):
         shape = (n_supervoxels, n_voxels)
     elif len(shape) != 2:
         raise ValueError(
-            "Atlas has %i axes. It should have either 1 or 2 axes." %
-            len(shape))
+            "Atlas has %i axes. It should have either 1 or 2 axes." % len(shape)
+        )
 
     n_supervoxels, n_voxels = shape
 
     if n_supervoxels > n_voxels:
-        raise ValueError("Number of regions in the atlas is bigger than "
-                         "the number of voxels (%i > %i)" %
-                         (n_supervoxels, n_voxels))
+        raise ValueError(
+            "Number of regions in the atlas is bigger than "
+            "the number of voxels (%i > %i)" % (n_supervoxels, n_voxels)
+        )
 
     if n_components is not None:
         if n_supervoxels < n_components:
-            raise ValueError("Number of regions in the atlas is "
-                             "lower than the number of components "
-                             "(%i < %i)" % (n_supervoxels, n_components))
+            raise ValueError(
+                "Number of regions in the atlas is "
+                "lower than the number of components "
+                "(%i < %i)" % (n_supervoxels, n_components)
+            )
     return shape
 
 
-def check_imgs(imgs,
-               n_components=None,
-               atlas_shape=None,
-               ignore_nsubjects=False):
+def check_imgs(
+    imgs, n_components=None, atlas_shape=None, ignore_nsubjects=False
+):
     """
     Check input images
 
@@ -423,14 +449,16 @@ def check_imgs(imgs,
         else:
             raise ValueError(
                 "Since imgs is a list, it should be a list of list "
-                "of arrays or a list of arrays but imgs[0] has type %s" %
-                type(imgs[0]))
+                "of arrays or a list of arrays but imgs[0] has type %s"
+                % type(imgs[0])
+            )
     elif isinstance(imgs, np.ndarray):
         shapes = _check_imgs_array(imgs)
     else:
         raise ValueError(
-            "Input imgs should either be a list or an array but has type %s" %
-            type(imgs))
+            "Input imgs should either be a list or an array but has type %s"
+            % type(imgs)
+        )
 
     _check_shapes(shapes, n_components, atlas_shape, ignore_nsubjects)
 
@@ -438,24 +466,31 @@ def check_imgs(imgs,
 
 
 def check_indexes(indexes, name):
-    if not (indexes is None or isinstance(indexes, list)
-            or isinstance(indexes, np.ndarray)):
+    if not (
+        indexes is None
+        or isinstance(indexes, list)
+        or isinstance(indexes, np.ndarray)
+    ):
         raise ValueError(
             "%s should be either a list, an array or None but received type %s"
-            % (name, type(indexes)))
+            % (name, type(indexes))
+        )
 
 
-def _check_shared_response_list_of_list(shared_response, n_components,
-                                        input_shapes):
+def _check_shared_response_list_of_list(
+    shared_response, n_components, input_shapes
+):
 
     # Check that shared_response is indeed a list of list of arrays
     n_subjects = len(shared_response)
     n_sessions = None
     for i in range(len(shared_response)):
         if not isinstance(shared_response[i], list):
-            raise ValueError("shared_response[0] is a list but "
-                             "shared_response[%i] is not a list "
-                             "this is incompatible." % i)
+            raise ValueError(
+                "shared_response[0] is a list but "
+                "shared_response[%i] is not a list "
+                "this is incompatible." % i
+            )
         assert_non_empty_list(shared_response[i], "shared_response[%i]" % i)
         if n_sessions is None:
             n_sessions = len(shared_response[i])
@@ -463,20 +498,27 @@ def _check_shared_response_list_of_list(shared_response, n_components,
             raise ValueError(
                 "shared_response[%i] has len %i whereas "
                 "shared_response[0] has len %i. They should "
-                "have same length" %
-                (i, len(shared_response[i]), len(shared_response[0])))
+                "have same length"
+                % (i, len(shared_response[i]), len(shared_response[0]))
+            )
         for j in range(len(shared_response[i])):
-            assert_array_2axis(shared_response[i][j],
-                               "shared_response[%i][%i]" % (i, j))
+            assert_array_2axis(
+                shared_response[i][j], "shared_response[%i][%i]" % (i, j)
+            )
 
-    return _check_shared_response_list_sessions([
-        np.mean([shared_response[i][j] for i in range(n_subjects)], axis=0)
-        for j in range(n_sessions)
-    ], n_components, input_shapes)
+    return _check_shared_response_list_sessions(
+        [
+            np.mean([shared_response[i][j] for i in range(n_subjects)], axis=0)
+            for j in range(n_sessions)
+        ],
+        n_components,
+        input_shapes,
+    )
 
 
-def _check_shared_response_list_sessions(shared_response, n_components,
-                                         input_shapes):
+def _check_shared_response_list_sessions(
+    shared_response, n_components, input_shapes
+):
     for j in range(len(shared_response)):
         assert_array_2axis(shared_response[j], "shared_response[%i]" % j)
         if input_shapes is not None:
@@ -485,26 +527,30 @@ def _check_shared_response_list_sessions(shared_response, n_components,
                     "Number of timeframes in input images during "
                     "session %i does not match the number of "
                     "timeframes during session %i "
-                    "of shared_response (%i != %i)" %
-                    (j, j, shared_response[j].shape[1], input_shapes[0, j, 1]))
+                    "of shared_response (%i != %i)"
+                    % (j, j, shared_response[j].shape[1], input_shapes[0, j, 1])
+                )
         if n_components is not None:
             if shared_response[j].shape[0] != n_components:
                 raise ValueError(
                     "Number of components in "
                     "shared_response during session %i is "
                     "different than "
-                    "the number of components of the model (%i != %i)" %
-                    (j, shared_response[j].shape[0], n_components))
+                    "the number of components of the model (%i != %i)"
+                    % (j, shared_response[j].shape[0], n_components)
+                )
     return shared_response
 
 
-def _check_shared_response_list_subjects(shared_response, n_components,
-                                         input_shapes):
+def _check_shared_response_list_subjects(
+    shared_response, n_components, input_shapes
+):
     for i in range(len(shared_response)):
         assert_array_2axis(shared_response[i], "shared_response[%i]" % i)
 
-    return _check_shared_response_array(np.mean(shared_response, axis=0),
-                                        n_components, input_shapes)
+    return _check_shared_response_array(
+        np.mean(shared_response, axis=0), n_components, input_shapes
+    )
 
 
 def _check_shared_response_array(shared_response, n_components, input_shapes):
@@ -516,14 +562,14 @@ def _check_shared_response_array(shared_response, n_components, input_shapes):
         new_input_shapes = np.zeros((n_subjects, 1, 2))
         new_input_shapes[:, 0, 0] = input_shapes[:, 0, 0]
         new_input_shapes[:, 0, 1] = np.sum(input_shapes[:, :, 1], axis=1)
-    return _check_shared_response_list_sessions([shared_response],
-                                                n_components, new_input_shapes)
+    return _check_shared_response_list_sessions(
+        [shared_response], n_components, new_input_shapes
+    )
 
 
-def check_shared_response(shared_response,
-                          aggregate="mean",
-                          n_components=None,
-                          input_shapes=None):
+def check_shared_response(
+    shared_response, aggregate="mean", n_components=None, input_shapes=None
+):
     """
     Check that shared response has valid input and turn it into
     a session-wise shared response
@@ -541,29 +587,50 @@ def check_shared_response(shared_response,
         assert_non_empty_list(shared_response, "shared_response")
         if isinstance(shared_response[0], list):
             if aggregate == "mean":
-                raise ValueError("self.aggregate has value 'mean' but "
-                                 "shared response is a list of list. This is "
-                                 "incompatible")
-            return False, _check_shared_response_list_of_list(
-                shared_response, n_components, input_shapes)
+                raise ValueError(
+                    "self.aggregate has value 'mean' but "
+                    "shared response is a list of list. This is "
+                    "incompatible"
+                )
+            return (
+                False,
+                _check_shared_response_list_of_list(
+                    shared_response, n_components, input_shapes
+                ),
+            )
         elif isinstance(shared_response[0], np.ndarray):
             if aggregate == "mean":
-                return False, _check_shared_response_list_sessions(
-                    shared_response, n_components, input_shapes)
+                return (
+                    False,
+                    _check_shared_response_list_sessions(
+                        shared_response, n_components, input_shapes
+                    ),
+                )
             else:
-                return True, _check_shared_response_list_subjects(
-                    shared_response, n_components, input_shapes)
+                return (
+                    True,
+                    _check_shared_response_list_subjects(
+                        shared_response, n_components, input_shapes
+                    ),
+                )
         else:
-            raise ValueError("shared_response is a list but "
-                             "shared_response[0] is neither a list "
-                             "or an array. This is invalid.")
+            raise ValueError(
+                "shared_response is a list but "
+                "shared_response[0] is neither a list "
+                "or an array. This is invalid."
+            )
     elif isinstance(shared_response, np.ndarray):
-        return True, _check_shared_response_array(shared_response,
-                                                  n_components, input_shapes)
+        return (
+            True,
+            _check_shared_response_array(
+                shared_response, n_components, input_shapes
+            ),
+        )
     else:
-        raise ValueError("shared_response should be either "
-                         "a list or an array but is of type %s" %
-                         type(shared_response))
+        raise ValueError(
+            "shared_response should be either "
+            "a list or an array but is of type %s" % type(shared_response)
+        )
 
 
 def create_temp_dir(temp_dir):
@@ -576,18 +643,22 @@ def create_temp_dir(temp_dir):
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
     else:
-        raise ValueError("Path %s already exists. "
-                         "When a model is used, filesystem should be cleaned "
-                         "by using the .clean() method" % temp_dir)
+        raise ValueError(
+            "Path %s already exists. "
+            "When a model is used, filesystem should be cleaned "
+            "by using the .clean() method" % temp_dir
+        )
 
 
-def reduce_data_single(subject_index,
-                       session_index,
-                       img,
-                       atlas=None,
-                       inv_atlas=None,
-                       low_ram=False,
-                       temp_dir=None):
+def reduce_data_single(
+    subject_index,
+    session_index,
+    img,
+    atlas=None,
+    inv_atlas=None,
+    low_ram=False,
+    temp_dir=None,
+):
     """Reduce data using given atlas
 
     Parameters
@@ -638,12 +709,16 @@ def reduce_data_single(subject_index,
     n_timeframes, n_voxels = data.shape
 
     # Here we check that input is normalized
-    if (np.max(np.abs(np.mean(data, axis=0))) > 1e-6
-            or np.max(np.abs(np.var(data, axis=0) - 1))) > 1e-6:
-        ValueError("Data in imgs[%i, %i] does not have 0 mean and unit \
+    if (
+        np.max(np.abs(np.mean(data, axis=0))) > 1e-6
+        or np.max(np.abs(np.var(data, axis=0) - 1))
+    ) > 1e-6:
+        ValueError(
+            "Data in imgs[%i, %i] does not have 0 mean and unit \
         variance. If you are using NiftiMasker to mask your data \
-        (nilearn) please use standardize=True." %
-                   (subject_index, session_index))
+        (nilearn) please use standardize=True."
+            % (subject_index, session_index)
+        )
 
     if inv_atlas is None and atlas is not None:
         atlas_values = np.unique(atlas)
@@ -651,7 +726,8 @@ def reduce_data_single(subject_index,
             atlas_values = atlas_values[1:]
 
         reduced_data = np.array(
-            [np.mean(data[:, atlas == c], axis=1) for c in atlas_values]).T
+            [np.mean(data[:, atlas == c], axis=1) for c in atlas_values]
+        ).T
     elif inv_atlas is not None and atlas is None:
         # this means that it is a probabilistic atlas
         reduced_data = data.dot(inv_atlas)
@@ -736,7 +812,8 @@ def reduce_data(imgs, atlas, n_jobs=1, low_ram=False, temp_dir=None):
         if len(loaded_atlas.shape) == 2:
             A = None
             A_inv = loaded_atlas.T.dot(
-                np.linalg.inv(loaded_atlas.dot(loaded_atlas.T)))
+                np.linalg.inv(loaded_atlas.dot(loaded_atlas.T))
+            )
         else:
             A = loaded_atlas
             A_inv = None
@@ -745,34 +822,41 @@ def reduce_data(imgs, atlas, n_jobs=1, low_ram=False, temp_dir=None):
     n_sessions = len(imgs[0])
 
     reduced_data_list = Parallel(n_jobs=n_jobs)(
-        delayed(reduce_data_single)(i,
-                                    j,
-                                    imgs[i][j],
-                                    atlas=A,
-                                    inv_atlas=A_inv,
-                                    low_ram=low_ram,
-                                    temp_dir=temp_dir)
-        for i in range(n_subjects) for j in range(n_sessions))
+        delayed(reduce_data_single)(
+            i,
+            j,
+            imgs[i][j],
+            atlas=A,
+            inv_atlas=A_inv,
+            low_ram=low_ram,
+            temp_dir=temp_dir,
+        )
+        for i in range(n_subjects)
+        for j in range(n_sessions)
+    )
 
     if low_ram:
-        reduced_data_list = np.reshape(reduced_data_list,
-                                       (n_subjects, n_sessions))
+        reduced_data_list = np.reshape(
+            reduced_data_list, (n_subjects, n_sessions)
+        )
     else:
         if len(np.array(reduced_data_list).shape) == 1:
-            reduced_data_list = np.reshape(reduced_data_list,
-                                           (n_subjects, n_sessions))
+            reduced_data_list = np.reshape(
+                reduced_data_list, (n_subjects, n_sessions)
+            )
         else:
             n_timeframes, n_supervoxels = np.array(reduced_data_list).shape[1:]
             reduced_data_list = np.reshape(
                 reduced_data_list,
-                (n_subjects, n_sessions, n_timeframes, n_supervoxels))
+                (n_subjects, n_sessions, n_timeframes, n_supervoxels),
+            )
 
     return reduced_data_list
 
 
-def _reduced_space_compute_shared_response(reduced_data_list,
-                                           reduced_basis_list,
-                                           n_components=50):
+def _reduced_space_compute_shared_response(
+    reduced_data_list, reduced_basis_list, n_components=50
+):
     """Compute shared response with basis fixed in reduced space
 
     Parameters
@@ -930,10 +1014,7 @@ def _compute_subject_basis(corr_mat):
 
 
 def fast_srm(
-        reduced_data_list,
-        n_iter=10,
-        n_components=None,
-        low_ram=False,
+    reduced_data_list, n_iter=10, n_components=None, low_ram=False,
 ):
     """Computes shared response and basis in reduced space
 
@@ -1009,7 +1090,8 @@ or list of arrays
     n_subjects = len(reduced_data_list)
     n_sessions = len(reduced_data_list[0])
     shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components)
+        reduced_data_list, None, n_components
+    )
 
     reduced_basis = [None] * n_subjects
     for _ in range(n_iter):
@@ -1024,7 +1106,8 @@ or list of arrays
             reduced_basis[n] = _compute_subject_basis(cov)
 
         shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components)
+            reduced_data_list, reduced_basis, n_components
+        )
 
     return shared_response
 
@@ -1061,7 +1144,8 @@ def lowram_srm(reduced_data_list, n_iter=10, n_components=None):
 
     n_subjects, n_sessions = reduced_data_list.shape[:2]
     shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components)
+        reduced_data_list, None, n_components
+    )
 
     reduced_basis = [None] * n_subjects
     for _ in range(n_iter):
@@ -1076,7 +1160,8 @@ def lowram_srm(reduced_data_list, n_iter=10, n_components=None):
             reduced_basis[n] = _compute_subject_basis(cov)
 
         shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components)
+            reduced_data_list, reduced_basis, n_components
+        )
 
     return shared_response
 
@@ -1120,8 +1205,9 @@ def _compute_basis_subject_online(sessions, shared_response_list):
     return _compute_subject_basis(basis_i)
 
 
-def _compute_shared_response_online_single(subjects, basis_list, temp_dir,
-                                           subjects_indexes, aggregate):
+def _compute_shared_response_online_single(
+    subjects, basis_list, temp_dir, subjects_indexes, aggregate
+):
     """Computes shared response during one session with basis fixed
 
     Parameters
@@ -1189,8 +1275,9 @@ def _compute_shared_response_online_single(subjects, basis_list, temp_dir,
         return shared_response / float(n)
 
 
-def _compute_shared_response_online(imgs, basis_list, temp_dir, n_jobs,
-                                    subjects_indexes, aggregate):
+def _compute_shared_response_online(
+    imgs, basis_list, temp_dir, n_jobs, subjects_indexes, aggregate
+):
     """Computes shared response with basis fixed
 
     Parameters
@@ -1237,18 +1324,28 @@ def _compute_shared_response_online(imgs, basis_list, temp_dir, n_jobs,
         or element i, j is the shared response of subject i during session j
     """
 
+    if subjects_indexes is None:
+        subjects_indexes = np.arange(len(imgs))
+
     n_subjects = len(subjects_indexes)
     n_sessions = len(imgs[0])
 
     shared_response_list = Parallel(n_jobs=n_jobs)(
-        delayed(_compute_shared_response_online_single)
-        ([imgs[i][j] for i in range(n_subjects)], basis_list, temp_dir,
-         subjects_indexes, aggregate) for j in range(n_sessions))
+        delayed(_compute_shared_response_online_single)(
+            [imgs[i][j] for i in range(n_subjects)],
+            basis_list,
+            temp_dir,
+            subjects_indexes,
+            aggregate,
+        )
+        for j in range(n_sessions)
+    )
 
     if aggregate is None:
-        shared_response_list = [[
-            shared_response_list[j][i].T for j in range(n_sessions)
-        ] for i in range(n_subjects)]
+        shared_response_list = [
+            [shared_response_list[j][i].T for j in range(n_sessions)]
+            for i in range(n_subjects)
+        ]
 
     if aggregate == "mean":
         shared_response_list = [
@@ -1330,15 +1427,18 @@ shape [n_components, n_voxels].
 Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
     """
-    def __init__(self,
-                 atlas=None,
-                 n_components=20,
-                 n_iter=100,
-                 temp_dir=None,
-                 low_ram=False,
-                 n_jobs=1,
-                 verbose="warn",
-                 aggregate="mean"):
+
+    def __init__(
+        self,
+        atlas=None,
+        n_components=20,
+        n_iter=100,
+        temp_dir=None,
+        low_ram=False,
+        n_jobs=1,
+        verbose="warn",
+        aggregate="mean",
+    ):
 
         self.n_jobs = n_jobs
         self.verbose = verbose
@@ -1355,18 +1455,21 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
         if temp_dir is None:
             if self.verbose == "warn" or self.verbose is True:
-                logger.warning("temp_dir has value None. "
-                               "All basis (spatial maps) and reconstructed "
-                               "data will therefore be kept in memory."
-                               "This can lead to memory errors when the "
-                               "number of subjects "
-                               "and/or sessions is large.")
+                logger.warning(
+                    "temp_dir has value None. "
+                    "All basis (spatial maps) and reconstructed "
+                    "data will therefore be kept in memory."
+                    "This can lead to memory errors when the "
+                    "number of subjects "
+                    "and/or sessions is large."
+                )
             self.temp_dir = None
             self.low_ram = False
 
         if temp_dir is not None:
-            self.temp_dir = os.path.join(temp_dir,
-                                         "fastsrm" + str(uuid.uuid4()))
+            self.temp_dir = os.path.join(
+                temp_dir, "fastsrm" + str(uuid.uuid4())
+            )
             self.low_ram = low_ram
 
     def clean(self):
@@ -1412,22 +1515,26 @@ at the object level.
         """
         atlas_shape = check_atlas(self.atlas, self.n_components)
         reshaped_input, imgs, shapes = check_imgs(
-            imgs, n_components=self.n_components, atlas_shape=atlas_shape)
+            imgs, n_components=self.n_components, atlas_shape=atlas_shape
+        )
         self.clean()
         create_temp_dir(self.temp_dir)
 
         if self.verbose is True:
             logger.info("[FastSRM.fit] Reducing data")
 
-        reduced_data = reduce_data(imgs,
-                                   atlas=self.atlas,
-                                   n_jobs=self.n_jobs,
-                                   low_ram=self.low_ram,
-                                   temp_dir=self.temp_dir)
+        reduced_data = reduce_data(
+            imgs,
+            atlas=self.atlas,
+            n_jobs=self.n_jobs,
+            low_ram=self.low_ram,
+            temp_dir=self.temp_dir,
+        )
 
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Finds shared "
-                        "response using reduced data")
+            logger.info(
+                "[FastSRM.fit] Finds shared " "response using reduced data"
+            )
 
         shared_response_list = fast_srm(
             reduced_data,
@@ -1437,14 +1544,17 @@ at the object level.
         )
 
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Finds basis using "
-                        "full data and shared response")
+            logger.info(
+                "[FastSRM.fit] Finds basis using "
+                "full data and shared response"
+            )
 
         if self.n_jobs == 1:
             basis = []
             for i, sessions in enumerate(imgs):
                 basis_i = _compute_basis_subject_online(
-                    sessions, shared_response_list)
+                    sessions, shared_response_list
+                )
                 if self.temp_dir is None:
                     basis.append(basis_i)
                 else:
@@ -1456,17 +1566,25 @@ at the object level.
             if self.temp_dir is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_basis_subject_online)(
-                        sessions, shared_response_list) for sessions in imgs)
+                        sessions, shared_response_list
+                    )
+                    for sessions in imgs
+                )
             else:
                 Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir)
-                    for j in range(len(imgs[0])) for i in range(len(imgs)))
+                        imgs[i][j], shared_response_list[j], self.temp_dir
+                    )
+                    for j in range(len(imgs[0]))
+                    for i in range(len(imgs))
+                )
 
                 basis = Parallel(n_jobs=self.n_jobs)(
-                    delayed(_compute_and_save_subject_basis)(i, sessions,
-                                                             self.temp_dir)
-                    for i, sessions in enumerate(imgs))
+                    delayed(_compute_and_save_subject_basis)(
+                        i, sessions, self.temp_dir
+                    )
+                    for i, sessions in enumerate(imgs)
+                )
 
         self.basis_list = basis
         return self
@@ -1567,7 +1685,8 @@ during session j in shared space.
             imgs,
             n_components=self.n_components,
             atlas_shape=atlas_shape,
-            ignore_nsubjects=True)
+            ignore_nsubjects=True,
+        )
         check_indexes(subjects_indexes, "subjects_indexes")
         if subjects_indexes is None:
             subjects_indexes = np.arange(len(imgs))
@@ -1576,19 +1695,27 @@ during session j in shared space.
 
         # Transform specific checks
         if len(subjects_indexes) < len(imgs):
-            raise ValueError("Input data imgs has len %i whereas "
-                             "subject_indexes has len %i. "
-                             "The number of basis used to compute "
-                             "the shared response should be equal "
-                             "to the number of subjects in imgs" %
-                             (len(imgs), len(subjects_indexes)))
+            raise ValueError(
+                "Input data imgs has len %i whereas "
+                "subject_indexes has len %i. "
+                "The number of basis used to compute "
+                "the shared response should be equal "
+                "to the number of subjects in imgs"
+                % (len(imgs), len(subjects_indexes))
+            )
 
-        assert_valid_index(subjects_indexes, len(self.basis_list),
-                           "subjects_indexes")
+        assert_valid_index(
+            subjects_indexes, len(self.basis_list), "subjects_indexes"
+        )
 
         shared_response = _compute_shared_response_online(
-            imgs, self.basis_list, self.temp_dir, self.n_jobs,
-            subjects_indexes, aggregate)
+            imgs,
+            self.basis_list,
+            self.temp_dir,
+            self.n_jobs,
+            subjects_indexes,
+            aggregate,
+        )
 
         # If shared response has only 1 session we need to reshape it
         if reshaped_input:
@@ -1602,10 +1729,7 @@ during session j in shared space.
         return shared_response
 
     def inverse_transform(
-            self,
-            shared_response,
-            subjects_indexes=None,
-            sessions_indexes=None,
+        self, shared_response, subjects_indexes=None, sessions_indexes=None,
     ):
         """From shared response and basis from training data
         reconstruct subject's data
@@ -1648,7 +1772,8 @@ subject_indexes[i] as an np array of shape n_voxels, n_timeframes
 
         """
         added_session, shared = check_shared_response(
-            shared_response, self.aggregate, n_components=self.n_components)
+            shared_response, self.aggregate, n_components=self.n_components
+        )
         n_subjects = len(self.basis_list)
         n_sessions = len(shared)
 
@@ -1731,13 +1856,15 @@ during session j in shared space.
             imgs,
             n_components=self.n_components,
             atlas_shape=atlas_shape,
-            ignore_nsubjects=True)
+            ignore_nsubjects=True,
+        )
 
         _, shared_response_list = check_shared_response(
             shared_response,
             n_components=self.n_components,
             aggregate=self.aggregate,
-            input_shapes=shapes)
+            input_shapes=shapes,
+        )
 
         # we need to transpose shared_response_list to be consistent with
         # other functions
@@ -1749,12 +1876,14 @@ during session j in shared space.
             basis = []
             for i, sessions in enumerate(imgs):
                 basis_i = _compute_basis_subject_online(
-                    sessions, shared_response_list)
+                    sessions, shared_response_list
+                )
                 if self.temp_dir is None:
                     basis.append(basis_i)
                 else:
                     path = os.path.join(
-                        self.temp_dir, "basis_%i" % (len(self.basis_list) + i))
+                        self.temp_dir, "basis_%i" % (len(self.basis_list) + i)
+                    )
                     np.save(path, basis_i)
                     basis.append(path + ".npy")
                 del basis_i
@@ -1762,16 +1891,24 @@ during session j in shared space.
             if self.temp_dir is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_basis_subject_online)(
-                        sessions, shared_response_list) for sessions in imgs)
+                        sessions, shared_response_list
+                    )
+                    for sessions in imgs
+                )
             else:
                 Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir)
-                    for j in range(len(imgs[0])) for i in range(len(imgs)))
+                        imgs[i][j], shared_response_list[j], self.temp_dir
+                    )
+                    for j in range(len(imgs[0]))
+                    for i in range(len(imgs))
+                )
 
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_subject_basis)(
-                        len(self.basis_list) + i, sessions, self.temp_dir)
-                    for i, sessions in enumerate(imgs))
+                        len(self.basis_list) + i, sessions, self.temp_dir
+                    )
+                    for i, sessions in enumerate(imgs)
+                )
 
         self.basis_list += basis
