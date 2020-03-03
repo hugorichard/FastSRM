@@ -14,7 +14,7 @@ import os
 import uuid
 
 import numpy as np
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, Memory
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
@@ -155,7 +155,7 @@ def ica_find_rotation(basis, n_subjects_ica):
         )
 
     used_basis = np.concatenate(
-            [safe_load(basis[i]) for i in index], axis=1
+        [safe_load(basis[i]) for i in index], axis=1
     ) / np.sqrt(n_subjects_ica)
 
     used_basis = used_basis.T
@@ -616,7 +616,6 @@ at the object level.
                 delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
             )
 
-
         self.basis_list = basis
         return self
 
@@ -943,3 +942,66 @@ during session j in shared space.
                 )
 
         self.basis_list += basis
+
+
+def do_srm(
+    imgs,
+    atlas=None,
+    n_components=20,
+    n_iter=100,
+    temp_dir=None,
+    low_ram=False,
+    n_jobs=1,
+    verbose="warn",
+    aggregate="mean",
+    identifiability="decorr",
+    n_subjects_ica=None,
+    memory=None,
+):
+    """
+    Performs srm.fit_transform(imgs) using caching
+    """
+    mem = Memory(memory)
+
+    @mem.cache
+    def fit_transform(
+        imgs,
+        atlas,
+        n_components,
+        n_iter,
+        temp_dir,
+        low_ram,
+        n_jobs,
+        verbose,
+        aggregate,
+        identifiability,
+        n_subjects_ica,
+    ):
+        srm = IdentifiableFastSRM(
+            imgs,
+            atlas=atlas,
+            n_components=n_components,
+            n_iter=n_iter,
+            temp_dir=temp_dir,
+            low_ram=low_ram,
+            n_jobs=n_jobs,
+            verbose=verbose,
+            aggregate=aggregate,
+            identifiability=identifiability,
+            n_subjects_ica=n_subjects_ica,
+        )
+        return srm.fit_transform(imgs)
+
+    return fit_transform(
+        imgs,
+        atlas,
+        n_components,
+        n_iter,
+        temp_dir,
+        low_ram,
+        n_jobs,
+        verbose,
+        aggregate,
+        identifiability,
+        n_subjects_ica,
+    )
