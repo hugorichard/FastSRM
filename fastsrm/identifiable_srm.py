@@ -35,6 +35,7 @@ from fastsrm.fastsrm import (
     safe_load,
 )
 from sklearn.decomposition import FastICA
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,15 @@ def decorr_find_rotation(shared_response):
 
 
 def fast_srm(
-    reduced_data_list, n_iter=10, n_components=None, low_ram=False,
+    reduced_data_list,
+    n_iter,
+    n_components,
+    save_basis,
+    tol,
+    verbose,
+    temp_dir,
+    init,
+    transpose=False,
 ):
     """Computes shared response and basis in reduced space
 
@@ -214,133 +223,70 @@ def fast_srm(
      shape=[n_timeframes, n_components]
         shared response, element i is the shared response during session i
     """
-    if low_ram:
-        return lowram_srm(reduced_data_list, n_iter, n_components)
-    else:
-        return det_srm(reduced_data_list, n_iter, n_components,)
-
-
-def det_srm(
-    reduced_data_list, n_iter=10, n_components=None,
-):
-    """Computes shared response and basis in reduced space
-
-    Parameters
-    ----------
-
-    reduced_data_list : array, \
-shape=[n_subjects, n_sessions, n_timeframes, n_supervoxels] \
-or list of arrays
-        Element i, j of the array is a path to the data of subject i
-        collected during session j.
-        Data are loaded with numpy.load and expected
-        shape is [n_timeframes, n_supervoxels]
-        or Element i, j of the array is the data in array of
-        shape=[n_timeframes, n_supervoxels]
-        n_timeframes and n_supervoxels are
-         assumed to be the same across subjects
-        n_timeframes can vary across sessions
-        Each voxel's timecourse is assumed to have mean 0 and variance 1
-
-    n_iter : int
-        Number of iterations performed
-
-    n_components : int or None
-        number of components
-
-    Returns
-    -------
-
-    shared_response_list : list of array, element i has
-     shape=[n_timeframes, n_components]
-        shared response, element i is the shared response during session i
-    """
+    # TODO: Remove low_ram mode and det_srm and have only one function that does everything
+    # This is quite easy
+    # - Just load data with safe_load
+    # - Save basis in temp_dir if low_ram mode is True
+    # - Otherwise just keep basis where they are
+    # - Shared responses can be kept in memory
 
     n_subjects = len(reduced_data_list)
     n_sessions = len(reduced_data_list[0])
-    shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components
-    )
+
+    if init is None:
+        shared_response = _reduced_space_compute_shared_response(
+            reduced_data_list, None, n_components, transpose
+        )
+    else:
+        shared_response = init
 
     reduced_basis = [None] * n_subjects
-
-    past_shared = None
-
     for iteration in range(n_iter):
         for n in range(n_subjects):
             cov = None
             for m in range(n_sessions):
-                data_nm = reduced_data_list[n, m]
-
-                if cov is None:
-                    cov = shared_response[m].T.dot(data_nm)
+                if transpose:
+                    data_nm = safe_load(reduced_data_list[n][m]).T
                 else:
-                    cov += shared_response[m].T.dot(data_nm)
-            reduced_basis[n] = _compute_subject_basis(cov)
-
-        shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components
-        )
-
-    return shared_response
-
-
-def lowram_srm(
-    reduced_data_list, n_iter=10, n_components=None,
-):
-    """Computes shared response and basis in reduced space
-
-    Parameters
-    ----------
-
-    reduced_data_list : array of str, shape=[n_subjects, n_sessions]
-        Element i, j of the array is a path to the data of subject i
-        collected during session j.
-        Data are loaded with numpy.load and expected
-        shape is [n_timeframes, n_supervoxels]
-        n_timeframes and n_supervoxels are
-         assumed to be the same across subjects
-        n_timeframes can vary across sessions
-        Each voxel's timecourse is assumed to have mean 0 and variance 1
-
-    n_iter : int
-        Number of iterations performed
-
-    n_components : int or None
-        number of components
-
-    Returns
-    -------
-
-    shared_response_list : list of array, element i has
-     shape=[n_timeframes, n_components]
-        shared response, element i is the shared response during session i
-    """
-
-    n_subjects, n_sessions = reduced_data_list.shape[:2]
-    shared_response = _reduced_space_compute_shared_response(
-        reduced_data_list, None, n_components
-    )
-
-    reduced_basis = [None] * n_subjects
-    for _ in range(n_iter):
-        for n in range(n_subjects):
-            cov = None
-            for m in range(n_sessions):
-                data_nm = np.load(reduced_data_list[n, m])
+                    data_nm = safe_load(reduced_data_list[n][m])
 
                 if cov is None:
                     cov = shared_response[m].T.dot(data_nm)
                 else:
                     cov += shared_response[m].T.dot(data_nm)
 
-            reduced_basis[n] = _compute_subject_basis(cov)
+            if save_basis and temp_dir is not None:
+                path = os.path.join(temp_dir, "basis_%i" % n)
+                np.save(path, _compute_subject_basis(cov))
+                reduced_basis[n] = path + ".npy"
+            else:
+                reduced_basis[n] = _compute_subject_basis(cov)
 
-        shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, reduced_basis, n_components
+        shared_response_new = _reduced_space_compute_shared_response(
+            reduced_data_list, reduced_basis, n_components, transpose
         )
 
-    return shared_response
+        grad_norm = np.sum(
+            [
+                np.linalg.norm(shared_response[j] - shared_response_new[j])
+                for j in range(n_sessions)
+            ]
+        )
+        shared_response = shared_response_new
+
+        if verbose:
+            print("iteration: %i grad_norm: %f" % (iteration, grad_norm))
+
+        if grad_norm < tol:
+            break
+
+    if grad_norm > tol:
+        warnings.warn(
+            "Convergence warning: ISRM did not converge. You should increase "
+            "the number of iterations. Gradient norm is %f" % grad_norm
+        )
+
+    return reduced_basis, shared_response
 
 
 class IdentifiableFastSRM(BaseEstimator, TransformerMixin):
@@ -405,6 +351,9 @@ subject-specific responses in shared space
         Number of randomly selected subject used to fit ica
         (only used if identifiability = "ica")
 
+    tol: float
+        Stops if the norm of the gradient falls below tolerance value
+
     Attributes
     ----------
 
@@ -438,6 +387,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         aggregate="mean",
         identifiability="decorr",
         n_subjects_ica=None,
+        tol=1e-7,
     ):
 
         self.n_jobs = n_jobs
@@ -447,6 +397,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.atlas = atlas
         self.n_subjects_ica = n_subjects_ica
         self.identifiability = identifiability
+        self.tol = tol
 
         if aggregate is not None and aggregate != "mean":
             raise ValueError("aggregate can have only value mean or None")
@@ -516,9 +467,16 @@ that contains the data of subject i (number of sessions is implicitly 1)
 at the object level.
         """
         atlas_shape = check_atlas(self.atlas, self.n_components)
-        reshaped_input, imgs, shapes = check_imgs(
+        reshaped_input, imgs_, shapes = check_imgs(
             imgs, n_components=self.n_components, atlas_shape=atlas_shape
         )
+
+        if self.identifiability == "ica":
+            # check that data are voxel-centered
+            for i in range(len(imgs_)):
+                for j in range(len(imgs_[i])):
+                    check_voxel_centered(safe_load(imgs_[i][j]))
+
         self.clean()
         create_temp_dir(self.temp_dir)
 
@@ -526,7 +484,7 @@ at the object level.
             logger.info("[FastSRM.fit] Reducing data")
 
         reduced_data = reduce_data(
-            imgs,
+            imgs_,
             atlas=self.atlas,
             n_jobs=self.n_jobs,
             low_ram=self.low_ram,
@@ -537,63 +495,38 @@ at the object level.
             logger.info(
                 "[FastSRM.fit] Finds shared " "response using reduced data"
             )
-        shared_response_list = fast_srm(
+
+        _, shared_response_list = fast_srm(
             reduced_data,
             n_iter=self.n_iter,
             n_components=self.n_components,
-            low_ram=self.low_ram,
+            save_basis=False,
+            tol=self.tol,
+            verbose=self.verbose,
+            temp_dir=self.temp_dir,
+            init=None,
+            transpose=False,
         )
+
         if self.verbose is True:
             logger.info(
                 "[FastSRM.fit] Finds basis using "
                 "full data and shared response"
             )
 
-        if self.n_jobs == 1:
-            basis = []
-            for i, sessions in enumerate(imgs):
-                basis_i = _compute_basis_subject_online(
-                    sessions, shared_response_list
-                )
-
-                if self.temp_dir is None:
-                    basis.append(basis_i)
-                else:
-                    path = os.path.join(self.temp_dir, "basis_%i" % i)
-                    np.save(path, basis_i)
-                    basis.append(path + ".npy")
-                del basis_i
-
-        else:
-            if self.temp_dir is None:
-                basis = Parallel(n_jobs=self.n_jobs)(
-                    delayed(_compute_basis_subject_online)(
-                        sessions, shared_response_list
-                    )
-                    for sessions in imgs
-                )
-            else:
-                Parallel(n_jobs=self.n_jobs)(
-                    delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir
-                    )
-                    for j in range(len(imgs[0]))
-                    for i in range(len(imgs))
-                )
-
-                basis = Parallel(n_jobs=self.n_jobs)(
-                    delayed(_compute_and_save_subject_basis)(
-                        i, sessions, self.temp_dir
-                    )
-                    for i, sessions in enumerate(imgs)
-                )
+        basis, shared_response_list = fast_srm(
+            imgs_,
+            n_iter=self.n_iter,
+            n_components=self.n_components,
+            save_basis=True,
+            tol=self.tol,
+            verbose=self.verbose,
+            temp_dir=self.temp_dir,
+            init=shared_response_list,
+            transpose=True,
+        )
 
         if self.identifiability == "ica":
-            # check that data are voxel-centered
-            for i in range(len(imgs)):
-                for j in range(len(imgs[i])):
-                    check_voxel_centered(safe_load(imgs[i][j]))
-
             # Compute rotation matrix and apply
             r = ica_find_rotation(basis, n_subjects_ica=self.n_subjects_ica)
             basis = Parallel(n_jobs=self.n_jobs)(
@@ -601,16 +534,7 @@ at the object level.
             )
 
         if self.identifiability == "decorr":
-            shared = _compute_shared_response_online(
-                imgs,
-                basis,
-                self.temp_dir,
-                self.n_jobs,
-                subjects_indexes=None,
-                aggregate="mean",
-            )
-            shared = np.concatenate(shared, axis=1)
-
+            shared = np.concatenate(shared_response_list, axis=0).T
             r = decorr_find_rotation(shared)
             basis = Parallel(n_jobs=self.n_jobs)(
                 delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
@@ -944,14 +868,15 @@ during session j in shared space.
         self.basis_list += basis
 
 
-def do_srm(
+def do_fittransform_srm(
     imgs,
     atlas=None,
     n_components=20,
-    n_iter=100,
+    n_iter=10000,
     temp_dir=None,
     low_ram=False,
     n_jobs=1,
+    tol=1e-7,
     verbose="warn",
     aggregate="mean",
     identifiability="decorr",
@@ -972,6 +897,7 @@ def do_srm(
         temp_dir,
         low_ram,
         n_jobs,
+        tol,
         verbose,
         aggregate,
         identifiability,
@@ -989,10 +915,77 @@ def do_srm(
             aggregate=aggregate,
             identifiability=identifiability,
             n_subjects_ica=n_subjects_ica,
+            tol=tol,
         )
         return srm.fit_transform(imgs)
 
     return fit_transform(
+        imgs,
+        atlas,
+        n_components,
+        n_iter,
+        temp_dir,
+        low_ram,
+        n_jobs,
+        verbose,
+        aggregate,
+        identifiability,
+        n_subjects_ica,
+    )
+
+
+def do_fit_srm(
+    imgs,
+    atlas=None,
+    n_components=20,
+    n_iter=10000,
+    temp_dir=None,
+    low_ram=False,
+    n_jobs=1,
+    tol=1e-7,
+    verbose="warn",
+    aggregate="mean",
+    identifiability="decorr",
+    n_subjects_ica=None,
+    memory=None,
+):
+    """
+    Performs srm.fit_transform(imgs) using caching
+    """
+    mem = Memory(memory)
+
+    @mem.cache
+    def fit(
+        imgs,
+        atlas,
+        n_components,
+        n_iter,
+        temp_dir,
+        low_ram,
+        n_jobs,
+        tol,
+        verbose,
+        aggregate,
+        identifiability,
+        n_subjects_ica,
+    ):
+        srm = IdentifiableFastSRM(
+            imgs,
+            atlas=atlas,
+            n_components=n_components,
+            n_iter=n_iter,
+            temp_dir=temp_dir,
+            low_ram=low_ram,
+            n_jobs=n_jobs,
+            verbose=verbose,
+            aggregate=aggregate,
+            identifiability=identifiability,
+            n_subjects_ica=n_subjects_ica,
+            tol=tol,
+        )
+        return srm.fit(imgs)
+
+    return fit(
         imgs,
         atlas,
         n_components,

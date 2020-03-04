@@ -174,7 +174,7 @@ def test_voxelcentered():
         srm.fit(X)
 
 
-@pytest.mark.parametrize("identifiability", ("ica", "decorr"))
+@pytest.mark.parametrize("identifiability", ("ica", "decorr", None))
 def test_fastsrm_class(identifiability):
     n_jobs = 1
     with tempfile.TemporaryDirectory() as datadir:
@@ -307,7 +307,7 @@ def test_fastsrm_class(identifiability):
         # ("list_of_array", False, True, None, 2, [25, 24], "mean")
     ],
 )
-@pytest.mark.parametrize("identifiability", ("ica", "decorr"))
+@pytest.mark.parametrize("identifiability", ("ica", "decorr", None))
 def test_fastsrm_class_correctness(
     input_format,
     low_ram,
@@ -336,7 +336,8 @@ def test_fastsrm_class_correctness(
             n_subjects_ica=n_subjects,
             atlas=atlas,
             n_components=n_components,
-            n_iter=10,
+            n_iter=1000,
+            tol=1e-7,
             temp_dir=temp_dir,
             low_ram=low_ram,
             verbose=True,
@@ -410,7 +411,7 @@ def test_fastsrm_class_correctness(
         ("list_of_array", False, True, None, 1, [25, 24], "mean"),
     ],
 )
-@pytest.mark.parametrize("identifiability", ("ica", "decorr"))
+@pytest.mark.parametrize("identifiability", ("ica", "decorr", None))
 def test_class_srm_inverse_transform(
     input_format,
     low_ram,
@@ -492,7 +493,7 @@ def test_class_srm_inverse_transform(
 
 
 @pytest.mark.parametrize("tempdir", (True, False))
-@pytest.mark.parametrize("identifiability", ("ica", "decorr"))
+@pytest.mark.parametrize("identifiability", ("ica", "decorr", None))
 def test_addsubs_wo_fit(tempdir, identifiability):
 
     with tempfile.TemporaryDirectory() as datadir:

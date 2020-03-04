@@ -28,6 +28,16 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
+def get_safe_shape(path_or_array):
+    """
+    Get shape of an array of saved array
+    """
+    if isinstance(path_or_array, np.ndarray):
+        return path_or_array.shape
+    else:
+        return get_shape(path_or_array)
+
+
 def get_shape(path):
     """Get shape of saved np array
     Parameters
@@ -855,7 +865,7 @@ def reduce_data(imgs, atlas, n_jobs=1, low_ram=False, temp_dir=None):
 
 
 def _reduced_space_compute_shared_response(
-    reduced_data_list, reduced_basis_list, n_components=50
+    reduced_data_list, reduced_basis_list, n_components=50, transpose=False
 ):
     """Compute shared response with basis fixed in reduced space
 
@@ -891,24 +901,28 @@ def _reduced_space_compute_shared_response(
         shared response, element i is the shared response during session i
 
     """
-    n_subjects, n_sessions = reduced_data_list.shape[:2]
+    n_subjects = len(reduced_data_list)
+    n_sessions = len(reduced_data_list[0])
+    if transpose:
+        n_supervoxels, n_timeframes = get_safe_shape(reduced_data_list[0][0])
+    else:
+        n_timeframes, n_supervoxels = get_safe_shape(reduced_data_list[0][0])
 
     s = [None] * n_sessions
 
     # This is just to check that all subjects have same number of
     # timeframes in a given session
     for n in range(n_subjects):
+        if reduced_basis_list is None:
+            basis_n = np.eye(n_components, n_supervoxels)
+        else:
+            basis_n = safe_load(reduced_basis_list[n])
         for m in range(n_sessions):
-            data_nm = safe_load(reduced_data_list[n][m])
-            n_timeframes, n_supervoxels = data_nm.shape
+            if transpose:
+                data_nm = safe_load(reduced_data_list[n][m]).T
+            else:
+                data_nm = safe_load(reduced_data_list[n][m])
 
-            if reduced_basis_list is None:
-                reduced_basis_list = []
-                for subject in range(n_subjects):
-                    q = np.eye(n_components, n_supervoxels)
-                    reduced_basis_list.append(q)
-
-            basis_n = reduced_basis_list[n]
             if s[m] is None:
                 s[m] = data_nm.dot(basis_n.T)
             else:
@@ -1319,7 +1333,8 @@ def _compute_shared_response_online(
     Returns
     -------
 
-    shared_response_list : list of array or list of list of array
+    shared_response_list : list of array or list of list of array of 
+    shape [n_components, n_timeframes]
         shared response, element i is the shared response during session i
         or element i, j is the shared response of subject i during session j
     """
