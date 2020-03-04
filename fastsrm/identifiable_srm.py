@@ -33,6 +33,7 @@ from fastsrm.fastsrm import (
     check_shared_response,
     assert_array_2axis,
     safe_load,
+    get_safe_shape,
 )
 from sklearn.decomposition import FastICA
 import warnings
@@ -260,17 +261,21 @@ def fast_srm(
             reduced_data_list, reduced_basis, n_components, transpose
         )
 
+        _, n_voxels = get_safe_shape(reduced_basis[0])
         S_new = np.concatenate(shared_response_new, axis=0)
         S = np.concatenate(shared_response, axis=0)
 
-        grad_norm = np.sum((S - S_new) ** 2) / np.prod(S.shape)
+        grad_norm = np.sum((S - S_new) ** 2) / (np.prod(S.shape) * n_voxels)
 
         shared_response = shared_response_new
-        loss = -np.sum(S_new ** 2) / np.prod(S_new.shape)
+        loss = -np.sum(S_new ** 2) / (np.prod(S_new.shape))
 
         grads.append(grad_norm)
         if verbose:
-            print("iteration: %i grad_norm: %.5e loss: %.5e" % (iteration, grad_norm, loss))
+            print(
+                "iteration: %i grad_norm: %.5e loss: %.5e"
+                % (iteration, grad_norm, loss)
+            )
 
         if grad_norm < tol:
             break
