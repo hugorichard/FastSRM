@@ -37,9 +37,6 @@ from fastsrm.fastsrm import (
 from sklearn.decomposition import FastICA
 import warnings
 
-logger = logging.getLogger(__name__)
-
-
 def apply_rotation(basis, rotation, temp_dir):
     """
     Apply rotation to matrix
@@ -144,7 +141,7 @@ def ica_find_rotation(basis, n_subjects_ica):
         )
 
     if n_subjects_ica is None:
-        logger.warning(
+        warnings.warn(
             "n_subjects_ica has been set to %i. To remove"
             " this warning please set it manually" % len(basis)
         )
@@ -401,7 +398,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 
         if temp_dir is None:
             if self.verbose == "warn" or self.verbose is True:
-                logger.warning(
+                warnings.warn(
                     "temp_dir has value None. "
                     "All basis (spatial maps) and reconstructed "
                     "data will therefore be kept in memory."
@@ -460,11 +457,11 @@ that contains the data of subject i (number of sessions is implicitly 1)
 at the object level.
         """
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Checking input atlas")
+            print("[FastSRM.fit] Checking input atlas")
         atlas_shape = check_atlas(self.atlas, self.n_components)
 
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Checking input images")
+            print("[FastSRM.fit] Checking input images")
 
         reshaped_input, imgs_, shapes = check_imgs(
             imgs, n_components=self.n_components, atlas_shape=atlas_shape
@@ -480,7 +477,7 @@ at the object level.
         create_temp_dir(self.temp_dir)
 
         if self.verbose is True:
-            logger.info("[FastSRM.fit] Reducing data")
+            print("[FastSRM.fit] Reducing data")
 
         reduced_data = reduce_data(
             imgs_,
@@ -491,7 +488,7 @@ at the object level.
         )
 
         if self.verbose is True:
-            logger.info(
+            print(
                 "[FastSRM.fit] Finds shared " "response using reduced data"
             )
 
@@ -508,7 +505,7 @@ at the object level.
         )
 
         if self.verbose is True:
-            logger.info(
+            print(
                 "[FastSRM.fit] Finds basis using "
                 "full data and shared response"
             )
