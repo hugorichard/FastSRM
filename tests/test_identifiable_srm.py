@@ -566,7 +566,7 @@ def test_recover_decorr_basis():
 
 
 def test_convergence():
-    n_voxels = 50
+    n_voxels = 500
     n_timeframes = [100, 101]
     n_subjects = 4
 
@@ -575,7 +575,12 @@ def test_convergence():
         for _ in range(n_subjects)
     ]
 
-    srm = IdentifiableFastSRM(n_components=3)
+    srm = IdentifiableFastSRM(n_components=3, tol=1e-9, n_iter=1000)
     srm.fit(X)
-    assert srm.grads[0] < 1e-6
-    assert srm.grads[1] < 1e-6
+    assert srm.grads[0][-1] < 1e-5
+    assert srm.grads[1][-1] < 1e-5
+
+    tot_loss = np.concatenate([srm.losses[0], srm.losses[1]])
+    diff_tot_loss = tot_loss[:-1] - tot_loss[1:]
+
+    assert np.prod(diff_tot_loss > 0) == 1

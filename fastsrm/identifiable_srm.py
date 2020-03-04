@@ -37,6 +37,7 @@ from fastsrm.fastsrm import (
 from sklearn.decomposition import FastICA
 import warnings
 
+
 def apply_rotation(basis, rotation, temp_dir):
     """
     Apply rotation to matrix
@@ -188,7 +189,7 @@ def fast_srm(
     temp_dir,
     init,
     transpose=False,
-        return_grads=False,
+    return_grads=False,
 ):
     """Computes shared response and basis in reduced space
 
@@ -233,6 +234,7 @@ def fast_srm(
 
     reduced_basis = [None] * n_subjects
     grads = []
+    losses = []
     for iteration in range(n_iter):
         for n in range(n_subjects):
             cov = None
@@ -258,29 +260,36 @@ def fast_srm(
             reduced_data_list, reduced_basis, n_components, transpose
         )
 
-        grad_norm = np.sum(
-            [
-                np.sum((shared_response[j] - shared_response_new[j]) ** 2) / np.prod(shared_response[j].shape)
-                for j in range(n_sessions)
-            ]
-        ) / n_sessions
+        grad_norm = (
+            np.sum(
+                [
+                    np.sum((shared_response[j] - shared_response_new[j]) ** 2)
+                    / np.prod(shared_response[j].shape)
+                    for j in range(n_sessions)
+                ]
+            )
+            / n_sessions
+        )
+
         shared_response = shared_response_new
+        S = np.concatenate(shared_response, axis=0).T
+        loss = -np.sum(S ** 2) * n_subjects
 
         grads.append(grad_norm)
-
         if verbose:
-            print("iteration: %i grad_norm: %f" % (iteration, grad_norm))
+            print("iteration: %i grad_norm: %.5e loss: %.5e" % (iteration, grad_norm, loss))
 
         if grad_norm < tol:
             break
+        losses.append(loss)
 
     if grad_norm > tol:
         warnings.warn(
             "Convergence warning: ISRM did not converge. You should increase "
-            "the number of iterations. Gradient norm is %f" % grad_norm
+            "the number of iterations. Gradient norm is %.5e" % grad_norm
         )
 
-    return reduced_basis, shared_response, grads
+    return reduced_basis, shared_response, grads, losses
 
 
 class IdentifiableFastSRM(BaseEstimator, TransformerMixin):
@@ -492,11 +501,9 @@ at the object level.
         )
 
         if self.verbose is True:
-            print(
-                "[FastSRM.fit] Finds shared " "response using reduced data"
-            )
+            print("[FastSRM.fit] Finds shared " "response using reduced data")
 
-        _, shared_response_list, grads_reduced = fast_srm(
+        _, shared_response_list, grads_reduced, losses_reduced = fast_srm(
             reduced_data,
             n_iter=self.n_iter,
             n_components=self.n_components,
@@ -514,7 +521,7 @@ at the object level.
                 "full data and shared response"
             )
 
-        basis, shared_response_list, grads_full = fast_srm(
+        basis, shared_response_list, grads_full, losses_full = fast_srm(
             imgs_,
             n_iter=self.n_iter,
             n_components=self.n_components,
@@ -527,6 +534,7 @@ at the object level.
         )
 
         self.grads = [grads_reduced, grads_full]
+        self.losses = [losses_reduced, losses_full]
 
         if self.identifiability == "ica":
             # Compute rotation matrix and apply
