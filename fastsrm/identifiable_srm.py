@@ -260,20 +260,13 @@ def fast_srm(
             reduced_data_list, reduced_basis, n_components, transpose
         )
 
-        grad_norm = (
-            np.sum(
-                [
-                    np.sum((shared_response[j] - shared_response_new[j]) ** 2)
-                    / np.prod(shared_response[j].shape)
-                    for j in range(n_sessions)
-                ]
-            )
-            / n_sessions
-        )
+        S_new = np.concatenate(shared_response_new, axis=0)
+        S = np.concatenate(shared_response, axis=0)
+
+        grad_norm = np.sum((S - S_new) ** 2) / np.prod(S.shape)
 
         shared_response = shared_response_new
-        S = np.concatenate(shared_response, axis=0).T
-        loss = -np.sum(S ** 2) * n_subjects
+        loss = -np.sum(S_new ** 2) / np.prod(S_new.shape)
 
         grads.append(grad_norm)
         if verbose:
