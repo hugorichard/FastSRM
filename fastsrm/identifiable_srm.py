@@ -223,13 +223,6 @@ def fast_srm(
      shape=[n_timeframes, n_components]
         shared response, element i is the shared response during session i
     """
-    # TODO: Remove low_ram mode and det_srm and have only one function that does everything
-    # This is quite easy
-    # - Just load data with safe_load
-    # - Save basis in temp_dir if low_ram mode is True
-    # - Otherwise just keep basis where they are
-    # - Shared responses can be kept in memory
-
     n_subjects = len(reduced_data_list)
     n_sessions = len(reduced_data_list[0])
 
