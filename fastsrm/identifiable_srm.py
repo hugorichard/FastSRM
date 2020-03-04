@@ -387,7 +387,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         aggregate="mean",
         identifiability="decorr",
         n_subjects_ica=None,
-        tol=1e-7,
+        tol=1e-6,
     ):
 
         self.n_jobs = n_jobs
