@@ -466,7 +466,13 @@ that contains the data of subject i (number of sessions is implicitly 1)
            Returns the instance itself. Contains attributes listed \
 at the object level.
         """
+        if self.verbose is True:
+            logger.info("[FastSRM.fit] Checking input atlas")
         atlas_shape = check_atlas(self.atlas, self.n_components)
+
+        if self.verbose is True:
+            logger.info("[FastSRM.fit] Checking input images")
+
         reshaped_input, imgs_, shapes = check_imgs(
             imgs, n_components=self.n_components, atlas_shape=atlas_shape
         )
