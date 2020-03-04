@@ -265,7 +265,7 @@ def fast_srm(
         S_new = np.concatenate(shared_response_new, axis=0)
         S = np.concatenate(shared_response, axis=0)
 
-        grad_norm = np.sum((S - S_new) ** 2) / (np.prod(S.shape) * n_voxels)
+        grad_norm = np.sum((S - S_new) ** 2) / (np.prod(S.shape))
 
         shared_response = shared_response_new
         loss = -np.sum(S_new ** 2) / (np.prod(S_new.shape))
