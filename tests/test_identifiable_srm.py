@@ -39,7 +39,12 @@ def generate_decorr_friendly_data(
         for i in range(n_sessions)
     ]
 
-    W = [np.linalg.svd(np.random.rand(n_voxels, n_components), full_matrices=False)[0].T for _ in range(n_subjects)]
+    W = [
+        np.linalg.svd(
+            np.random.rand(n_voxels, n_components), full_matrices=False
+        )[0].T
+        for _ in range(n_subjects)
+    ]
 
     Ss = []
     for j in range(n_sessions):
@@ -558,3 +563,19 @@ def test_recover_decorr_basis():
     srm.basis_list = align_basis(srm.basis_list, W)
     for i in range(len(srm.basis_list)):
         assert_array_almost_equal(srm.basis_list[i], W[i])
+
+
+def test_convergence():
+    n_voxels = 50
+    n_timeframes = [100, 101]
+    n_subjects = 4
+
+    X = [
+        [np.random.rand(n_voxels, n_t) for n_t in n_timeframes]
+        for _ in range(n_subjects)
+    ]
+
+    srm = IdentifiableFastSRM(n_components=3)
+    srm.fit(X)
+    assert srm.grads[0] < 1e-6
+    assert srm.grads[1] < 1e-6

@@ -188,6 +188,7 @@ def fast_srm(
     temp_dir,
     init,
     transpose=False,
+        return_grads=False,
 ):
     """Computes shared response and basis in reduced space
 
@@ -231,6 +232,7 @@ def fast_srm(
         shared_response = init
 
     reduced_basis = [None] * n_subjects
+    grads = []
     for iteration in range(n_iter):
         for n in range(n_subjects):
             cov = None
@@ -264,6 +266,8 @@ def fast_srm(
         ) / n_sessions
         shared_response = shared_response_new
 
+        grads.append(grad_norm)
+
         if verbose:
             print("iteration: %i grad_norm: %f" % (iteration, grad_norm))
 
@@ -276,7 +280,7 @@ def fast_srm(
             "the number of iterations. Gradient norm is %f" % grad_norm
         )
 
-    return reduced_basis, shared_response
+    return reduced_basis, shared_response, grads
 
 
 class IdentifiableFastSRM(BaseEstimator, TransformerMixin):
@@ -492,7 +496,7 @@ at the object level.
                 "[FastSRM.fit] Finds shared " "response using reduced data"
             )
 
-        _, shared_response_list = fast_srm(
+        _, shared_response_list, grads_reduced = fast_srm(
             reduced_data,
             n_iter=self.n_iter,
             n_components=self.n_components,
@@ -510,7 +514,7 @@ at the object level.
                 "full data and shared response"
             )
 
-        basis, shared_response_list = fast_srm(
+        basis, shared_response_list, grads_full = fast_srm(
             imgs_,
             n_iter=self.n_iter,
             n_components=self.n_components,
@@ -521,6 +525,8 @@ at the object level.
             init=shared_response_list,
             transpose=True,
         )
+
+        self.grads = [grads_reduced, grads_full]
 
         if self.identifiability == "ica":
             # Compute rotation matrix and apply
