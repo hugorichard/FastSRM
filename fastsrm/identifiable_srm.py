@@ -268,10 +268,10 @@ def fast_srm(
 
         grad_norm = np.sum(
             [
-                np.linalg.norm(shared_response[j] - shared_response_new[j])
+                np.sum((shared_response[j] - shared_response_new[j]) ** 2) / np.prod(shared_response[j].shape)
                 for j in range(n_sessions)
             ]
-        )
+        ) / n_sessions
         shared_response = shared_response_new
 
         if verbose:
