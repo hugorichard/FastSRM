@@ -172,10 +172,13 @@ def align_sign(recov, source):
     return [mult.dot(w) for w in recov]
 
 
-def align_basis(recov, source):
+def align_basis(recov, source, return_index=False):
     # Let us align components here
     _, ib = solve_hungarian(
         np.concatenate(source, axis=1).T,
         np.concatenate(recov, axis=1).T)[2]
 
-    return align_sign([w[ib] for w in recov], source)
+    if return_index:
+        return align_sign([w[ib] for w in recov], source), ib
+    else:
+        return align_sign([w[ib] for w in recov], source)

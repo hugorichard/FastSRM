@@ -380,7 +380,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self,
         atlas=None,
         n_components=20,
-        n_iter=100,
+        n_iter=1000,
         temp_dir=None,
         low_ram=False,
         n_jobs=1,
