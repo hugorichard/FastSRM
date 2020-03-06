@@ -1,6 +1,6 @@
 import os
 import tempfile
-
+from time import time
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
@@ -135,6 +135,10 @@ def generate_ica_friendly_data(
             S_s = S[:, slices_timeframes[session]]
             S_s = S_s - np.mean(S_s, axis=1, keepdims=True)
             data = Q.dot(S_s)
+            noise = np.random.rand(*data.shape)
+            noise = noise - np.mean(noise, axis=1, keepdims=True)
+            noise = noise - np.mean(noise, axis=0, keepdims=True)
+            data = data + noise_level * noise
             X_.append(data)
         X.append(X_)
 
@@ -173,7 +177,7 @@ def test_voxelcentered():
     with pytest.raises(
         ValueError,
         match=(
-            "Input data should be voxel-centered when " "identifiability = ica"
+            "Input data should be voxel-centered when identifiability = ica"
         ),
     ):
         srm.fit(X)
@@ -186,8 +190,8 @@ def test_fastsrm_class(identifiability):
         np.random.seed(0)
 
         np.random.seed(0)
-        paths, W, S = generate_data(
-            n_voxels, n_timeframes, n_subjects, n_components, datadir, 0
+        paths, W, S = generate_ica_friendly_data(
+            n_voxels, n_timeframes, n_subjects, datadir, 0
         )
 
         atlas = np.arange(1, n_voxels + 1)
@@ -208,6 +212,7 @@ def test_fastsrm_class(identifiability):
             srm.transform(paths)
 
         srm.fit(paths)
+
         # An error can occur if temporary directory already exists
         with pytest.raises(
             ValueError,
@@ -429,15 +434,10 @@ def test_class_srm_inverse_transform(
 ):
 
     with tempfile.TemporaryDirectory() as datadir:
-        X, W, S = generate_data(
-            n_voxels,
-            n_timeframes,
-            n_subjects,
-            n_components,
-            datadir,
-            0,
-            input_format,
+        X, W, S = generate_ica_friendly_data(
+            n_voxels, n_timeframes, n_subjects, datadir, 0, input_format
         )
+
 
         if tempdir:
             temp_dir = datadir
@@ -584,3 +584,77 @@ def test_convergence():
     diff_tot_loss = tot_loss[:-1] - tot_loss[1:]
 
     assert np.prod(diff_tot_loss > 0) == 1
+
+
+def test_memory():
+    n_voxels = 500
+    n_timeframes = [100, 101]
+    n_subjects = 4
+
+    with tempfile.TemporaryDirectory() as datadir:
+        X, W, S = generate_ica_friendly_data(
+            n_voxels, n_timeframes, n_subjects, datadir, 0
+        )
+
+        dts = []
+        for (low_ram, tempdir, atlas, n_jobs, aggregate, identifiability) in [
+            (True, True, None, 1, "mean", "decorr"),
+            (False, False, np.arange(1, n_voxels + 1), 2, None, "ica"),
+            (True, True, None, 1, "mean", None),
+            (False, False, np.arange(1, n_voxels + 1), 1, None, None),
+        ]:
+            if tempdir:
+                temp_dir = datadir
+            else:
+                temp_dir = None
+
+            srm = IdentifiableFastSRM(
+                identifiability=identifiability,
+                n_subjects_ica=n_subjects,
+                atlas=atlas,
+                n_components=n_components,
+                n_iter=500,
+                temp_dir=temp_dir,
+                low_ram=low_ram,
+                verbose=True,
+                tol=0,
+                n_jobs=n_jobs,
+                aggregate=aggregate,
+                memory=datadir + "/memory"
+            )
+            t0 = time()
+            srm.fit(X)
+            t1 = time()
+
+            dts.append(t1 - t0)
+
+            shared_response_raw = srm.transform(X)
+
+            # Check inverse transform
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw,
+                sessions_indexes=[1],
+                subjects_indexes=[0, 2],
+            )
+            for i, ii in enumerate([0, 2]):
+                for j, jj in enumerate([1]):
+                    assert_array_almost_equal(
+                        reconstructed_data[i][j], safe_load(X[ii][jj])
+                    )
+
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw,
+                subjects_indexes=None,
+                sessions_indexes=None,
+            )
+
+            for i in range(len(X)):
+                for j in range(len(X[i])):
+                    assert_array_almost_equal(
+                        reconstructed_data[i][j], safe_load(X[i][j])
+                    )
+
+            srm.clean()
+
+    for i in range(len(dts) -1):
+        assert dts[0] > dts[i+1]

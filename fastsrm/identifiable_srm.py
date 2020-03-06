@@ -39,6 +39,15 @@ from sklearn.decomposition import FastICA
 import warnings
 
 
+def clean_temp_dir(temp_dir, memory):
+    if temp_dir is not None and memory is None:
+        if os.path.exists(temp_dir):
+            for root, dirs, files in os.walk(temp_dir, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+            os.rmdir(temp_dir)
+
+
 def apply_rotation(basis, rotation, temp_dir):
     """
     Apply rotation to matrix
@@ -76,7 +85,7 @@ def check_voxel_centered(data):
     """
     if np.max(np.abs(np.mean(data, axis=1))) > 1e-6:
         raise ValueError(
-            "Input data should be voxel-centered when " "identifiability = ica"
+            "Input data should be voxel-centered when identifiability = ica"
         )
 
 
@@ -154,9 +163,13 @@ def ica_find_rotation(basis, n_subjects_ica):
             np.arange(len(basis)), size=n_subjects_ica, replace=False
         )
 
-    used_basis = np.concatenate(
-        [safe_load(basis[i]) for i in index], axis=1
-    ) / np.sqrt(n_subjects_ica)
+    used_basis = []
+    for i in index:
+        basis_i = safe_load(basis[i])
+        check_voxel_centered(basis_i)
+        used_basis.append(basis_i)
+
+    used_basis = np.concatenate(used_basis, axis=1) / np.sqrt(n_subjects_ica)
 
     used_basis = used_basis.T
     n_samples, n_features = used_basis.shape
@@ -389,6 +402,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         identifiability="decorr",
         n_subjects_ica=None,
         tol=1e-6,
+        memory=None,
     ):
 
         self.n_jobs = n_jobs
@@ -399,6 +413,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.n_subjects_ica = n_subjects_ica
         self.identifiability = identifiability
         self.tol = tol
+        self.memory = memory
 
         if aggregate is not None and aggregate != "mean":
             raise ValueError("aggregate can have only value mean or None")
@@ -421,9 +436,15 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
             self.low_ram = False
 
         if temp_dir is not None:
-            self.temp_dir = os.path.join(
-                temp_dir, "fastsrm" + str(uuid.uuid4())
-            )
+            if memory is not None:
+                self.temp_dir = os.path.join(
+                    memory, "fastsrm" + str(uuid.uuid4())
+                )
+            else:
+                self.temp_dir = os.path.join(
+                    temp_dir, "fastsrm" + str(uuid.uuid4())
+                )
+
             self.low_ram = low_ram
 
     def clean(self):
@@ -431,13 +452,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
 free memory. This method should be called when fitted model \
 is not needed anymore.
         """
-        if self.temp_dir is not None:
-            if os.path.exists(self.temp_dir):
-                for root, dirs, files in os.walk(self.temp_dir, topdown=False):
-                    for name in files:
-                        os.remove(os.path.join(root, name))
-                os.rmdir(self.temp_dir)
-
+        clean_temp_dir(self.temp_dir, self.memory)
         self.basis_list = []
 
     def fit(self, imgs):
@@ -467,72 +482,111 @@ that contains the data of subject i (number of sessions is implicitly 1)
            Returns the instance itself. Contains attributes listed \
 at the object level.
         """
-        if self.verbose is True:
-            print("[FastSRM.fit] Checking input atlas")
-        atlas_shape = check_atlas(self.atlas, self.n_components)
+        mem = Memory(self.memory)
 
-        if self.verbose is True:
-            print("[FastSRM.fit] Checking input images")
+        @mem.cache(ignore=["atlas", "n_jobs", "low_ram", "temp_dir", "verbose"])
+        def _fit(
+            imgs,
+            atlas,
+            n_jobs,
+            low_ram,
+            temp_dir,
+            n_components,
+            verbose,
+            memory,
+            n_iter,
+            tol,
+        ):
+            if verbose is True:
+                print("[FastSRM.fit] Checking input atlas")
+            atlas_shape = check_atlas(atlas, n_components)
 
-        reshaped_input, imgs_, shapes = check_imgs(
-            imgs, n_components=self.n_components, atlas_shape=atlas_shape
-        )
+            if verbose is True:
+                print("[FastSRM.fit] Checking input images")
 
-        if self.identifiability == "ica":
-            # check that data are voxel-centered
-            for i in range(len(imgs_)):
-                for j in range(len(imgs_[i])):
-                    check_voxel_centered(safe_load(imgs_[i][j]))
-
-        self.clean()
-        create_temp_dir(self.temp_dir)
-
-        if self.verbose is True:
-            print("[FastSRM.fit] Reducing data")
-
-        reduced_data = reduce_data(
-            imgs_,
-            atlas=self.atlas,
-            n_jobs=self.n_jobs,
-            low_ram=self.low_ram,
-            temp_dir=self.temp_dir,
-        )
-
-        if self.verbose is True:
-            print("[FastSRM.fit] Finds shared " "response using reduced data")
-
-        _, shared_response_list, grads_reduced, losses_reduced = fast_srm(
-            reduced_data,
-            n_iter=self.n_iter,
-            n_components=self.n_components,
-            save_basis=False,
-            tol=self.tol,
-            verbose=self.verbose,
-            temp_dir=self.temp_dir,
-            init=None,
-            transpose=False,
-        )
-
-        if self.verbose is True:
-            print(
-                "[FastSRM.fit] Finds basis using "
-                "full data and shared response"
+            reshaped_input, imgs_, shapes = check_imgs(
+                imgs, n_components=n_components, atlas_shape=atlas_shape
             )
 
-        basis, shared_response_list, grads_full, losses_full = fast_srm(
-            imgs_,
-            n_iter=self.n_iter,
-            n_components=self.n_components,
-            save_basis=True,
-            tol=self.tol,
-            verbose=self.verbose,
-            temp_dir=self.temp_dir,
-            init=shared_response_list,
-            transpose=True,
+            clean_temp_dir(temp_dir, memory)
+            basis_list = []
+            create_temp_dir(temp_dir)
+
+            if verbose is True:
+                print("[FastSRM.fit] Reducing data")
+
+            reduced_data = reduce_data(
+                imgs_,
+                atlas=atlas,
+                n_jobs=n_jobs,
+                low_ram=low_ram,
+                temp_dir=temp_dir,
+            )
+
+            if verbose is True:
+                print(
+                    "[FastSRM.fit] Finds shared " "response using reduced data"
+                )
+
+            _, shared_response_list, grads_reduced, losses_reduced = fast_srm(
+                reduced_data,
+                n_iter=n_iter,
+                n_components=n_components,
+                save_basis=False,
+                tol=tol,
+                verbose=verbose,
+                temp_dir=temp_dir,
+                init=None,
+                transpose=False,
+            )
+
+            if verbose is True:
+                print(
+                    "[FastSRM.fit] Finds basis using "
+                    "full data and shared response"
+                )
+
+            basis, shared_response_list, grads_full, losses_full = fast_srm(
+                imgs_,
+                n_iter=n_iter,
+                n_components=n_components,
+                save_basis=True,
+                tol=tol,
+                verbose=verbose,
+                temp_dir=temp_dir,
+                init=shared_response_list,
+                transpose=True,
+            )
+            grads = [grads_reduced, grads_full]
+            losses = [losses_reduced, losses_full]
+            return grads, losses, basis, shared_response_list, temp_dir
+
+        grads, losses, basis, shared_response_list, temp_dir = _fit(
+            imgs,
+            self.atlas,
+            self.n_jobs,
+            self.low_ram,
+            self.temp_dir,
+            self.n_components,
+            self.verbose,
+            self.memory,
+            self.n_iter,
+            self.tol,
         )
 
-        self.grads = [grads_reduced, grads_full]
-        self.losses = [losses_reduced, losses_full]
+        self.temp_dir = temp_dir
+
+        # Basis can either be a list of path or arrays depending on tempdir
+        # If memory is used we don't know in which form they are so we correct this here
+        if self.memory is not None:
+            if self.temp_dir is None and not isinstance(basis[0], np.ndarray):
+                basis = [safe_load(basis[i]) for i in range(len(basis))]
+            if self.temp_dir is not None and isinstance(basis[0], np.ndarray):
+                for i in range(len(basis)):
+                    basis_i = safe_load(basis[i])
+                    path = os.path.join(self.temp_dir, "basis_%i" % i)
+                    np.save(path, basis_i)
+                    basis[i] = path + ".npy"
 
         if self.identifiability == "ica":
             # Compute rotation matrix and apply
@@ -548,6 +602,8 @@ at the object level.
                 delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
             )
 
+        self.grads = grads
+        self.losses = losses
         self.basis_list = basis
         return self
 
@@ -874,135 +930,3 @@ during session j in shared space.
                 )
 
         self.basis_list += basis
-
-
-def do_fittransform_srm(
-    imgs,
-    atlas=None,
-    n_components=20,
-    n_iter=10000,
-    temp_dir=None,
-    low_ram=False,
-    n_jobs=1,
-    tol=1e-7,
-    verbose="warn",
-    aggregate="mean",
-    identifiability="decorr",
-    n_subjects_ica=None,
-    memory=None,
-):
-    """
-    Performs srm.fit_transform(imgs) using caching
-    """
-    mem = Memory(memory)
-
-    @mem.cache
-    def fit_transform(
-        imgs,
-        atlas,
-        n_components,
-        n_iter,
-        temp_dir,
-        low_ram,
-        n_jobs,
-        tol,
-        verbose,
-        aggregate,
-        identifiability,
-        n_subjects_ica,
-    ):
-        srm = IdentifiableFastSRM(
-            imgs,
-            atlas=atlas,
-            n_components=n_components,
-            n_iter=n_iter,
-            temp_dir=temp_dir,
-            low_ram=low_ram,
-            n_jobs=n_jobs,
-            verbose=verbose,
-            aggregate=aggregate,
-            identifiability=identifiability,
-            n_subjects_ica=n_subjects_ica,
-            tol=tol,
-        )
-        return srm.fit_transform(imgs)
-
-    return fit_transform(
-        imgs,
-        atlas,
-        n_components,
-        n_iter,
-        temp_dir,
-        low_ram,
-        n_jobs,
-        verbose,
-        aggregate,
-        identifiability,
-        n_subjects_ica,
-    )
-
-
-def do_fit_srm(
-    imgs,
-    atlas=None,
-    n_components=20,
-    n_iter=10000,
-    temp_dir=None,
-    low_ram=False,
-    n_jobs=1,
-    tol=1e-7,
-    verbose="warn",
-    aggregate="mean",
-    identifiability="decorr",
-    n_subjects_ica=None,
-    memory=None,
-):
-    """
-    Performs srm.fit_transform(imgs) using caching
-    """
-    mem = Memory(memory)
-
-    @mem.cache
-    def fit(
-        imgs,
-        atlas,
-        n_components,
-        n_iter,
-        temp_dir,
-        low_ram,
-        n_jobs,
-        tol,
-        verbose,
-        aggregate,
-        identifiability,
-        n_subjects_ica,
-    ):
-        srm = IdentifiableFastSRM(
-            imgs,
-            atlas=atlas,
-            n_components=n_components,
-            n_iter=n_iter,
-            temp_dir=temp_dir,
-            low_ram=low_ram,
-            n_jobs=n_jobs,
-            verbose=verbose,
-            aggregate=aggregate,
-            identifiability=identifiability,
-            n_subjects_ica=n_subjects_ica,
-            tol=tol,
-        )
-        return srm.fit(imgs)
-
-    return fit(
-        imgs,
-        atlas,
-        n_components,
-        n_iter,
-        temp_dir,
-        low_ram,
-        n_jobs,
-        verbose,
-        aggregate,
-        identifiability,
-        n_subjects_ica,
-    )
