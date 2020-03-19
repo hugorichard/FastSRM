@@ -415,6 +415,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.identifiability = identifiability
         self.tol = tol
         self.memory = memory
+        self.n_iter_reduced = n_iter_reduced
 
         if aggregate is not None and aggregate != "mean":
             raise ValueError("aggregate can have only value mean or None")
@@ -523,7 +524,7 @@ at the object level.
                 if verbose is True:
                     print("[FastSRM.fit] Finds basis")
 
-                grad_reduced = []
+                grads_reduced = []
                 losses_reduced = []
 
                 basis, shared_response_list, grads_full, losses_full = fast_srm(
