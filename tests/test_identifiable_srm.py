@@ -203,7 +203,6 @@ def test_fastsrm_class(identifiability):
             n_iter=10,
             temp_dir=datadir,
             low_ram=True,
-            verbose=True,
             n_jobs=n_jobs,
         )
 
@@ -350,7 +349,6 @@ def test_fastsrm_class_correctness(
             tol=1e-7,
             temp_dir=temp_dir,
             low_ram=low_ram,
-            verbose=True,
             n_jobs=n_jobs,
             aggregate=aggregate,
         )
@@ -452,7 +450,6 @@ def test_class_srm_inverse_transform(
             n_iter=10,
             temp_dir=temp_dir,
             low_ram=low_ram,
-            verbose=True,
             n_jobs=n_jobs,
             aggregate=aggregate,
         )
@@ -523,7 +520,6 @@ def test_addsubs_wo_fit(tempdir, identifiability):
             n_components=n_components,
             n_iter=10,
             temp_dir=temp_dir,
-            verbose=True,
         )
 
         srm.add_subjects(X, S)
@@ -575,7 +571,7 @@ def test_convergence():
         for _ in range(n_subjects)
     ]
 
-    srm = IdentifiableFastSRM(n_components=3, tol=1e-9, n_iter=1000)
+    srm = IdentifiableFastSRM(atlas = np.arange(n_voxels), n_components=3, tol=1e-9, n_iter=1000, n_iter_reduced=1000)
     srm.fit(X)
     assert srm.grads[0][-1] < 1e-5
     assert srm.grads[1][-1] < 1e-5
@@ -597,11 +593,11 @@ def test_memory():
         )
 
         dts = []
-        for (low_ram, tempdir, atlas, n_jobs, aggregate, identifiability) in [
-            (True, True, None, 1, "mean", "decorr"),
-            (False, False, np.arange(1, n_voxels + 1), 2, None, "ica"),
-            (True, True, None, 1, "mean", None),
-            (False, False, np.arange(1, n_voxels + 1), 1, None, None),
+        for (low_ram, tempdir, n_jobs, aggregate, identifiability) in [
+            (True, True,1, "mean", "decorr"),
+            (False, False, 2, None, "ica"),
+            (True, True, 1, "mean", None),
+            (False, False, 1, None, None),
         ]:
             if tempdir:
                 temp_dir = datadir
@@ -611,12 +607,12 @@ def test_memory():
             srm = IdentifiableFastSRM(
                 identifiability=identifiability,
                 n_subjects_ica=n_subjects,
-                atlas=atlas,
+                atlas=np.arange(n_voxels),
                 n_components=n_components,
-                n_iter=500,
+                n_iter=100,
+                n_iter_reduced=100,
                 temp_dir=temp_dir,
                 low_ram=low_ram,
-                verbose=True,
                 tol=0,
                 n_jobs=n_jobs,
                 aggregate=aggregate,

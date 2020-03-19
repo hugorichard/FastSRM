@@ -434,8 +434,12 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
                     "number of subjects "
                     "and/or sessions is large."
                 )
+
             self.temp_dir = None
             self.low_ram = False
+
+        if self.verbose == "warn":
+            self.verbose = False
 
         if temp_dir is not None:
             if memory is not None:
