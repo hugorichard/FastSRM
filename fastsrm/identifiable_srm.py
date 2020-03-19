@@ -332,6 +332,9 @@ is (n_voxels,) for a deterministic atlas and \
     n_iter : int
         Number of iterations to perform
 
+    n_iter_reduced : int
+        Number of iterations to perform on reduced data
+
     temp_dir : str or None
         Path to dir where temporary results are stored. If None \
 temporary results will be stored in memory. This can results in memory \
@@ -355,8 +358,9 @@ If "warn" only warnings are printed.
 from all subjects. If None, shared_response contains all \
 subject-specific responses in shared space
 
-    identifiability: str
+    identifiability: str or None
         Possible values:
+        - None: yields the SRM solution without modification
         - "ica": performs a linear ICA on spatial maps
         - "decorr" (default): shared response has diagonal covariance\
 (diagonal values are sorted)
@@ -400,7 +404,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         n_jobs=1,
         verbose="warn",
         aggregate="mean",
-        identifiability="decorr",
+        identifiability=None,
         n_subjects_ica=None,
         tol=1e-6,
         memory=None,
