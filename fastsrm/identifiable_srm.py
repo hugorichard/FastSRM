@@ -393,7 +393,8 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self,
         atlas=None,
         n_components=20,
-        n_iter=1000,
+        n_iter=100,
+        n_iter_reduced=1000,
         temp_dir=None,
         low_ram=False,
         n_jobs=1,
@@ -484,7 +485,9 @@ at the object level.
         """
         mem = Memory(self.memory)
 
-        @mem.cache(ignore=["atlas", "n_jobs", "low_ram", "temp_dir", "verbose"])
+        @mem.cache(
+            ignore=["n_jobs", "low_ram", "temp_dir", "verbose", "memory"]
+        )
         def _fit(
             imgs,
             atlas,
@@ -496,6 +499,7 @@ at the object level.
             memory,
             n_iter,
             tol,
+            n_iter_reduced,
         ):
             if verbose is True:
                 print("[FastSRM.fit] Checking input atlas")
@@ -515,48 +519,73 @@ at the object level.
             if verbose is True:
                 print("[FastSRM.fit] Reducing data")
 
-            reduced_data = reduce_data(
-                imgs_,
-                atlas=atlas,
-                n_jobs=n_jobs,
-                low_ram=low_ram,
-                temp_dir=temp_dir,
-            )
+            if atlas is None:
+                if verbose is True:
+                    print("[FastSRM.fit] Finds basis")
 
-            if verbose is True:
-                print(
-                    "[FastSRM.fit] Finds shared " "response using reduced data"
+                grad_reduced = []
+                losses_reduced = []
+
+                basis, shared_response_list, grads_full, losses_full = fast_srm(
+                    imgs_,
+                    n_iter=n_iter,
+                    n_components=n_components,
+                    save_basis=True,
+                    tol=tol,
+                    verbose=verbose,
+                    temp_dir=temp_dir,
+                    init=None,
+                    transpose=True,
+                )
+            else:
+                reduced_data = reduce_data(
+                    imgs_,
+                    atlas=atlas,
+                    n_jobs=n_jobs,
+                    low_ram=low_ram,
+                    temp_dir=temp_dir,
                 )
 
-            _, shared_response_list, grads_reduced, losses_reduced = fast_srm(
-                reduced_data,
-                n_iter=n_iter,
-                n_components=n_components,
-                save_basis=False,
-                tol=tol,
-                verbose=verbose,
-                temp_dir=temp_dir,
-                init=None,
-                transpose=False,
-            )
-
-            if verbose is True:
-                print(
-                    "[FastSRM.fit] Finds basis using "
-                    "full data and shared response"
+                if verbose is True:
+                    print(
+                        "[FastSRM.fit] Finds shared "
+                        "response using reduced data"
+                    )
+                (
+                    _,
+                    shared_response_list,
+                    grads_reduced,
+                    losses_reduced,
+                ) = fast_srm(
+                    reduced_data,
+                    n_iter=n_iter_reduced,
+                    n_components=n_components,
+                    save_basis=False,
+                    tol=tol,
+                    verbose=verbose,
+                    temp_dir=temp_dir,
+                    init=None,
+                    transpose=False,
                 )
 
-            basis, shared_response_list, grads_full, losses_full = fast_srm(
-                imgs_,
-                n_iter=n_iter,
-                n_components=n_components,
-                save_basis=True,
-                tol=tol,
-                verbose=verbose,
-                temp_dir=temp_dir,
-                init=shared_response_list,
-                transpose=True,
-            )
+                if verbose is True:
+                    print(
+                        "[FastSRM.fit] Finds basis using "
+                        "full data and shared response"
+                    )
+
+                basis, shared_response_list, grads_full, losses_full = fast_srm(
+                    imgs_,
+                    n_iter=n_iter,
+                    n_components=n_components,
+                    save_basis=True,
+                    tol=tol,
+                    verbose=verbose,
+                    temp_dir=temp_dir,
+                    init=shared_response_list,
+                    transpose=True,
+                )
+
             grads = [grads_reduced, grads_full]
             losses = [losses_reduced, losses_full]
             return grads, losses, basis, shared_response_list, temp_dir
@@ -572,6 +601,7 @@ at the object level.
             self.memory,
             self.n_iter,
             self.tol,
+            self.n_iter_reduced,
         )
 
         self.temp_dir = temp_dir
@@ -704,7 +734,7 @@ during session j in shared space.
             n_components=self.n_components,
             atlas_shape=atlas_shape,
             ignore_nsubjects=True,
-            ignore_ncomponents=True
+            ignore_ncomponents=True,
         )
         check_indexes(subjects_indexes, "subjects_indexes")
         if subjects_indexes is None:
