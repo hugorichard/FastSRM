@@ -658,3 +658,11 @@ def test_memory():
 
     for i in range(len(dts) -1):
         assert dts[0] > dts[i+1]
+
+def test_ncomponents():
+    X_train = [np.random.rand(100, 20) for _ in range(3)]
+    X_test = [np.random.rand(100, 5) for _ in range(3)]
+
+    srm = IdentifiableFastSRM(n_components=10, verbose=False)
+    srm.fit(X_train)
+    srm.transform(X_test)

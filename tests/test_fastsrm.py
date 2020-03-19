@@ -759,3 +759,14 @@ def test_addsubs_wo_fit(tempdir):
 
         for i in range(len(W)):
             assert_array_almost_equal(safe_load(srm.basis_list[i]), W[i])
+
+
+def test_ncomponents():
+    X_train = [np.random.rand(100, 20) for _ in range(3)]
+    X_test = [np.random.rand(100, 5) for _ in range(3)]
+
+    srm = FastSRM(n_components=10)
+    srm.fit(X_train)
+    srm.transform(X_test)
+
+

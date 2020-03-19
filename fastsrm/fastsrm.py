@@ -273,10 +273,10 @@ def _check_shapes_components(n_components, n_timeframes):
 
 
 def _check_shapes_atlas_compatibility(
-    n_voxels, n_timeframes, n_components=None, atlas_shape=None
+        n_voxels, n_timeframes, n_components=None, atlas_shape=None, ignore_ncomponents=False
 ):
     if n_components is not None:
-        if np.sum(n_timeframes) < n_components:
+        if not ignore_ncomponents and np.sum(n_timeframes) < n_components:
             raise ValueError(
                 "Total number of timeframes is shorter than "
                 "number of components (%i < %i)"
@@ -294,7 +294,7 @@ def _check_shapes_atlas_compatibility(
 
 
 def _check_shapes(
-    shapes, n_components=None, atlas_shape=None, ignore_nsubjects=False
+        shapes, n_components=None, atlas_shape=None, ignore_nsubjects=False, ignore_ncomponents=False
 ):
     """Check that number of voxels is the same for each subjects. Number of
     timeframes can vary between sessions but must be consistent across
@@ -335,7 +335,7 @@ def _check_shapes(
                 )
 
     _check_shapes_atlas_compatibility(
-        n_voxels, np.sum(n_timeframes_list), n_components, atlas_shape
+        n_voxels, np.sum(n_timeframes_list), n_components, atlas_shape, ignore_ncomponents
     )
 
 
@@ -410,7 +410,7 @@ def check_atlas(atlas, n_components=None):
 
 
 def check_imgs(
-    imgs, n_components=None, atlas_shape=None, ignore_nsubjects=False
+        imgs, n_components=None, atlas_shape=None, ignore_nsubjects=False, ignore_ncomponents=False
 ):
     """
     Check input images
@@ -470,7 +470,7 @@ def check_imgs(
             % type(imgs)
         )
 
-    _check_shapes(shapes, n_components, atlas_shape, ignore_nsubjects)
+    _check_shapes(shapes, n_components, atlas_shape, ignore_nsubjects, ignore_ncomponents)
 
     return reshaped_input, new_imgs, shapes
 
@@ -865,7 +865,7 @@ def reduce_data(imgs, atlas, n_jobs=1, low_ram=False, temp_dir=None):
 
 
 def _reduced_space_compute_shared_response(
-    reduced_data_list, reduced_basis_list, n_components=50, transpose=False
+        reduced_data_list, reduced_basis_list, n_components=50, transpose=False, seed=0
 ):
     """Compute shared response with basis fixed in reduced space
 
@@ -912,9 +912,10 @@ def _reduced_space_compute_shared_response(
 
     # This is just to check that all subjects have same number of
     # timeframes in a given session
+    random_state = np.random.RandomState(seed)
     for n in range(n_subjects):
         if reduced_basis_list is None:
-            basis_n = np.eye(n_components, n_supervoxels)
+            basis_n = np.linalg.qr(random_state.random_sample((n_supervoxels, n_components)))[0].T
         else:
             basis_n = safe_load(reduced_basis_list[n])
         for m in range(n_sessions):
@@ -1700,6 +1701,7 @@ during session j in shared space.
             n_components=self.n_components,
             atlas_shape=atlas_shape,
             ignore_nsubjects=True,
+            ignore_ncomponents=True
         )
         check_indexes(subjects_indexes, "subjects_indexes")
         if subjects_indexes is None:
