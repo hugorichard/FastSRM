@@ -133,8 +133,8 @@ def solve_hungarian(recov, source):
     Parameters
     ----------------
 
-    recov: np.array
-    Array with the recovered sources
+    recov: np.array shape (n_timeframes, n_components)
+    Array with the recovered sources (n_timeframes, n_components)
 
     source: np.array
     Array with the true sources
