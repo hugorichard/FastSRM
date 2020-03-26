@@ -239,7 +239,7 @@ def ica_find_rotation(basis, n_subjects_ica):
         n_subjects_ica == 0. Please set a positive value for n_subjects_ica"
         )
 
-    if n_subjects_ica is None:
+    if n_subjects_ica is None or n_subjects_ica >= len(basis):
         warnings.warn(
             "n_subjects_ica has been set to %i. To remove"
             " this warning please set it manually" % len(basis)
