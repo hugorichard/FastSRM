@@ -16,7 +16,10 @@ from fastsrm.utils import (
     to_path,
 )
 from fastsrm.utils import align_basis
+from fastsrm.identifiable_srm import fast_srm
 import matplotlib.pyplot as plt
+from fastsrm.identifiable_srm import svd_reduce
+from tqdm import tqdm
 
 n_voxels = 500
 n_subjects = 5
@@ -436,7 +439,6 @@ def test_class_srm_inverse_transform(
             n_voxels, n_timeframes, n_subjects, datadir, 0, input_format
         )
 
-
         if tempdir:
             temp_dir = datadir
         else:
@@ -571,7 +573,13 @@ def test_convergence():
         for _ in range(n_subjects)
     ]
 
-    srm = IdentifiableFastSRM(atlas = np.arange(n_voxels), n_components=3, tol=1e-9, n_iter=1000, n_iter_reduced=1000)
+    srm = IdentifiableFastSRM(
+        atlas=np.arange(n_voxels),
+        n_components=3,
+        tol=1e-9,
+        n_iter=1000,
+        n_iter_reduced=1000,
+    )
     srm.fit(X)
     assert srm.grads[0][-1] < 1e-5
     assert srm.grads[1][-1] < 1e-5
@@ -594,7 +602,7 @@ def test_memory():
 
         dts = []
         for (low_ram, tempdir, n_jobs, aggregate, identifiability) in [
-            (True, True,1, "mean", "decorr"),
+            (True, True, 1, "mean", "decorr"),
             (False, False, 2, None, "ica"),
             (True, True, 1, "mean", None),
             (False, False, 1, None, None),
@@ -616,7 +624,7 @@ def test_memory():
                 tol=0,
                 n_jobs=n_jobs,
                 aggregate=aggregate,
-                memory=datadir + "/memory"
+                memory=datadir + "/memory",
             )
             t0 = time()
             srm.fit(X)
@@ -652,8 +660,9 @@ def test_memory():
 
             srm.clean()
 
-    for i in range(len(dts) -1):
-        assert dts[0] > dts[i+1]
+    for i in range(len(dts) - 1):
+        assert dts[0] > dts[i + 1]
+
 
 def test_ncomponents():
     X_train = [np.random.rand(100, 20) for _ in range(3)]
@@ -662,3 +671,40 @@ def test_ncomponents():
     srm = IdentifiableFastSRM(n_components=10, verbose=False)
     srm.fit(X_train)
     srm.transform(X_test)
+
+
+def test_svd_reduce():
+    n_subjects = 4
+    n_timeframes = [10, 11]
+    n_voxels = 100
+
+    X = [
+        [np.random.rand(n_voxels, n_t) for n_t in n_timeframes]
+        for _ in range(n_subjects)
+    ]
+    XX = [np.concatenate(X[i], axis=1) for i in range(n_subjects)]
+
+    X_red_svds = []
+    for i in range(n_subjects):
+        U, S, V = np.linalg.svd(XX[i])
+        X_red_svds.append(S.reshape(-1, 1) * V)
+    X_red = svd_reduce(X, 1, False)
+
+    X_red = [np.concatenate(X_red[i], axis=1) for i in range(n_subjects)]
+
+    for i in range(n_subjects):
+        np.testing.assert_array_almost_equal(
+            np.abs(X_red[i]), np.abs(X_red_svds[i])
+        )
+
+def test_use_pca():
+    for i in tqdm(range(20)):
+        X_train = [np.random.rand(100, 10) for _ in range(3)]
+        srm = IdentifiableFastSRM(n_components=5, use_pca=False, tol=1e-18, identifiability="decorr", n_iter=10000)
+        A = srm.fit_transform(X_train)
+
+        srm2 = IdentifiableFastSRM(
+            n_components=5, use_pca=True, n_iter=1, identifiability="decorr", tol=1e-18, n_iter_reduced=10000,
+        )
+        B = srm2.fit_transform(X_train)
+        np.testing.assert_array_almost_equal(A, B)

@@ -12,7 +12,7 @@ The implementation is based on the following publications:
 import logging
 import os
 import uuid
-
+import scipy.linalg
 import numpy as np
 from joblib import Parallel, delayed, Memory
 
@@ -37,6 +37,94 @@ from fastsrm.fastsrm import (
 )
 from sklearn.decomposition import FastICA
 import warnings
+
+
+def svd_reduce(imgs, n_jobs, verbose):
+    """Reduce data using svd.
+    Work done in parallel across subjects.
+
+    Parameters
+    ----------
+
+    imgs : array of str, shape=[n_subjects, n_sessions]
+        Element i, j of the array is a path to the data of subject i
+        collected during session j.
+        Data are loaded with numpy.load and expected shape is
+        [n_voxels, n_timeframes]
+        n_timeframes and n_voxels are assumed to be the same across subjects
+        n_timeframes can vary across sessions
+        Each voxel's timecourse is assumed to have mean 0 and variance 1
+
+        imgs can also be a list of list of arrays where element i, j of
+        the array is a numpy array of shape [n_voxels, n_timeframes] that
+        contains the data of subject i collected during session j.
+
+        imgs can also be a list of arrays where element i of the array is
+        a numpy array of shape [n_voxels, n_timeframes] that contains the
+        data of subject i (number of sessions is implicitly 1)
+
+    n_jobs : integer, optional, default=1
+        The number of CPUs to use to do the computation.
+         -1 means all CPUs, -2 all CPUs but one, and so on.
+
+    temp_dir : str or None
+        path to dir where temporary results are stored
+        if None temporary results will be stored in memory. This
+        can results in memory errors when the number of subjects
+        and / or sessions is large
+
+    low_ram : bool
+        if True and temp_dir is not None, reduced_data will be saved on disk
+        this increases the number of IO but reduces memory complexity when
+         the number of subject and/or sessions is large
+
+    Returns
+    -------
+    reduced_data: np array shape=[n_subjects, n_sessions]
+        Element i, j of the array is a path to the reduced data of subject i session j.
+        np.load(reduced_data[i, j]) has shape [n_timeframes, n_timeframes] first is dimension.
+        If low_ram is False then reduced data is a list of list (n_subjects, n_sessions)
+        of arrays of shape (n_timeframes, n_timeframes)
+
+    """
+    n_subjects = len(imgs)
+    n_timeframes = len(imgs[0])
+
+    def svd_i(img):
+        n_voxels = get_safe_shape(img[0])[0]
+
+        slices = []
+        t_i = 0
+        for i in range(len(img)):
+            n_voxels, n_timeframes = get_safe_shape(img[i])
+            slices.append(slice(t_i, t_i + n_timeframes))
+            t_i = t_i + n_timeframes
+        total_timeframes = t_i
+
+        # First compute X^TX
+        C = np.zeros((total_timeframes, total_timeframes))
+        for i in range(len(img)):
+            Xi = safe_load(img[i])
+            slice_i = slices[i]
+            C[slice_i, slice_i] = Xi.T.dot(Xi) / 2
+            for j in range(i + 1, len(img)):
+                Xj = safe_load(img[j])
+                slice_j = slices[j]
+                C[slice_i, slice_j] = Xi.T.dot(Xj)
+                del Xj
+            del Xi
+        C = C + C.T
+
+        # Then compute SVD
+        V, S, Vt = np.linalg.svd(C)
+        X_reduced = np.sqrt(S.reshape(-1, 1)) * Vt  # X_reduced = np.diag(np.sqrt(S)).dot(V)
+        X_reduced = [X_reduced[:, i] for i in slices]
+        return X_reduced
+
+    X = Parallel(n_jobs=n_jobs, verbose=verbose)(
+        delayed(svd_i)(img) for img in imgs
+    )
+    return X
 
 
 def clean_temp_dir(temp_dir, memory):
@@ -189,7 +277,13 @@ def decorr_find_rotation(shared_response):
 
     shared_response: np array of shape [n_components, n_timeframes]
     """
-    U, _, _ = np.linalg.svd(shared_response)
+    U, S, V = np.linalg.svd(shared_response, full_matrices=False)
+    def get_sign(u):
+        max_abs_cols = np.argmax(np.abs(u), axis=0)
+        signs = np.sign(u[max_abs_cols, range(u.shape[1])])
+        return signs
+    sign = get_sign(S * V.T)
+    U = sign * U
     return U.T
 
 
@@ -240,9 +334,13 @@ def fast_srm(
     n_sessions = len(reduced_data_list[0])
 
     if init is None:
-        shared_response = _reduced_space_compute_shared_response(
-            reduced_data_list, None, n_components, transpose
-        )
+        shared_response = []
+        for j in range(n_sessions):
+            n_voxels, n_timeframes = get_safe_shape(reduced_data_list[0][j])
+            if transpose:
+                shared_response.append(np.random.rand(n_components, n_timeframes).T)
+            else:
+                shared_response.append(np.random.rand(n_components, n_timeframes))
     else:
         shared_response = init
 
@@ -372,6 +470,15 @@ subject-specific responses in shared space
     tol: float
         Stops if the norm of the gradient falls below tolerance value
 
+    memory: str
+        Path to the caching directory.
+        Used to cache the fitting process.
+        By default, no caching is done.
+
+    use_pca: bool
+        If True use pca as a preprocessing step.
+        By default this is used when n_iter > 1
+
     Attributes
     ----------
 
@@ -408,6 +515,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         n_subjects_ica=None,
         tol=1e-6,
         memory=None,
+        use_pca=None,
     ):
 
         self.n_jobs = n_jobs
@@ -420,6 +528,14 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.tol = tol
         self.memory = memory
         self.n_iter_reduced = n_iter_reduced
+
+        if use_pca is None:
+            if self.n_iter > 1:
+                self.use_pca = True
+            else:
+                self.use_pca = False
+        else:
+            self.use_pca = use_pca
 
         if aggregate is not None and aggregate != "mean":
             raise ValueError("aggregate can have only value mean or None")
@@ -509,6 +625,7 @@ at the object level.
             n_iter,
             tol,
             n_iter_reduced,
+            use_pca,
         ):
             if verbose is True:
                 print("[FastSRM.fit] Checking input atlas")
@@ -525,17 +642,18 @@ at the object level.
             basis_list = []
             create_temp_dir(temp_dir)
 
-            if verbose is True:
-                print("[FastSRM.fit] Reducing data")
-
-            if atlas is None:
-                if verbose is True:
-                    print("[FastSRM.fit] Finds basis")
-
+            if atlas is None and use_pca is False:
                 grads_reduced = []
                 losses_reduced = []
 
-                basis, shared_response_list, grads_full, losses_full = fast_srm(
+                if verbose is True:
+                    print("[FastSRM.fit] Finding basis")
+                (
+                    basis,
+                    shared_response_list,
+                    grads_full,
+                    losses_full,
+                ) = fast_srm(
                     imgs_,
                     n_iter=n_iter,
                     n_components=n_components,
@@ -547,13 +665,26 @@ at the object level.
                     transpose=True,
                 )
             else:
-                reduced_data = reduce_data(
-                    imgs_,
-                    atlas=atlas,
-                    n_jobs=n_jobs,
-                    low_ram=low_ram,
-                    temp_dir=temp_dir,
-                )
+                if use_pca:
+                    if verbose is True:
+                        print("[FastSRM.fit] Reducing data using online svd")
+                    reduced_data = svd_reduce(
+                        imgs_, n_jobs=n_jobs, verbose=verbose
+                    )
+                    transpose = True
+
+                elif atlas is not None:
+                    if verbose is True:
+                        print("[FastSRM.fit] Reducing data using input atlas")
+
+                    reduced_data = reduce_data(
+                        imgs_,
+                        atlas=atlas,
+                        n_jobs=n_jobs,
+                        low_ram=low_ram,
+                        temp_dir=temp_dir,
+                    )
+                    transpose = False
 
                 if verbose is True:
                     print(
@@ -574,7 +705,7 @@ at the object level.
                     verbose=verbose,
                     temp_dir=temp_dir,
                     init=None,
-                    transpose=False,
+                    transpose=transpose,
                 )
 
                 if verbose is True:
@@ -611,6 +742,7 @@ at the object level.
             self.n_iter,
             self.tol,
             self.n_iter_reduced,
+            self.use_pca,
         )
 
         self.temp_dir = temp_dir

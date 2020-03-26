@@ -764,7 +764,7 @@ def reduce_data(imgs, atlas, n_jobs=1, low_ram=False, temp_dir=None):
         Element i, j of the array is a path to the data of subject i
         collected during session j.
         Data are loaded with numpy.load and expected shape is
-        [n_timeframes, n_voxels]
+        [n_voxels, n_timeframes]
         n_timeframes and n_voxels are assumed to be the same across subjects
         n_timeframes can vary across sessions
         Each voxel's timecourse is assumed to have mean 0 and variance 1
