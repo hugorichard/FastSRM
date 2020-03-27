@@ -611,7 +611,7 @@ at the object level.
         mem = Memory(self.memory)
 
         @mem.cache(
-            ignore=["n_jobs", "low_ram", "temp_dir", "verbose", "memory"]
+            ignore=["n_jobs", "low_ram", "temp_dir", "verbose", "memory", "use_pca"]
         )
         def _fit(
             imgs,
@@ -638,8 +638,8 @@ at the object level.
                 imgs, n_components=n_components, atlas_shape=atlas_shape
             )
 
-            clean_temp_dir(temp_dir, memory)
             basis_list = []
+            clean_temp_dir(temp_dir, memory)
             create_temp_dir(temp_dir)
 
             if atlas is None and use_pca is False:
@@ -745,14 +745,19 @@ at the object level.
             self.use_pca,
         )
 
-        self.temp_dir = temp_dir
+        if temp_dir != self.temp_dir:
+            clean_temp_dir(self.temp_dir, None)
+            create_temp_dir(self.temp_dir)
 
         # Basis can either be a list of path or arrays depending on tempdir
         # If memory is used we don't know in which form they are so we correct this here
         if self.memory is not None:
+            # If basis is already an array nothing to do
+            # If basis is not an array but we want an array we load it
             if self.temp_dir is None and not isinstance(basis[0], np.ndarray):
                 basis = [safe_load(basis[i]) for i in range(len(basis))]
-            if self.temp_dir is not None and isinstance(basis[0], np.ndarray):
+            # If we don't want an array we save the basis where we want
+            if self.temp_dir is not None:
                 for i in range(len(basis)):
                     basis_i = safe_load(basis[i])
                     path = os.path.join(self.temp_dir, "basis_%i" % i)

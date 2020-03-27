@@ -363,7 +363,6 @@ def test_fastsrm_class_correctness(
         )
         prev_basis = srm.basis_list
         # we need to align both basis though...
-        srm.fit(X)
         srm.basis_list = align_basis(srm.basis_list, prev_basis)
 
         basis = [safe_load(b) for b in srm.basis_list]
@@ -708,3 +707,33 @@ def test_use_pca():
         )
         B = srm2.fit_transform(X_train)
         np.testing.assert_array_almost_equal(A, B)
+
+
+def test_overwriting_memory():
+    n_voxels = 500
+    n_timeframes = [100, 101]
+    n_subjects = 4
+
+    with tempfile.TemporaryDirectory() as datadir:
+        X_train = [np.random.rand(100, 10) for _ in range(3)]
+        srm = IdentifiableFastSRM(
+            identifiability=None,
+            n_components=5,
+            temp_dir=datadir,
+            memory=datadir + "/memory",
+        )
+        srm.fit(X_train)
+        W = [np.load(w) for w in srm.basis_list]
+
+
+        srm2 = IdentifiableFastSRM(
+            identifiability="decorr",
+            n_components=5,
+            temp_dir=datadir,
+            memory=datadir + "/memory",
+        )
+        srm2.fit(X_train)
+
+        W_ = [np.load(w) for w in srm.basis_list]
+        np.testing.assert_array_almost_equal(W, W_)
+
