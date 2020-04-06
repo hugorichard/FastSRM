@@ -117,7 +117,9 @@ def svd_reduce(imgs, n_jobs, verbose):
 
         # Then compute SVD
         V, S, Vt = np.linalg.svd(C)
-        X_reduced = np.sqrt(S.reshape(-1, 1)) * Vt  # X_reduced = np.diag(np.sqrt(S)).dot(V)
+        X_reduced = (
+            np.sqrt(S.reshape(-1, 1)) * Vt
+        )  # X_reduced = np.diag(np.sqrt(S)).dot(V)
         X_reduced = [X_reduced[:, i] for i in slices]
         return X_reduced
 
@@ -278,10 +280,12 @@ def decorr_find_rotation(shared_response):
     shared_response: np array of shape [n_components, n_timeframes]
     """
     U, S, V = np.linalg.svd(shared_response, full_matrices=False)
+
     def get_sign(u):
         max_abs_cols = np.argmax(np.abs(u), axis=0)
         signs = np.sign(u[max_abs_cols, range(u.shape[1])])
         return signs
+
     sign = get_sign(S * V.T)
     U = sign * U
     return U.T
@@ -336,11 +340,14 @@ def fast_srm(
     if init is None:
         shared_response = []
         for j in range(n_sessions):
-            n_voxels, n_timeframes = get_safe_shape(reduced_data_list[0][j])
             if transpose:
-                shared_response.append(np.random.rand(n_components, n_timeframes).T)
+                n_voxels, n_timeframes = get_safe_shape(reduced_data_list[0][j])
             else:
-                shared_response.append(np.random.rand(n_components, n_timeframes))
+                n_timeframes, n_voxels = get_safe_shape(reduced_data_list[0][j])
+
+            shared_response.append(
+                np.random.rand(n_timeframes, n_components)
+            )
     else:
         shared_response = init
 
@@ -611,7 +618,14 @@ at the object level.
         mem = Memory(self.memory)
 
         @mem.cache(
-            ignore=["n_jobs", "low_ram", "temp_dir", "verbose", "memory", "use_pca"]
+            ignore=[
+                "n_jobs",
+                "low_ram",
+                "temp_dir",
+                "verbose",
+                "memory",
+                "use_pca",
+            ]
         )
         def _fit(
             imgs,

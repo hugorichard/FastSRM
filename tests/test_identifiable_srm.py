@@ -20,6 +20,7 @@ from fastsrm.identifiable_srm import fast_srm
 import matplotlib.pyplot as plt
 from fastsrm.identifiable_srm import svd_reduce
 from tqdm import tqdm
+from scipy.stats import laplace, norm
 
 n_voxels = 500
 n_subjects = 5
@@ -696,17 +697,29 @@ def test_svd_reduce():
             np.abs(X_red[i]), np.abs(X_red_svds[i])
         )
 
+
 def test_use_pca():
     for i in tqdm(range(20)):
         X_train = [np.random.rand(100, 10) for _ in range(3)]
-        srm = IdentifiableFastSRM(n_components=5, use_pca=False, tol=1e-18, identifiability="decorr", n_iter=10000)
+        srm = IdentifiableFastSRM(
+            n_components=5,
+            use_pca=False,
+            tol=1e-18,
+            identifiability="decorr",
+            n_iter=10000,
+        )
         A = srm.fit_transform(X_train)
 
         srm2 = IdentifiableFastSRM(
-            n_components=5, use_pca=True, n_iter=1, identifiability="decorr", tol=1e-18, n_iter_reduced=10000,
+            n_components=5,
+            use_pca=True,
+            n_iter=1,
+            identifiability="decorr",
+            tol=1e-18,
+            n_iter_reduced=10000,
         )
         B = srm2.fit_transform(X_train)
-        np.testing.assert_array_almost_equal(A, B)
+        np.testing.assert_array_almost_equal(A, B, 4)
 
 
 def test_overwriting_memory():
@@ -725,7 +738,6 @@ def test_overwriting_memory():
         srm.fit(X_train)
         W = [np.load(w) for w in srm.basis_list]
 
-
         srm2 = IdentifiableFastSRM(
             identifiability="decorr",
             n_components=5,
@@ -737,3 +749,16 @@ def test_overwriting_memory():
         W_ = [np.load(w) for w in srm.basis_list]
         np.testing.assert_array_almost_equal(W, W_)
 
+
+def test_atlas():
+    n_voxels = 500
+    n_timeframes = 100
+    n_subjects = 4
+    atlas = np.repeat(np.arange(10), 50)
+
+    X_train = [np.random.rand(n_voxels, n_timeframes) for _ in range(3)]
+    srm = IdentifiableFastSRM(
+        identifiability=None, atlas=atlas, n_components=5, n_iter=1
+    )
+    S = srm.fit_transform(X_train)
+    X_pred = srm.inverse_transform(S)
