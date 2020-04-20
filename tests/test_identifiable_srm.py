@@ -756,9 +756,53 @@ def test_atlas():
     n_subjects = 4
     atlas = np.repeat(np.arange(10), 50)
 
-    X_train = [np.random.rand(n_voxels, n_timeframes) for _ in range(3)]
+    X_train = [
+        np.random.rand(n_voxels, n_timeframes) for _ in range(n_subjects)
+    ]
     srm = IdentifiableFastSRM(
         identifiability=None, atlas=atlas, n_components=5, n_iter=1
     )
     S = srm.fit_transform(X_train)
     X_pred = srm.inverse_transform(S)
+
+
+def test_random_state():
+    n_voxels = 500
+    n_timeframes = 10
+    n_subjects = 4
+    X_train = [
+        np.random.rand(n_voxels, n_timeframes) for _ in range(n_subjects)
+    ]
+    srm = IdentifiableFastSRM(
+        identifiability=None,
+        n_components=5,
+        n_iter=1,
+        n_iter_reduced=3,
+        random_state=None,
+    )
+    srm2 = IdentifiableFastSRM(
+        identifiability=None,
+        n_components=5,
+        n_iter=1,
+        n_iter_reduced=3,
+        random_state=0,
+    )
+    srm3 = IdentifiableFastSRM(
+        identifiability=None,
+        n_components=5,
+        n_iter=1,
+        n_iter_reduced=3,
+        random_state=0,
+    )
+    S1 = srm.fit_transform(X_train)
+    S2 = srm2.fit_transform(X_train)
+    S3 = srm3.fit_transform(X_train)
+
+    print(S1)
+    print(S2)
+    print(S3)
+    np.testing.assert_allclose(S2, S3)
+
+    for S in [S2, S3]:
+        with pytest.raises(AssertionError,):
+            np.testing.assert_allclose(S, S1)
