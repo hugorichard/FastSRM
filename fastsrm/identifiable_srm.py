@@ -37,6 +37,7 @@ from fastsrm.fastsrm import (
 )
 from sklearn.decomposition import FastICA
 import warnings
+from sklearn.utils import check_random_state
 
 
 def svd_reduce(imgs, n_jobs, verbose):
@@ -87,8 +88,6 @@ def svd_reduce(imgs, n_jobs, verbose):
         of arrays of shape (n_timeframes, n_timeframes)
 
     """
-    n_subjects = len(imgs)
-    n_timeframes = len(imgs[0])
 
     def svd_i(img):
         n_voxels = get_safe_shape(img[0])[0]
@@ -218,7 +217,7 @@ def _compute_basis_subject_online(sessions, shared_response_list):
     return _compute_subject_basis(basis_i)
 
 
-def ica_find_rotation(basis, n_subjects_ica):
+def ica_find_rotation(basis, n_subjects_ica, random_state):
     """
     Finds rotation r such that
     r.dot(srm.basis_list[0]) is the appropriate basis
@@ -249,7 +248,7 @@ def ica_find_rotation(basis, n_subjects_ica):
         index = np.arange(len(basis))
         n_subjects_ica = len(basis)
     else:
-        index = np.random.choice(
+        index = random_state.choice(
             np.arange(len(basis)), size=n_subjects_ica, replace=False
         )
 
@@ -300,8 +299,8 @@ def fast_srm(
     verbose,
     temp_dir,
     init,
-    transpose=False,
-    return_grads=False,
+    transpose,
+    random_state,
 ):
     """Computes shared response and basis in reduced space
 
@@ -341,12 +340,16 @@ def fast_srm(
         shared_response = []
         for j in range(n_sessions):
             if transpose:
-                n_voxels, n_timeframes = get_safe_shape(reduced_data_list[0][j])
+                n_voxels, n_timeframes = get_safe_shape(
+                    reduced_data_list[0][j]
+                )
             else:
-                n_timeframes, n_voxels = get_safe_shape(reduced_data_list[0][j])
+                n_timeframes, n_voxels = get_safe_shape(
+                    reduced_data_list[0][j]
+                )
 
             shared_response.append(
-                np.random.rand(n_timeframes, n_components)
+                random_state.rand(n_timeframes, n_components)
             )
     else:
         shared_response = init
@@ -522,7 +525,8 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         n_subjects_ica=None,
         tol=1e-6,
         memory=None,
-        use_pca=None,
+        use_pca=True,
+        random_state=0,
     ):
 
         self.n_jobs = n_jobs
@@ -535,12 +539,10 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.tol = tol
         self.memory = memory
         self.n_iter_reduced = n_iter_reduced
+        self.random_state = check_random_state(random_state)
 
-        if use_pca is None:
-            if self.n_iter > 1:
-                self.use_pca = True
-            else:
-                self.use_pca = False
+        if atlas is not None:
+            self.use_pca = False
         else:
             self.use_pca = use_pca
 
@@ -640,6 +642,7 @@ at the object level.
             tol,
             n_iter_reduced,
             use_pca,
+            random_state,
         ):
             if verbose is True:
                 print("[FastSRM.fit] Checking input atlas")
@@ -652,7 +655,6 @@ at the object level.
                 imgs, n_components=n_components, atlas_shape=atlas_shape
             )
 
-            basis_list = []
             clean_temp_dir(temp_dir, memory)
             create_temp_dir(temp_dir)
 
@@ -677,6 +679,7 @@ at the object level.
                     temp_dir=temp_dir,
                     init=None,
                     transpose=True,
+                    random_state=random_state,
                 )
             else:
                 if use_pca:
@@ -720,6 +723,7 @@ at the object level.
                     temp_dir=temp_dir,
                     init=None,
                     transpose=transpose,
+                    random_state=random_state,
                 )
 
                 if verbose is True:
@@ -728,7 +732,12 @@ at the object level.
                         "full data and shared response"
                     )
 
-                basis, shared_response_list, grads_full, losses_full = fast_srm(
+                (
+                    basis,
+                    shared_response_list,
+                    grads_full,
+                    losses_full,
+                ) = fast_srm(
                     imgs_,
                     n_iter=n_iter,
                     n_components=n_components,
@@ -738,6 +747,7 @@ at the object level.
                     temp_dir=temp_dir,
                     init=shared_response_list,
                     transpose=True,
+                    random_state=random_state,
                 )
 
             grads = [grads_reduced, grads_full]
@@ -757,6 +767,7 @@ at the object level.
             self.tol,
             self.n_iter_reduced,
             self.use_pca,
+            self.random_state,
         )
 
         if temp_dir != self.temp_dir:
@@ -780,7 +791,11 @@ at the object level.
 
         if self.identifiability == "ica":
             # Compute rotation matrix and apply
-            r = ica_find_rotation(basis, n_subjects_ica=self.n_subjects_ica)
+            r = ica_find_rotation(
+                basis,
+                n_subjects_ica=self.n_subjects_ica,
+                random_state=self.random_state,
+            )
             basis = Parallel(n_jobs=self.n_jobs)(
                 delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
             )
