@@ -9,10 +9,8 @@ The implementation is based on the following publications:
 
 # Author: Hugo Richard
 
-import logging
 import os
 import uuid
-import scipy.linalg
 import numpy as np
 from joblib import Parallel, delayed, Memory
 
@@ -35,7 +33,7 @@ from fastsrm.fastsrm import (
     safe_load,
     get_safe_shape,
 )
-from sklearn.decomposition import FastICA
+from picard import picard
 import warnings
 from sklearn.utils import check_random_state
 
@@ -164,20 +162,6 @@ errors when the number of subjects and/or sessions is large
         return basis
 
 
-def check_voxel_centered(data):
-    """
-    Check that data are voxel centered
-
-    Parameters
-    ----------
-    data: array of shape [n_voxels, n_timeframes]
-    """
-    if np.max(np.abs(np.mean(data, axis=1))) > 1e-6:
-        raise ValueError(
-            "Input data should be voxel-centered when identifiability = ica"
-        )
-
-
 def _compute_basis_subject_online(sessions, shared_response_list):
     """Computes subject's basis with shared response fixed
 
@@ -240,11 +224,7 @@ def ica_find_rotation(basis, n_subjects_ica, random_state):
         n_subjects_ica == 0. Please set a positive value for n_subjects_ica"
         )
 
-    if n_subjects_ica is None or n_subjects_ica >= len(basis):
-        warnings.warn(
-            "n_subjects_ica has been set to %i. To remove"
-            " this warning please set it manually" % len(basis)
-        )
+    if n_subjects_ica is None:
         index = np.arange(len(basis))
         n_subjects_ica = len(basis)
     else:
@@ -255,17 +235,14 @@ def ica_find_rotation(basis, n_subjects_ica, random_state):
     used_basis = []
     for i in index:
         basis_i = safe_load(basis[i])
-        check_voxel_centered(basis_i)
         used_basis.append(basis_i)
 
     used_basis = np.concatenate(used_basis, axis=1) / np.sqrt(n_subjects_ica)
 
-    used_basis = used_basis.T
-    n_samples, n_features = used_basis.shape
+    n_features, n_samples = used_basis.shape
     used_basis = used_basis * np.sqrt(n_samples)
-    ica = FastICA(whiten=False)
-    ica.fit(used_basis)
-    return ica.components_
+    K, W, Y = picard(used_basis, whiten=False, max_iter=1000)
+    return W
 
 
 def decorr_find_rotation(shared_response):

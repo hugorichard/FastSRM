@@ -175,18 +175,6 @@ def generate_ica_friendly_data(
         raise ValueError("Wrong input_format")
 
 
-def test_voxelcentered():
-    X = [np.random.rand(n_voxels, n_timeframes[0]) for _ in range(3)]
-    srm = IdentifiableFastSRM(identifiability="ica")
-    with pytest.raises(
-        ValueError,
-        match=(
-            "Input data should be voxel-centered when identifiability = ica"
-        ),
-    ):
-        srm.fit(X)
-
-
 @pytest.mark.parametrize("identifiability", ("ica", "decorr", None))
 def test_fastsrm_class(identifiability):
     n_jobs = 1
