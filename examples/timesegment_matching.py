@@ -82,7 +82,7 @@ def time_segment_matching(
     return accuracy
 
 
-def cross_validated_timesegment_matching(algo, paths):
+def cross_validated_timesegment_matching(algo, paths, win_size):
     """
     This does subjects wise time segment matching (like in SRM paper) cross validated
     Parameters
@@ -91,6 +91,8 @@ def cross_validated_timesegment_matching(algo, paths):
     paths: str np array of shape (n_subjects, n_sessions)
         paths[i, j] is the path to masked data
         np.load(paths[i, j]) is of shape n_voxels, n_components
+    win_size: int
+        Length of time segment to recover
     """
     cv = KFold(n_splits=5, shuffle=False)
     n_sessions = len(paths[0])
@@ -100,7 +102,7 @@ def cross_validated_timesegment_matching(algo, paths):
         algo.fit(paths[:, sessions_train])
         shared_response = algo.transform(paths[:, sessions_test])
         shared_response = [np.concatenate(s, axis=1) for s in shared_response]
-        cv_scores.append(time_segment_matching(shared_response, win_size=9))
+        cv_scores.append(time_segment_matching(shared_response, win_size=win_size))
     return np.array(cv_scores)
 
 
