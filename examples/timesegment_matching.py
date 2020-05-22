@@ -180,7 +180,7 @@ def repeated_sessions_timesegment_matching(data,
                     if i != j:
                         C[i, j] = 0
             A = np.argmax(C, axis=1)
-            accuracy_.append(np.mean(np.arange(n_t - win_size) == A))
+            accuracy_.append(np.array(np.arange(n_t - win_size) == A))
         accuracy.append(accuracy_)
     return np.array(accuracy)
 
