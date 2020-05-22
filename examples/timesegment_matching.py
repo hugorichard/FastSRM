@@ -156,7 +156,7 @@ def repeated_sessions_timesegment_matching(data,
         Length of time segment to recover
     Returns
     -------
-    accuracy: np array of shape n_subjects, n_components
+    accuracy: np array of shape n_subjects, n_components, n_timesegments
         leave one subject out accuracy per subjects per components
     """
     import matplotlib.pyplot as plt
