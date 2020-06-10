@@ -13,7 +13,7 @@ setup(
     install_requires=[
         'scikit-learn',
         'joblib',
-        'picard'
+        'python-picard'
     ],
     version = '0.0.2',
     license='MIT',
