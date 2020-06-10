@@ -18,6 +18,7 @@ setup(
     version = '0.0.2',
     license='MIT',
     author='Hugo RICHARD',
+    download_url='https://github.com/hugorichard/FastSRM/archive/v_002.tar.gz',
     author_email='hugo.richard@inria.fr',
     url='https://github.com/hugorichard/FastSRM',
     long_description=long_description,
