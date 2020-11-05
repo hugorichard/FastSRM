@@ -1,6 +1,7 @@
 numpy>=1.12
 scikit-learn>=0.23
 python-picard
+joblib
 nibabel
 nilearn
 scipy>=0.18.0

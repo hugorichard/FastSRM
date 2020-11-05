@@ -15,7 +15,7 @@ setup(
         'joblib',
         'python-picard'
     ],
-    version = '0.0.2',
+    version = '0.0.3',
     license='MIT',
     author='Hugo RICHARD',
     download_url='https://github.com/hugorichard/FastSRM/archive/v_002.tar.gz',
