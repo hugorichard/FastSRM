@@ -13,7 +13,9 @@ setup(
     install_requires=[
         'scikit-learn',
         'joblib',
-        'python-picard'
+        'python-picard',
+        'tqdm',
+        'matplotlib'
     ],
     version = '0.0.3',
     license='MIT',
