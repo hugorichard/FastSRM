@@ -7,8 +7,3 @@ Install
 ---------
 
 `pip install fastsrm`
-
-Docs
-------
-
-Docs are available at https://hugorichard.github.io/FastSRM/generated/html/  
