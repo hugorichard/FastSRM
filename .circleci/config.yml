@@ -32,7 +32,7 @@ jobs:
           command: |
              source activate testenv
              which python
-             python -c "import multiviewica"
+             python -c "import fastsrm"
       - run:
           name: Run tests
           command: |
