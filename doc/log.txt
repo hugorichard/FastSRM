@@ -1,0 +1,134 @@
+sphinx-build -b html -d _build/doctrees   . _build/html
+Running Sphinx v3.1.1
+making output directory... done
+[autosummary] generating autosummary for: README.rst, api.rst, index.rst
+[autosummary] generating autosummary for: /home/hugo/Research/multiviewica/doc/generated/multiviewica.groupica.rst, /home/hugo/Research/multiviewica/doc/generated/multiviewica.multiviewica.rst, /home/hugo/Research/multiviewica/doc/generated/multiviewica.permica.rst
+generating gallery...
+generating gallery for auto_examples... [ 12%] plot_utils.py
+/home/hugo/Research/multiviewica/doc/conf.py:206: RemovedInSphinx40Warning: The app.add_stylesheet() is deprecated. Please use app.add_css_file() instead.
+  app.add_stylesheet('style.css')
+generating gallery for auto_examples... [ 25%] fmri_utils.py
+generating gallery for auto_examples... [ 37%] reconstruction_utils.py
+generating gallery for auto_examples... [ 50%] plot_synthetic_experiment.py
+generating gallery for auto_examples... [ 62%] plot_meg_phantom_experiment.py
+generating gallery for auto_examples... [ 75%] timesegment_matching_utils.py
+generating gallery for auto_examples... [ 87%] timesegment_matching.py
+generating gallery for auto_examples... [100%] reconstruction_experiment.py
+
+computation time summary:
+    - ../examples/plot_meg_phantom_experiment.py:   19.21 sec   0.0 MB
+    - ../examples/plot_synthetic_experiment.py:     12.94 sec   0.0 MB
+    - ../examples/plot_utils.py:                     0.00 sec   0.0 MB
+    - ../examples/fmri_utils.py:                     0.00 sec   0.0 MB
+    - ../examples/reconstruction_experiment.py:      0.00 sec   0.0 MB
+    - ../examples/reconstruction_utils.py:           0.00 sec   0.0 MB
+    - ../examples/timesegment_matching.py:           0.00 sec   0.0 MB
+    - ../examples/timesegment_matching_utils.py:     0.00 sec   0.0 MB
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 3 source files that are out of date
+updating environment: [new config] 16 added, 0 changed, 0 removed
+reading sources... [  6%] README
+reading sources... [ 12%] api
+reading sources... [ 18%] auto_examples/fmri_utils
+reading sources... [ 25%] auto_examples/index
+reading sources... [ 31%] auto_examples/plot_meg_phantom_experiment
+reading sources... [ 37%] auto_examples/plot_synthetic_experiment
+reading sources... [ 43%] auto_examples/plot_utils
+reading sources... [ 50%] auto_examples/reconstruction_experiment
+reading sources... [ 56%] auto_examples/reconstruction_utils
+reading sources... [ 62%] auto_examples/sg_execution_times
+reading sources... [ 68%] auto_examples/timesegment_matching
+reading sources... [ 75%] auto_examples/timesegment_matching_utils
+reading sources... [ 81%] generated/multiviewica.groupica
+reading sources... [ 87%] generated/multiviewica.multiviewica
+reading sources... [ 93%] generated/multiviewica.permica
+reading sources... [100%] index
+
+/home/hugo/miniconda3/envs/testenv/lib/python3.8/site-packages/multiviewica/multiviewica.py:docstring of multiviewica.multiviewica:2: WARNING: Undefined substitution referenced: "W_i".
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [  6%] README
+writing output... [ 12%] api
+writing output... [ 18%] auto_examples/fmri_utils
+writing output... [ 25%] auto_examples/index
+writing output... [ 31%] auto_examples/plot_meg_phantom_experiment
+writing output... [ 37%] auto_examples/plot_synthetic_experiment
+writing output... [ 43%] auto_examples/plot_utils
+writing output... [ 50%] auto_examples/reconstruction_experiment
+writing output... [ 56%] auto_examples/reconstruction_utils
+writing output... [ 62%] auto_examples/sg_execution_times
+writing output... [ 68%] auto_examples/timesegment_matching
+writing output... [ 75%] auto_examples/timesegment_matching_utils
+writing output... [ 81%] generated/multiviewica.groupica
+writing output... [ 87%] generated/multiviewica.multiviewica
+writing output... [ 93%] generated/multiviewica.permica
+writing output... [100%] index
+
+generating indices...  genindex py-modindexdone
+writing additional pages...  searchdone
+copying images... [  6%] ../figures/synthetic_experiment.png
+copying images... [ 13%] ../figures/reconstruction.png
+copying images... [ 20%] ../figures/timesegment_matching.png
+copying images... [ 26%] auto_examples/images/thumb/sphx_glr_plot_utils_thumb.png
+copying images... [ 33%] auto_examples/images/thumb/sphx_glr_fmri_utils_thumb.png
+copying images... [ 40%] auto_examples/images/thumb/sphx_glr_reconstruction_utils_thumb.png
+copying images... [ 46%] auto_examples/images/thumb/sphx_glr_plot_synthetic_experiment_thumb.png
+copying images... [ 53%] auto_examples/images/thumb/sphx_glr_plot_meg_phantom_experiment_thumb.png
+copying images... [ 60%] auto_examples/images/thumb/sphx_glr_timesegment_matching_utils_thumb.png
+copying images... [ 66%] auto_examples/images/thumb/sphx_glr_timesegment_matching_thumb.png
+copying images... [ 73%] auto_examples/images/thumb/sphx_glr_reconstruction_experiment_thumb.png
+copying images... [ 80%] auto_examples/images/sphx_glr_plot_meg_phantom_experiment_001.png
+copying images... [ 86%] auto_examples/images/sphx_glr_plot_meg_phantom_experiment_002.png
+copying images... [ 93%] auto_examples/images/sphx_glr_plot_meg_phantom_experiment_003.png
+copying images... [100%] auto_examples/images/sphx_glr_plot_synthetic_experiment_001.png
+
+copying downloadable files... [  5%] auto_examples/fmri_utils.py
+copying downloadable files... [ 11%] auto_examples/fmri_utils.ipynb
+copying downloadable files... [ 16%] auto_examples/auto_examples_python.zip
+copying downloadable files... [ 22%] auto_examples/auto_examples_jupyter.zip
+copying downloadable files... [ 27%] auto_examples/plot_meg_phantom_experiment.py
+copying downloadable files... [ 33%] auto_examples/plot_meg_phantom_experiment.ipynb
+copying downloadable files... [ 38%] auto_examples/plot_synthetic_experiment.py
+copying downloadable files... [ 44%] auto_examples/plot_synthetic_experiment.ipynb
+copying downloadable files... [ 50%] auto_examples/plot_utils.py
+copying downloadable files... [ 55%] auto_examples/plot_utils.ipynb
+copying downloadable files... [ 61%] auto_examples/reconstruction_experiment.py
+copying downloadable files... [ 66%] auto_examples/reconstruction_experiment.ipynb
+copying downloadable files... [ 72%] auto_examples/reconstruction_utils.py
+copying downloadable files... [ 77%] auto_examples/reconstruction_utils.ipynb
+copying downloadable files... [ 83%] auto_examples/timesegment_matching.py
+copying downloadable files... [ 88%] auto_examples/timesegment_matching.ipynb
+copying downloadable files... [ 94%] auto_examples/timesegment_matching_utils.py
+copying downloadable files... [100%] auto_examples/timesegment_matching_utils.ipynb
+
+copying static files... ... done
+copying extra files... done
+dumping search index in English (code: en)... done
+dumping object inventory... done
+build succeeded, 1 warning.
+
+The HTML pages are in _build/html.
+
+Sphinx-gallery successfully executed 3 out of 3 files subselected by:
+
+    gallery_conf["filename_pattern"] = '/plot'
+    gallery_conf["ignore_pattern"]   = '__init__\\.py'
+
+after excluding 0 files that had previously been run (based on MD5).
+
+embedding documentation hyperlinks...
+embedding documentation hyperlinks for auto_examples... [ 10%] index.html
+embedding documentation hyperlinks for auto_examples... [ 20%] reconstruction_utils.html
+embedding documentation hyperlinks for auto_examples... [ 30%] sg_execution_times.html
+embedding documentation hyperlinks for auto_examples... [ 40%] fmri_utils.html
+embedding documentation hyperlinks for auto_examples... [ 50%] timesegment_matching.html
+embedding documentation hyperlinks for auto_examples... [ 60%] plot_synthetic_experiment.html
+embedding documentation hyperlinks for auto_examples... [ 70%] reconstruction_experiment.html
+embedding documentation hyperlinks for auto_examples... [ 80%] plot_meg_phantom_experiment.html
+embedding documentation hyperlinks for auto_examples... [ 90%] timesegment_matching_utils.html
+embedding documentation hyperlinks for auto_examples... [100%] plot_utils.html
+
+
+Build finished. The HTML pages are in _build/html.
