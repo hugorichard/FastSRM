@@ -1,0 +1,11 @@
+numpy>=1.12
+scikit-learn>=0.23
+python-picard
+nibabel
+nilearn
+scipy>=0.18.0
+matplotlib>=2.0.0
+pytest
+pytest-timeout
+pytest-cov
+coverage
