@@ -63,6 +63,18 @@ jobs:
           root: doc/_build
           paths:
             - html
+      - checkout
+      - attach_workspace:
+          at: doc/_build
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "hugo.richard@inria.fr"
+            git config user.name "hrichard"
+    - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dist doc/_build/html
       - save_cache:
           key: v3-packages
           paths:
