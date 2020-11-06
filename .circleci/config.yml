@@ -89,8 +89,8 @@ jobs:
           fingerprints:
             - "6a:5d:db:dc:93:87:30:b8:e5:34:b5:1b:47:d7:af:a4"
       - run:
-        name: Deploy docs to gh-pages branch
-        command: gh-pages --dotfiles --message "[skip ci] Updates" --dist doc/_build/html
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dotfiles --message "[skip ci] Updates" --dist doc/_build/html
 
 workflows:
   version: 2
