@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/python:3.8.1-buster
 
@@ -63,6 +63,18 @@ jobs:
           root: doc/_build
           paths:
             - html
+      - save_cache:
+          key: v3-packages
+          paths:
+            - $HOME/miniconda3
+      - save_cache:
+          key: pip-cache
+          paths:
+            - ~/.cache/pip
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
       - checkout
       - attach_workspace:
           at: doc/_build
@@ -75,11 +87,17 @@ jobs:
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dist doc/_build/html
-      - save_cache:
-          key: v3-packages
-          paths:
-            - $HOME/miniconda3
-      - save_cache:
-          key: pip-cache
-          paths:
-            - ~/.cache/pip
+      - add_ssh_keys:
+          fingerprints:
+            - "6a:5d:db:dc:93:87:30:b8:e5:34:b5:1b:47:d7:af:a4"
+
+workflows:
+  build:
+    jobs:
+      - test
+      - docs-deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
