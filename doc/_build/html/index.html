@@ -1,0 +1,587 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FastSRM’s documentation &mdash; FastSRM  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> FastSRM
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">FastSRM’s documentation</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">FastSRM</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>FastSRM’s documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fastsrm-s-documentation">
+<h1>FastSRM’s documentation<a class="headerlink" href="#fastsrm-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-fastsrm.identifiable_srm"></span><p>Fast Shared Response Model (FastSRM)</p>
+<p>The implementation is based on the following publications:</p>
+<dl class="citation">
+<dt class="label" id="richard2019"><span class="brackets"><a class="fn-backref" href="#id1">Richard2019</a></span></dt>
+<dd><p>“Fast Shared Response Model for fMRI data”
+H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019
+<a class="reference external" href="https://arxiv.org/pdf/1909.12537.pdf">https://arxiv.org/pdf/1909.12537.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM">
+<em class="property">class </em><code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">IdentifiableFastSRM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atlas</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">n_iter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n_iter_reduced</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">temp_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">low_ram</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">'warn'</span></em>, <em class="sig-param"><span class="n">aggregate</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">identifiability</span><span class="o">=</span><span class="default_value">'ica'</span></em>, <em class="sig-param"><span class="n">n_subjects_ica</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-12</span></em>, <em class="sig-param"><span class="n">memory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_pca</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="Permalink to this definition">¶</a></dt>
+<dd><p>SRM decomposition using a very low amount of memory and computational power thanks to the use of an atlas as described in <a class="reference internal" href="#richard2019" id="id1"><span>[Richard2019]</span></a>.</p>
+<p>Given multi-subject data, factorize it as a shared response S among all subjects and an orthogonal transform (basis) W per subject:</p>
+<div class="math notranslate nohighlight">
+\[X_i \approx W_i S, \forall i=1 \dots N\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atlas</strong> (<em>array</em><em>, </em><em>shape=</em><em>[</em><em>n_supervoxels</em><em>, </em><em>n_voxels</em><em>] or </em><em>array</em><em>,</em><em>shape=</em><em>[</em><em>n_voxels</em><em>] or </em><em>str</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Probabilistic or deterministic atlas on which to project the data. Deterministic atlas is an array of shape [n_voxels,] where values range from 1 to n_supervoxels. Voxels labelled 0 will be ignored. If atlas is a str the corresponding array is loaded with numpy.load and expected shape is (n_voxels,) for a deterministic atlas and (n_supervoxels, n_voxels) for a probabilistic atlas.</p></li>
+<li><p><strong>n_components</strong> (<em>int</em>) – Number of timecourses of the shared coordinates</p></li>
+<li><p><strong>n_iter</strong> (<em>int</em>) – Number of iterations to perform</p></li>
+<li><p><strong>n_iter_reduced</strong> (<em>int</em>) – Number of iterations to perform on reduced data</p></li>
+<li><p><strong>temp_dir</strong> (<em>str</em><em> or </em><em>None</em>) – Path to dir where temporary results are stored. If None temporary results will be stored in memory. This can results in memory errors when the number of subjects and/or sessions is large</p></li>
+<li><p><strong>low_ram</strong> (<em>bool</em>) – If True and temp_dir is not None, reduced_data will be saved on disk. This increases the number of IO but reduces memory complexity when the number of subject and/or sessions is large</p></li>
+<li><p><strong>n_jobs</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default=1</em>) – The number of CPUs to use to do the computation. -1 means all CPUs, -2 all CPUs but one, and so on.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em> or </em><em>&quot;warn&quot;</em>) – If True, logs are enabled. If False, logs are disabled. If “warn” only warnings are printed.</p></li>
+<li><p><strong>aggregate</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>default=&quot;mean&quot;</em>) – If “mean”, shared_response is the mean shared response from all subjects. If None, shared_response contains all subject-specific responses in shared space</p></li>
+<li><p><strong>identifiability</strong> (<em>str</em><em> or </em><em>None</em>) – Possible values:
+- None: yields the SRM solution without modification
+- “ica”: performs a linear ICA on spatial maps
+- “decorr” (default): shared response has diagonal covariance(diagonal values are sorted)</p></li>
+<li><p><strong>n_subjects_ica</strong> (<em>int</em>) – Number of randomly selected subject used to fit ica
+(only used if identifiability = “ica”)</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Stops if the norm of the gradient falls below tolerance value</p></li>
+<li><p><strong>memory</strong> (<em>str</em>) – Path to the caching directory.
+Used to cache the fitting process.
+By default, no caching is done.</p></li>
+<li><p><strong>use_pca</strong> (<em>bool</em>) – If True use pca as a preprocessing step.
+By default this is used when n_iter &gt; 1</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">`basis_list`</code></dt>
+<dd><ul class="simple">
+<li><p>if basis is a list of array, element i is the basis of subject i</p></li>
+<li><p>if basis is a list of str, element i is the path to the basis of subject i that is loaded with np.load yielding an array of shape [n_components, n_voxels].</p></li>
+</ul>
+<p>Note that any call to the clean method erases this attribute</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of array, element i has shape=[n_components, n_voxels] or list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>References:</strong>
+H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared response model for fMRI data (<a class="reference external" href="https://arxiv.org/pdf/1909.12537.pdf">https://arxiv.org/pdf/1909.12537.pdf</a>)</p>
+</div>
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects">
+<code class="sig-name descname">add_subjects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">shared_response</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add subjects to the current fit. Each new basis will be appended at the end of the list of basis (which can be accessed using self.basis)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
+<p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
+</p></li>
+<li><p><strong>shared_response</strong> (<em>list of arrays</em><em>, </em><em>list of list of arrays</em><em> or </em><em>array</em>) – <ul>
+<li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
+<li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=None: shared response is a list of list of array, element i, j is the projection of data of subject i collected during session j in shared space.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.clean">
+<code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>This erases temporary files and basis_list attribute to free memory. This method should be called when fitted model is not needed anymore.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes basis across subjects from input imgs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
+<p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
+</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Returns the instance itself. Contains attributes listed at the object level.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes basis across subjects and shared response from input imgs
+return shared response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
+<p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
+</p></li>
+<li><p><strong>subjects_indexes</strong> (<em>list</em><em> or </em><em>None:</em>) – if None imgs[i] will be transformed using basis_list[i]. Otherwise imgs[i] will be transformed using basis_list[subjects_index[i]]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>shared_response</strong> –</p>
+<ul class="simple">
+<li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
+<li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=None: shared response is a list of list of array, element i, j is the projection of data of subject i collected during session j in shared space.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of arrays, list of list of arrays or array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.inverse_transform">
+<code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shared_response</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sessions_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.inverse_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>From shared response and basis from training data
+reconstruct subject’s data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shared_response</strong> (<em>list of arrays</em><em>, </em><em>list of list of arrays</em><em> or </em><em>array</em>) – <ul>
+<li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
+<li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=None: shared response is a list of list of array, element i, j is the projection of data of subject i collected during session j in shared space.</p></li>
+</ul>
+</p></li>
+<li><p><strong>subjects_indexes</strong> (<em>list</em><em> or </em><em>None</em>) – if None reconstructs data of all subjects used during train. Otherwise reconstructs data of subjects specified by subjects_indexes.</p></li>
+<li><p><strong>sessions_indexes</strong> (<em>list</em><em> or </em><em>None</em>) – if None reconstructs data of all sessions. Otherwise uses reconstructs data of sessions specified by sessions_indexes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>reconstructed_data</strong> –</p>
+<ul class="simple">
+<li><p>if reconstructed_data is a list of list : element i, j is the reconstructed data for subject subjects_indexes[i] and session sessions_indexes[j] as an np array of shape n_voxels, n_timeframes</p></li>
+<li><p>if reconstructed_data is a list : element i is the reconstructed data for subject subject_indexes[i] as an np array of shape n_voxels, n_timeframes</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of list of arrays or list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>From data in imgs and basis from training data,
+computes shared response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
+<p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
+</p></li>
+<li><p><strong>subjects_indexes</strong> (<em>list</em><em> or </em><em>None:</em>) – if None imgs[i] will be transformed using basis_list[i]. Otherwise imgs[i] will be transformed using basis[subjects_index[i]]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>shared_response</strong> –</p>
+<ul class="simple">
+<li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
+<li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
+<li><p>if imgs is an array or a list of list of array and self.aggregate=None: shared response is a list of list of array, element i, j is the projection of data of subject i collected during session j in shared space.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of arrays, list of list of arrays or array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="fastsrm.identifiable_srm.apply_rotation">
+<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">apply_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">basis</span></em>, <em class="sig-param"><span class="n">rotation</span></em>, <em class="sig-param"><span class="n">temp_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.apply_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply rotation to matrix
+:param basis:
+:type basis: array of shape [n_components, n_voxels]
+:param rotation:
+:type rotation: array of shape [n_components, n_components]
+:param temp_dir: Path to dir where temporary results are stored. If None temporary results will be stored in memory. This can results in memory errors when the number of subjects and/or sessions is large
+:type temp_dir: str or None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>rotated_basis</strong> – rotated_basis = rotation.dot(basis)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array of shape [n_components, n_voxels]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fastsrm.identifiable_srm.decorr_find_rotation">
+<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">decorr_find_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shared_response</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.decorr_find_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds rotation r such that
+r.dot(W) is the appropriate basis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shared_response</strong> (<em>np array of shape</em><em> [</em><em>n_components</em><em>, </em><em>n_timeframes</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fastsrm.identifiable_srm.fast_srm">
+<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">fast_srm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reduced_data_list</span></em>, <em class="sig-param"><span class="n">n_iter</span></em>, <em class="sig-param"><span class="n">n_components</span></em>, <em class="sig-param"><span class="n">save_basis</span></em>, <em class="sig-param"><span class="n">tol</span></em>, <em class="sig-param"><span class="n">verbose</span></em>, <em class="sig-param"><span class="n">temp_dir</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="n">transpose</span></em>, <em class="sig-param"><span class="n">random_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.fast_srm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes shared response and basis in reduced space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reduced_data_list</strong> (<em>array</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>]</em>) – </p></li>
+<li><p><strong>array</strong> (<em>or</em>) – Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected
+shape is [n_timeframes, n_supervoxels]
+or Element i, j of the array is the data in array of
+shape=[n_timeframes, n_supervoxels]
+n_timeframes and n_supervoxels are
+assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
+<li><p><strong>shape=</strong><strong>[</strong><strong>n_subjects</strong> – Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected
+shape is [n_timeframes, n_supervoxels]
+or Element i, j of the array is the data in array of
+shape=[n_timeframes, n_supervoxels]
+n_timeframes and n_supervoxels are
+assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
+<li><p><strong>n_sessions</strong> – Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected
+shape is [n_timeframes, n_supervoxels]
+or Element i, j of the array is the data in array of
+shape=[n_timeframes, n_supervoxels]
+n_timeframes and n_supervoxels are
+assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
+<li><p><strong>n_timeframes</strong> – Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected
+shape is [n_timeframes, n_supervoxels]
+or Element i, j of the array is the data in array of
+shape=[n_timeframes, n_supervoxels]
+n_timeframes and n_supervoxels are
+assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
+<li><p><strong>n_supervoxels</strong><strong>]</strong> – Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected
+shape is [n_timeframes, n_supervoxels]
+or Element i, j of the array is the data in array of
+shape=[n_timeframes, n_supervoxels]
+n_timeframes and n_supervoxels are
+assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
+<li><p><strong>n_iter</strong> (<em>int</em>) – Number of iterations performed</p></li>
+<li><p><strong>n_components</strong> (<em>int</em><em> or </em><em>None</em>) – number of components</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>shared_response_list</strong> –</p>
+<dl class="simple">
+<dt>shape=[n_timeframes, n_components]</dt><dd><p>shared response, element i is the shared response during session i</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of array, element i has</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fastsrm.identifiable_srm.ica_find_rotation">
+<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">ica_find_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">basis</span></em>, <em class="sig-param"><span class="n">n_subjects_ica</span></em>, <em class="sig-param"><span class="n">random_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.ica_find_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds rotation r such that
+r.dot(srm.basis_list[0]) is the appropriate basis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basis</strong> (<em>list of array</em>) – </p></li>
+<li><p><strong>n_subjects_ica</strong> (<em>int</em>) – Number of randomly selected subject used to fit ica</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em>) – if False: basis[i] has shape [n_components, n_voxels]
+if True: basis[i] has shape [n_voxels, n_components]</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="fastsrm.identifiable_srm.svd_reduce">
+<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">svd_reduce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">n_jobs</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.svd_reduce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduce data using svd.
+Work done in parallel across subjects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>]</em>) – <p>Element i, j of the array is a path to the data of subject i
+collected during session j.
+Data are loaded with numpy.load and expected shape is
+[n_voxels, n_timeframes]
+n_timeframes and n_voxels are assumed to be the same across subjects
+n_timeframes can vary across sessions
+Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<p>imgs can also be a list of list of arrays where element i, j of
+the array is a numpy array of shape [n_voxels, n_timeframes] that
+contains the data of subject i collected during session j.</p>
+<p>imgs can also be a list of arrays where element i of the array is
+a numpy array of shape [n_voxels, n_timeframes] that contains the
+data of subject i (number of sessions is implicitly 1)</p>
+</p></li>
+<li><p><strong>n_jobs</strong> (<em>integer</em><em>, </em><em>optional</em><em>, </em><em>default=1</em>) – <dl class="simple">
+<dt>The number of CPUs to use to do the computation.</dt><dd><p>-1 means all CPUs, -2 all CPUs but one, and so on.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>temp_dir</strong> (<em>str</em><em> or </em><em>None</em>) – path to dir where temporary results are stored
+if None temporary results will be stored in memory. This
+can results in memory errors when the number of subjects
+and / or sessions is large</p></li>
+<li><p><strong>low_ram</strong> (<em>bool</em>) – if True and temp_dir is not None, reduced_data will be saved on disk
+this increases the number of IO but reduces memory complexity when
+the number of subject and/or sessions is large</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>reduced_data</strong> – Element i, j of the array is a path to the reduced data of subject i session j.
+np.load(reduced_data[i, j]) has shape [n_timeframes, n_timeframes] first is dimension.
+If low_ram is False then reduced data is a list of list (n_subjects, n_sessions)
+of arrays of shape (n_timeframes, n_timeframes)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np array shape=[n_subjects, n_sessions]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Hugo RICHARD
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
