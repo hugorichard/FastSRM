@@ -71,6 +71,7 @@ jobs:
           key: pip-cache
           paths:
             - ~/.cache/pip
+
   docs-deploy:
     docker:
       - image: node:8.10.0
@@ -92,6 +93,7 @@ jobs:
         command: gh-pages --dotfiles --message "[skip ci] Updates" --dist doc/_build/html
 
 workflows:
+  version: 2
   build:
     jobs:
       - test
