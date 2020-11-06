@@ -75,7 +75,7 @@ def svd_reduce(imgs, n_jobs, verbose):
     low_ram : bool
         if True and temp_dir is not None, reduced_data will be saved on disk
         this increases the number of IO but reduces memory complexity when
-         the number of subject and/or sessions is large
+        the number of subject and/or sessions is large
 
     Returns
     -------
@@ -293,7 +293,7 @@ def fast_srm(
         or Element i, j of the array is the data in array of
         shape=[n_timeframes, n_supervoxels]
         n_timeframes and n_supervoxels are
-         assumed to be the same across subjects
+        assumed to be the same across subjects
         n_timeframes can vary across sessions
         Each voxel's timecourse is assumed to have mean 0 and variance 1
 
