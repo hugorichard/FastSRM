@@ -3,3 +3,4 @@ sphinx-bootstrap-theme
 pillow
 sphinx-gallery
 pandoc
+sphinx_rtd_theme
