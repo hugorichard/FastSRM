@@ -10,3 +10,8 @@ Install
 ---------
 
 `pip install fastsrm`
+
+Documentation
+--------------
+
+https://hugorichard.github.io/FastSRM/
