@@ -6,14 +6,24 @@ import pytest
 from numpy.testing import assert_array_almost_equal
 from sklearn.exceptions import NotFittedError
 
-from fastsrm.fastsrm import (FastSRM, _compute_and_save_corr_mat,
-                             _compute_and_save_subject_basis,
-                             _compute_basis_subject_online,
-                             _reduced_space_compute_shared_response,
-                             check_atlas, check_imgs, check_shared_response,
-                             create_temp_dir, fast_srm, reduce_data, safe_load)
+from fastsrm.fastsrm import (
+    FastSRM,
+    _compute_and_save_corr_mat,
+    _compute_and_save_subject_basis,
+    _compute_basis_subject_online,
+    _reduced_space_compute_shared_response,
+    check_atlas,
+    check_imgs,
+    check_shared_response,
+    create_temp_dir,
+    fast_srm,
+    reduce_data,
+    safe_load,
+)
+from fastsrm.identifiable_srm import IdentifiableFastSRM
 
-from fastsrm.utils import to_path, generate_data
+
+from fastsrm.utils import generate_data
 
 n_voxels = 10
 n_subjects = 5
@@ -32,15 +42,17 @@ def test_generated_data():
         n_sessions = len(n_timeframes)
 
         np.random.seed(0)
-        paths, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                    n_components, datadir)
+        paths, W, S = generate_data(
+            n_voxels, n_timeframes, n_subjects, n_components, datadir
+        )
 
         # Test if generated data has the good shape
         for subject in range(n_subjects):
             for session in range(n_sessions):
-                assert (np.load(
-                    paths[subject, session]).shape == (n_voxels,
-                                                       n_timeframes[session]))
+                assert np.load(paths[subject, session]).shape == (
+                    n_voxels,
+                    n_timeframes[session],
+                )
 
         # Test if generated basis have good shape
         assert len(W) == n_subjects
@@ -53,16 +65,21 @@ def test_generated_data():
 
 
 def test_bad_aggregate():
-    with pytest.raises(ValueError,
-                       match="aggregate can have only value mean or None"):
+    with pytest.raises(
+        ValueError, match="aggregate can have only value mean or None"
+    ):
         FastSRM(aggregate="invalid")
 
 
 def test_check_atlas():
     assert check_atlas(None) is None
-    with pytest.raises(ValueError,
-                       match=("Atlas is stored using type <class 'list'> "
-                              "which is neither np.ndarray or str")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Atlas is stored using type <class 'list'> "
+            "which is neither np.ndarray or str"
+        ),
+    ):
         check_atlas([])
 
     A = np.random.rand(10, 100)
@@ -81,113 +98,152 @@ def test_check_atlas():
         np.save(f, A)
         assert check_atlas(f + ".npy") == (5, 11)
 
-    with pytest.raises(ValueError,
-                       match=("Atlas has 3 axes. It should have either "
-                              "1 or 2 axes.")):
+    with pytest.raises(
+        ValueError,
+        match=("Atlas has 3 axes. It should have either " "1 or 2 axes."),
+    ):
         check_atlas(np.random.rand(5, 1, 2))
 
-    with pytest.raises(ValueError,
-                       match=(r"Number of regions in the atlas is lower than "
-                              r"the number of components \(3 < 5\)")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"Number of regions in the atlas is lower than "
+            r"the number of components \(3 < 5\)"
+        ),
+    ):
         check_atlas(np.random.rand(3, 10), n_components=5)
 
-    with pytest.raises(ValueError,
-                       match=(r"Number of regions in the atlas is bigger than "
-                              r"the number of voxels \(5 > 2\)")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"Number of regions in the atlas is bigger than "
+            r"the number of voxels \(5 > 2\)"
+        ),
+    ):
         check_atlas(np.random.rand(5, 2))
 
 
 empty_list_error = "%s is a list of length 0 which is not valid"
-array_type_error = ("%s should be of type np.ndarray but is of type %s")
-array_2axis_error = ("%s must have exactly 2 axes but has %i axes")
+array_type_error = "%s should be of type np.ndarray but is of type %s"
+array_2axis_error = "%s must have exactly 2 axes but has %i axes"
 
 
 def test_check_imgs():
     with pytest.raises(
-            ValueError,
-            match=(r"Since imgs is a list, it should be a list of list "
-                   r"of arrays or a list "
-                   r"of arrays but imgs\[0\] has type <class 'str'>")):
+        ValueError,
+        match=(
+            r"Since imgs is a list, it should be a list of list "
+            r"of arrays or a list "
+            r"of arrays but imgs\[0\] has type <class 'str'>"
+        ),
+    ):
         check_imgs(["bla"])
 
     with pytest.raises(
-            ValueError,
-            match=("Input imgs should either be a list or an array but "
-                   "has type <class 'str'>")):
+        ValueError,
+        match=(
+            "Input imgs should either be a list or an array but "
+            "has type <class 'str'>"
+        ),
+    ):
         check_imgs("bla")
 
     with pytest.raises(ValueError, match=empty_list_error % "imgs"):
         check_imgs([])
 
     with pytest.raises(
-            ValueError,
-            match=r"imgs\[1\] has type <class 'str'> whereas imgs\[0\] has "
-            "type <class 'int'>. This is inconsistent."):
+        ValueError,
+        match=r"imgs\[1\] has type <class 'str'> whereas imgs\[0\] has "
+        "type <class 'int'>. This is inconsistent.",
+    ):
         check_imgs([0, "bla"])
 
     with pytest.raises(ValueError, match=empty_list_error % r"imgs\[0\]"):
         check_imgs([[]])
 
     with pytest.raises(
-            ValueError,
-            match=(r"imgs\[1\] has length 1 whereas imgs\[0\] has length 2."
-                   " All subjects should have the same number of sessions.")):
+        ValueError,
+        match=(
+            r"imgs\[1\] has length 1 whereas imgs\[0\] has length 2."
+            " All subjects should have the same number of sessions."
+        ),
+    ):
         check_imgs([["a", "a"], ["a"]])
 
-    with pytest.raises(ValueError,
-                       match=array_type_error %
-                       (r"imgs\[0\]\[0\]", r"<class 'str'>")):
+    with pytest.raises(
+        ValueError,
+        match=array_type_error % (r"imgs\[0\]\[0\]", r"<class 'str'>"),
+    ):
         check_imgs([["bka"]])
 
-    with pytest.raises(ValueError,
-                       match=array_2axis_error % (r"imgs\[0\]\[0\]", 1)):
+    with pytest.raises(
+        ValueError, match=array_2axis_error % (r"imgs\[0\]\[0\]", 1)
+    ):
         check_imgs([[np.random.rand(5)]])
 
-    with pytest.raises(ValueError,
-                       match=array_2axis_error % (r"imgs\[0\]", 1)):
+    with pytest.raises(
+        ValueError, match=array_2axis_error % (r"imgs\[0\]", 1)
+    ):
         check_imgs([np.random.rand(5)])
 
-    with pytest.raises(ValueError,
-                       match=(r"imgs\[0, 0\] is stored using type "
-                              "<class 'numpy.float64'> which is not a str")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"imgs\[0, 0\] is stored using type "
+            "<class 'numpy.float64'> which is not a str"
+        ),
+    ):
         check_imgs(np.random.rand(5, 3))
 
     with pytest.raises(ValueError, match=array_2axis_error % (r"imgs", 1)):
         check_imgs(np.random.rand(5))
 
     with pytest.raises(
-            ValueError,
-            match=("The number of subjects should be greater than 1")):
+        ValueError, match=("The number of subjects should be greater than 1")
+    ):
         check_imgs([np.random.rand(5, 3)])
 
     with pytest.raises(
-            ValueError,
-            match=("Subject 1 Session 0 does not have the same number "
-                   "of timeframes as Subject 0 Session 0")):
+        ValueError,
+        match=(
+            "Subject 1 Session 0 does not have the same number "
+            "of timeframes as Subject 0 Session 0"
+        ),
+    ):
         check_imgs([np.random.rand(10, 5), np.random.rand(10, 10)])
 
     with pytest.raises(
-            ValueError,
-            match=("Subject 1 Session 0 does not have the same number "
-                   "of voxels as Subject 0 Session 0")):
+        ValueError,
+        match=(
+            "Subject 1 Session 0 does not have the same number "
+            "of voxels as Subject 0 Session 0"
+        ),
+    ):
         check_imgs([np.random.rand(10, 5), np.random.rand(20, 5)])
 
     with pytest.raises(
-            ValueError,
-            match=("Total number of timeframes is shorter than number "
-                   r"of components \(5 < 8\)")):
-        check_imgs([np.random.rand(10, 5),
-                    np.random.rand(10, 5)],
-                   n_components=8)
+        ValueError,
+        match=(
+            "Total number of timeframes is shorter than number "
+            r"of components \(5 < 8\)"
+        ),
+    ):
+        check_imgs(
+            [np.random.rand(10, 5), np.random.rand(10, 5)], n_components=8
+        )
 
     with pytest.raises(
-            ValueError,
-            match=("Number of voxels in the atlas is not the same as "
-                   r"the number of voxels in input data \(11 != 10\)")):
-        check_imgs([np.random.rand(10, 5),
-                    np.random.rand(10, 5)],
-                   n_components=3,
-                   atlas_shape=(8, 11))
+        ValueError,
+        match=(
+            "Number of voxels in the atlas is not the same as "
+            r"the number of voxels in input data \(11 != 10\)"
+        ),
+    ):
+        check_imgs(
+            [np.random.rand(10, 5), np.random.rand(10, 5)],
+            n_components=3,
+            atlas_shape=(8, 11),
+        )
 
 
 def test_check_shared():
@@ -203,17 +259,14 @@ def test_check_shared():
     input_shapes[1, 1, 0] = 10
     input_shapes[1, 1, 1] = 2
 
-    shared_list_list = [[
-        np.array([[1, 2, 3], [4, 5, 6]]),
-        np.array([[1, 2], [4, 5]]),
-    ], [
-        np.array([[2, 3, 4], [5, 6, 7]]),
-        np.array([[2, 3], [5, 6]]),
-    ]]
+    shared_list_list = [
+        [np.array([[1, 2, 3], [4, 5, 6]]), np.array([[1, 2], [4, 5]]),],
+        [np.array([[2, 3, 4], [5, 6, 7]]), np.array([[2, 3], [5, 6]]),],
+    ]
 
     shared_list_subjects = [
         np.array([[1, 2, 3, 1, 2], [4, 5, 6, 4, 5]]),
-        np.array([[2, 3, 4, 2, 3], [5, 6, 7, 5, 6]])
+        np.array([[2, 3, 4, 2, 3], [5, 6, 7, 5, 6]]),
     ]
 
     shared_list_sessions = [
@@ -221,76 +274,112 @@ def test_check_shared():
         np.array([[1.5, 2.5], [4.5, 5.5]]),
     ]
 
-    shared_array = np.array([[1.5, 2.5, 3.5, 1.5, 2.5],
-                             [4.5, 5.5, 6.5, 4.5, 5.5]])
+    shared_array = np.array(
+        [[1.5, 2.5, 3.5, 1.5, 2.5], [4.5, 5.5, 6.5, 4.5, 5.5]]
+    )
 
-    with pytest.raises(ValueError,
-                       match=(r"shared_response should be either a list or an "
-                              "array but is of type <class 'str'>")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"shared_response should be either a list or an "
+            "array but is of type <class 'str'>"
+        ),
+    ):
         check_shared_response("bla")
 
     with pytest.raises(
-            ValueError,
-            match=(r"shared_response is a list but shared_response\[0\] "
-                   "is neither a list or an array. This is invalid.")):
+        ValueError,
+        match=(
+            r"shared_response is a list but shared_response\[0\] "
+            "is neither a list or an array. This is invalid."
+        ),
+    ):
         check_shared_response(["bla", "bli"])
 
     with pytest.raises(
-            ValueError,
-            match=(r"shared_response\[0\] is a list but shared_response\[1\] "
-                   "is not a list this is incompatible")):
+        ValueError,
+        match=(
+            r"shared_response\[0\] is a list but shared_response\[1\] "
+            "is not a list this is incompatible"
+        ),
+    ):
         check_shared_response(
-            [[np.random.rand(2, 2)], np.array([1])], aggregate=None)
-
-    with pytest.raises(ValueError,
-                       match=(r"shared_response\[1\] has len 1 whereas "
-                              r"shared_response\[0\] has len 2. They should "
-                              "have same len")):
-        check_shared_response([[np.random.rand(2, 2),
-                                np.random.rand(2, 2)], [np.random.rand(2, 2)]],
-                              aggregate=None)
+            [[np.random.rand(2, 2)], np.array([1])], aggregate=None
+        )
 
     with pytest.raises(
-            ValueError,
-            match=('Number of timeframes in input images during session 0 '
-                   'does not match the number of timeframes during session '
-                   r'0 of shared_response \(2 != 3\)')):
+        ValueError,
+        match=(
+            r"shared_response\[1\] has len 1 whereas "
+            r"shared_response\[0\] has len 2. They should "
+            "have same len"
+        ),
+    ):
+        check_shared_response(
+            [
+                [np.random.rand(2, 2), np.random.rand(2, 2)],
+                [np.random.rand(2, 2)],
+            ],
+            aggregate=None,
+        )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Number of timeframes in input images during session 0 "
+            "does not match the number of timeframes during session "
+            r"0 of shared_response \(2 != 3\)"
+        ),
+    ):
         check_shared_response(
             [np.random.rand(2, 2), np.random.rand(2, 2)],
             aggregate="mean",
-            input_shapes=input_shapes)
+            input_shapes=input_shapes,
+        )
 
-    with pytest.raises(ValueError,
-                       match=("Number of components in shared_response "
-                              "during session 0 is different than "
-                              "the number of components of the "
-                              r"model \(2 != 4\)")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Number of components in shared_response "
+            "during session 0 is different than "
+            "the number of components of the "
+            r"model \(2 != 4\)"
+        ),
+    ):
         check_shared_response(np.random.rand(2, 10), n_components=4)
 
-    with pytest.raises(ValueError,
-                       match=("self.aggregate has value 'mean' but shared "
-                              "response is a list of list. "
-                              "This is incompatible")):
+    with pytest.raises(
+        ValueError,
+        match=(
+            "self.aggregate has value 'mean' but shared "
+            "response is a list of list. "
+            "This is incompatible"
+        ),
+    ):
         added_session, reshaped_shared = check_shared_response(
             shared_list_list,
             aggregate="mean",
             n_components=2,
-            input_shapes=input_shapes)
+            input_shapes=input_shapes,
+        )
 
     added_session, reshaped_shared = check_shared_response(
         shared_list_subjects,
         aggregate=None,
         n_components=2,
-        input_shapes=input_shapes)
+        input_shapes=input_shapes,
+    )
     assert added_session
-    assert_array_almost_equal(np.array(reshaped_shared),
-                              shared_array.reshape(1, 2, 5))
+    assert_array_almost_equal(
+        np.array(reshaped_shared), shared_array.reshape(1, 2, 5)
+    )
 
     added_session, reshaped_shared = check_shared_response(
         shared_list_sessions,
         aggregate="mean",
         n_components=2,
-        input_shapes=input_shapes)
+        input_shapes=input_shapes,
+    )
     assert not added_session
     for j in range(len(reshaped_shared)):
         assert_array_almost_equal(reshaped_shared[j], shared_list_sessions[j])
@@ -299,10 +388,12 @@ def test_check_shared():
         shared_array,
         aggregate="mean",
         n_components=2,
-        input_shapes=input_shapes)
+        input_shapes=input_shapes,
+    )
     assert added_session
-    assert_array_almost_equal(np.array(reshaped_shared),
-                              shared_array.reshape(1, 2, 5))
+    assert_array_almost_equal(
+        np.array(reshaped_shared), shared_array.reshape(1, 2, 5)
+    )
 
 
 def test_reduce_data_dummyatlases():
@@ -317,31 +408,32 @@ def test_reduce_data_dummyatlases():
             n_sessions = len(n_timeframes)
 
             np.random.seed(0)
-            paths, _, _ = generate_data(n_voxels, n_timeframes, n_subjects,
-                                        n_components, datadir)
+            paths, _, _ = generate_data(
+                n_voxels, n_timeframes, n_subjects, n_components, datadir
+            )
 
             # test atlas that reduces nothing
             atlas = np.arange(1, n_voxels + 1)
-            data = reduce_data(paths,
-                               atlas=atlas,
-                               n_jobs=n_jobs,
-                               low_ram=False)
+            data = reduce_data(
+                paths, atlas=atlas, n_jobs=n_jobs, low_ram=False
+            )
             for i in range(n_subjects):
                 for j in range(n_sessions):
-                    assert_array_almost_equal(data[i, j].T,
-                                              np.load(paths[i, j]))
+                    assert_array_almost_equal(
+                        data[i, j].T, np.load(paths[i, j])
+                    )
 
             # test atlas that reduces everything
             atlas = np.ones(n_voxels)
-            data = reduce_data(paths,
-                               atlas=atlas,
-                               n_jobs=n_jobs,
-                               low_ram=False)
+            data = reduce_data(
+                paths, atlas=atlas, n_jobs=n_jobs, low_ram=False
+            )
             for i in range(n_subjects):
                 for j in range(n_sessions):
                     assert_array_almost_equal(
                         data[i, j].T.flatten(),
-                        np.mean(np.load(paths[i, j]), axis=0))
+                        np.mean(np.load(paths[i, j]), axis=0),
+                    )
 
 
 def test_reduce_data_outputshapes():
@@ -357,22 +449,23 @@ def test_reduce_data_outputshapes():
             n_sessions = len(n_timeframes)
 
             np.random.seed(0)
-            paths, _, _ = generate_data(n_voxels, n_timeframes, n_subjects,
-                                        n_components, datadir)
+            paths, _, _ = generate_data(
+                n_voxels, n_timeframes, n_subjects, n_components, datadir
+            )
 
             # Test if reduced data has the good shape
             # probabilistic atlas
             atlas = np.random.rand(n_supervoxels, n_voxels)
-            data = reduce_data(paths,
-                               atlas=atlas,
-                               n_jobs=n_jobs,
-                               low_ram=False,
-                               temp_dir=None)
+            data = reduce_data(
+                paths, atlas=atlas, n_jobs=n_jobs, low_ram=False, temp_dir=None
+            )
 
             for subject in range(n_subjects):
                 for session in range(n_sessions):
                     assert data[subject, session].shape == (
-                        n_timeframes[session], n_supervoxels)
+                        n_timeframes[session],
+                        n_supervoxels,
+                    )
 
             # deterministic atlas
             det_atlas = np.round(np.random.rand(n_voxels) * n_supervoxels)
@@ -381,16 +474,20 @@ def test_reduce_data_outputshapes():
                 det_atlas = np.round(np.random.rand(n_voxels) * n_supervoxels)
                 n_unique = len(np.unique(det_atlas)[1:])
 
-            data = reduce_data(paths,
-                               atlas=det_atlas,
-                               n_jobs=n_jobs,
-                               low_ram=True,
-                               temp_dir=datadir)
+            data = reduce_data(
+                paths,
+                atlas=det_atlas,
+                n_jobs=n_jobs,
+                low_ram=True,
+                temp_dir=datadir,
+            )
 
             for subject in range(n_subjects):
                 for session in range(n_sessions):
-                    assert (np.load(data[subject, session]).shape == (
-                        n_timeframes[session], n_supervoxels))
+                    assert np.load(data[subject, session]).shape == (
+                        n_timeframes[session],
+                        n_supervoxels,
+                    )
 
 
 def test_reduced_data_srm():
@@ -406,33 +503,32 @@ def test_reduced_data_srm():
         n_components = 3  # number of components used for SRM model
         n_sessions = len(n_timeframes)
 
-        paths, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                    n_components, datadir, 0)
+        paths, W, S = generate_data(
+            n_voxels, n_timeframes, n_subjects, n_components, datadir, 0
+        )
 
         atlas = np.arange(1, n_voxels + 1)
-        data = reduce_data(paths,
-                           atlas=atlas,
-                           n_jobs=n_jobs,
-                           low_ram=False,
-                           temp_dir=None)
+        data = reduce_data(
+            paths, atlas=atlas, n_jobs=n_jobs, low_ram=False, temp_dir=None
+        )
 
         # Test if shared response has the good shape
-        shared_response_list = \
-            _reduced_space_compute_shared_response(
-                data,
-                reduced_basis_list=None,
-                n_components=n_components
-            )
+        shared_response_list = _reduced_space_compute_shared_response(
+            data, reduced_basis_list=None, n_components=n_components
+        )
         assert len(shared_response_list) == n_sessions
 
         for session in range(n_sessions):
-            assert (shared_response_list[session].shape == (
-                n_timeframes[session], n_components))
+            assert shared_response_list[session].shape == (
+                n_timeframes[session],
+                n_components,
+            )
 
         # Test basis from shared response
         for i, sessions in enumerate(paths):
             basis = _compute_basis_subject_online(
-                sessions, [S[k].T for k in range(len(S))])
+                sessions, [S[k].T for k in range(len(S))]
+            )
             # test shape
             assert basis.shape == (n_components, n_voxels)
             # test orthogonality
@@ -442,23 +538,28 @@ def test_reduced_data_srm():
 
         # Test reduced_data_shared_response
         shared_response_list = _reduced_space_compute_shared_response(
-            data, reduced_basis_list=W, n_components=n_components)
+            data, reduced_basis_list=W, n_components=n_components
+        )
         for session in range(n_sessions):
             S_real = np.mean(
                 [data[i, session].dot(W[i].T) for i in range(n_subjects)],
-                axis=0)
+                axis=0,
+            )
             assert_array_almost_equal(shared_response_list[session], S_real)
-            assert_array_almost_equal(shared_response_list[session],
-                                      S[session].T)
+            assert_array_almost_equal(
+                shared_response_list[session], S[session].T
+            )
 
         shared_response_list = fast_srm(data, n_components=n_components)
 
         for i, sessions in enumerate(paths):
-            basis = _compute_basis_subject_online(sessions,
-                                                  shared_response_list)
+            basis = _compute_basis_subject_online(
+                sessions, shared_response_list
+            )
             for j, session in enumerate(sessions):
-                assert_array_almost_equal(shared_response_list[j].dot(basis),
-                                          np.load(paths[i, j]).T)
+                assert_array_almost_equal(
+                    shared_response_list[j].dot(basis), np.load(paths[i, j]).T
+                )
 
 
 def test_compute_and_save():
@@ -469,8 +570,9 @@ def test_compute_and_save():
         n_subjects = 5
         n_components = 3  # number of components used for SRM model
 
-        paths, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                    n_components, datadir, 0)
+        paths, W, S = generate_data(
+            n_voxels, n_timeframes, n_subjects, n_components, datadir, 0
+        )
 
         for m, subjects in enumerate(paths.T):
             for subject in subjects:
@@ -495,17 +597,20 @@ def test_fastsrm_class():
         n_components = 3  # number of components used for SRM model
 
         np.random.seed(0)
-        paths, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                    n_components, datadir, 0)
+        paths, W, S = generate_data(
+            n_voxels, n_timeframes, n_subjects, n_components, datadir, 0
+        )
 
         atlas = np.arange(1, n_voxels + 1)
-        srm = FastSRM(atlas=atlas,
-                      n_components=n_components,
-                      n_iter=10,
-                      temp_dir=datadir,
-                      low_ram=True,
-                      verbose=True,
-                      n_jobs=n_jobs)
+        srm = FastSRM(
+            atlas=atlas,
+            n_components=n_components,
+            n_iter=10,
+            temp_dir=datadir,
+            low_ram=True,
+            verbose=True,
+            n_jobs=n_jobs,
+        )
 
         # Raises an error because model is not fitted yet
         with pytest.raises(NotFittedError):
@@ -513,11 +618,15 @@ def test_fastsrm_class():
 
         srm.fit(paths)
         # An error can occur if temporary directory already exists
-        with pytest.raises(ValueError,
-                           match=("Path %s already exists. When a model "
-                                  "is used, filesystem should be "
-                                  r"cleaned by using the .clean\(\) "
-                                  "method" % srm.temp_dir)):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "Path %s already exists. When a model "
+                "is used, filesystem should be "
+                r"cleaned by using the .clean\(\) "
+                "method" % srm.temp_dir
+            ),
+        ):
             # Error can occur if the filesystem is uncleaned
             create_temp_dir(srm.temp_dir)
             create_temp_dir(srm.temp_dir)
@@ -525,40 +634,64 @@ def test_fastsrm_class():
         shared_response = srm.transform(paths)
 
         # Raise error when wrong index
-        with pytest.raises(ValueError,
-                           match=("subjects_indexes should be either "
-                                  "a list, an array or None but "
-                                  "received type <class 'int'>")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "subjects_indexes should be either "
+                "a list, an array or None but "
+                "received type <class 'int'>"
+            ),
+        ):
             srm.transform(paths, subjects_indexes=1000)
 
-        with pytest.raises(ValueError,
-                           match=("subjects_indexes should be either "
-                                  "a list, an array or None but "
-                                  "received type <class 'int'>")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "subjects_indexes should be either "
+                "a list, an array or None but "
+                "received type <class 'int'>"
+            ),
+        ):
             srm.inverse_transform(shared_response, subjects_indexes=1000)
 
-        with pytest.raises(ValueError,
-                           match=("sessions_indexes should be either "
-                                  "a list, an array or None but "
-                                  "received type <class 'int'>")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "sessions_indexes should be either "
+                "a list, an array or None but "
+                "received type <class 'int'>"
+            ),
+        ):
             srm.inverse_transform(shared_response, sessions_indexes=1000)
 
-        with pytest.raises(ValueError,
-                           match=("Input data imgs has len 5 whereas "
-                                  "subject_indexes has len 1. "
-                                  "The number of basis used to compute "
-                                  "the shared response should be equal to "
-                                  "the number of subjects in imgs")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "Input data imgs has len 5 whereas "
+                "subject_indexes has len 1. "
+                "The number of basis used to compute "
+                "the shared response should be equal to "
+                "the number of subjects in imgs"
+            ),
+        ):
             srm.transform(paths, subjects_indexes=[0])
 
-        with pytest.raises(ValueError,
-                           match=("Index 1 of subjects_indexes has value 8 "
-                                  "whereas value should be between 0 and 4")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "Index 1 of subjects_indexes has value 8 "
+                "whereas value should be between 0 and 4"
+            ),
+        ):
             srm.transform(paths[:2], subjects_indexes=[0, 8])
 
-        with pytest.raises(ValueError,
-                           match=("Index 1 of sessions_indexes has value 8 "
-                                  "whereas value should be between 0 and 1")):
+        with pytest.raises(
+            ValueError,
+            match=(
+                "Index 1 of sessions_indexes has value 8 "
+                "whereas value should be between 0 and 1"
+            ),
+        ):
             srm.inverse_transform(shared_response, sessions_indexes=[0, 8])
 
         # Check behavior of .clean
@@ -573,10 +706,14 @@ def apply_aggregate(shared_response, aggregate, input_format):
             return [np.mean(shared_response, axis=0)]
         else:
             return [
-                np.mean([
-                    shared_response[i][j] for i in range(len(shared_response))
-                ],
-                        axis=0) for j in range(len(shared_response[0]))
+                np.mean(
+                    [
+                        shared_response[i][j]
+                        for i in range(len(shared_response))
+                    ],
+                    axis=0,
+                )
+                for j in range(len(shared_response[0]))
             ]
     else:
         if input_format == "list_of_array":
@@ -588,8 +725,9 @@ def apply_aggregate(shared_response, aggregate, input_format):
 def apply_input_format(X, input_format):
     if input_format == "array":
         n_sessions = len(X[0])
-        XX = [[np.load(X[i, j]) for j in range(len(X[i]))]
-              for i in range(len(X))]
+        XX = [
+            [np.load(X[i, j]) for j in range(len(X[i]))] for i in range(len(X))
+        ]
     elif input_format == "list_of_array":
         XX = [[x] for x in X]
         n_sessions = 1
@@ -601,21 +739,46 @@ def apply_input_format(X, input_format):
 
 @pytest.mark.parametrize(
     "input_format, low_ram, tempdir, atlas, n_jobs, n_timeframes, aggregate",
-    [("array", True, True, None, 1, [25, 25], "mean"),
-     ("list_of_list", False, False, np.arange(1, n_voxels + 1), 1, [25, 24
-                                                                    ], None),
-     ("list_of_list", False, False, np.arange(1, n_voxels + 1), 2, [25, 25
-                                                                    ], None),
-     ("list_of_array", True, True, np.eye(n_voxels), 2, [25, 24], None),
-     ("list_of_array", True, True, np.eye(n_voxels), 2, [25, 25], None),
-     ("list_of_array", True, True, np.eye(n_voxels), 1, [25, 25], None),
-     ("list_of_array", False, True, None, 2, [25, 24], "mean")])
-def test_fastsrm_class_correctness(input_format, low_ram, tempdir, atlas,
-                                   n_jobs, n_timeframes, aggregate):
+    [
+        ("array", True, True, None, 1, [25, 25], "mean"),
+        (
+            "list_of_list",
+            False,
+            False,
+            np.arange(1, n_voxels + 1),
+            1,
+            [25, 24],
+            None,
+        ),
+        (
+            "list_of_list",
+            False,
+            False,
+            np.arange(1, n_voxels + 1),
+            2,
+            [25, 25],
+            None,
+        ),
+        ("list_of_array", True, True, np.eye(n_voxels), 2, [25, 24], None),
+        ("list_of_array", True, True, np.eye(n_voxels), 2, [25, 25], None),
+        ("list_of_array", True, True, np.eye(n_voxels), 1, [25, 25], None),
+        ("list_of_array", False, True, None, 2, [25, 24], "mean"),
+    ],
+)
+def test_fastsrm_class_correctness(
+    input_format, low_ram, tempdir, atlas, n_jobs, n_timeframes, aggregate
+):
     with tempfile.TemporaryDirectory() as datadir:
         np.random.seed(0)
-        X, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                n_components, datadir, 0, input_format)
+        X, W, S = generate_data(
+            n_voxels,
+            n_timeframes,
+            n_subjects,
+            n_components,
+            datadir,
+            0,
+            input_format,
+        )
 
         XX, n_sessions = apply_input_format(X, input_format)
 
@@ -641,52 +804,77 @@ def test_fastsrm_class_correctness(input_format, low_ram, tempdir, atlas,
         srm.fit(X)
         basis = [safe_load(b) for b in srm.basis_list]
         shared_response_raw = srm.transform(X)
-        shared_response = apply_aggregate(shared_response_raw, aggregate,
-                                          input_format)
-        shared_response_fittransform = apply_aggregate(srm.fit_transform(X),
-                                                       aggregate, input_format)
+        shared_response = apply_aggregate(
+            shared_response_raw, aggregate, input_format
+        )
+        shared_response_fittransform = apply_aggregate(
+            srm.fit_transform(X), aggregate, input_format
+        )
 
         for j in range(n_sessions):
-            assert_array_almost_equal(shared_response_fittransform[j],
-                                      shared_response[j])
+            assert_array_almost_equal(
+                shared_response_fittransform[j], shared_response[j]
+            )
 
         # Check that the decomposition works
         for i in range(n_subjects):
             for j in range(n_sessions):
-                assert_array_almost_equal(shared_response[j].T.dot(basis[i]),
-                                          XX[i][j].T)
+                assert_array_almost_equal(
+                    shared_response[j].T.dot(basis[i]), XX[i][j].T
+                )
 
         # Check that if we use all subjects but one if gives almost the
         # same shared response
-        shared_response_partial_raw = srm.transform(X[1:5],
-                                                    subjects_indexes=list(
-                                                        range(1, 5)))
+        shared_response_partial_raw = srm.transform(
+            X[1:5], subjects_indexes=list(range(1, 5))
+        )
 
-        shared_response_partial = apply_aggregate(shared_response_partial_raw,
-                                                  aggregate, input_format)
+        shared_response_partial = apply_aggregate(
+            shared_response_partial_raw, aggregate, input_format
+        )
         for j in range(n_sessions):
-            assert_array_almost_equal(shared_response_partial[j],
-                                      shared_response[j])
+            assert_array_almost_equal(
+                shared_response_partial[j], shared_response[j]
+            )
 
         # Check that if we perform add 2 times the same subject we
         # obtain the same decomposition
         srm.add_subjects(X[:1], shared_response_raw)
-        assert_array_almost_equal(safe_load(srm.basis_list[0]),
-                                  safe_load(srm.basis_list[-1]))
+        assert_array_almost_equal(
+            safe_load(srm.basis_list[0]), safe_load(srm.basis_list[-1])
+        )
 
 
 @pytest.mark.parametrize(
     "input_format, low_ram, tempdir, atlas, n_jobs, n_timeframes, aggregate",
-    [("array", True, True, None, 1, [25, 25], "mean"),
-     ("list_of_list", False, False, np.arange(1, n_voxels + 1), 1, [25, 24
-                                                                    ], None),
-     ("list_of_array", False, True, None, 1, [25, 24], "mean")])
-def test_class_srm_inverse_transform(input_format, low_ram, tempdir, atlas,
-                                     n_jobs, n_timeframes, aggregate):
+    [
+        ("array", True, True, None, 1, [25, 25], "mean"),
+        (
+            "list_of_list",
+            False,
+            False,
+            np.arange(1, n_voxels + 1),
+            1,
+            [25, 24],
+            None,
+        ),
+        ("list_of_array", False, True, None, 1, [25, 24], "mean"),
+    ],
+)
+def test_class_srm_inverse_transform(
+    input_format, low_ram, tempdir, atlas, n_jobs, n_timeframes, aggregate
+):
 
     with tempfile.TemporaryDirectory() as datadir:
-        X, W, S = generate_data(n_voxels, n_timeframes, n_subjects,
-                                n_components, datadir, 0, input_format)
+        X, W, S = generate_data(
+            n_voxels,
+            n_timeframes,
+            n_subjects,
+            n_components,
+            datadir,
+            0,
+            input_format,
+        )
 
         if tempdir:
             temp_dir = datadir
@@ -708,40 +896,88 @@ def test_class_srm_inverse_transform(input_format, low_ram, tempdir, atlas,
         shared_response_raw = srm.transform(X)
         # Check inverse transform
         if input_format == "list_of_array":
-            reconstructed_data = srm.inverse_transform(shared_response_raw,
-                                                       subjects_indexes=[0, 2])
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw, subjects_indexes=[0, 2]
+            )
             for i, ii in enumerate([0, 2]):
                 assert_array_almost_equal(reconstructed_data[i], X[ii])
 
-            reconstructed_data = srm.inverse_transform(shared_response_raw,
-                                                       subjects_indexes=None)
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw, subjects_indexes=None
+            )
             for i in range(len(X)):
                 assert_array_almost_equal(reconstructed_data[i], X[i])
         else:
-            reconstructed_data = srm.inverse_transform(shared_response_raw,
-                                                       sessions_indexes=[1],
-                                                       subjects_indexes=[0, 2])
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw,
+                sessions_indexes=[1],
+                subjects_indexes=[0, 2],
+            )
             for i, ii in enumerate([0, 2]):
                 for j, jj in enumerate([1]):
-                    assert_array_almost_equal(reconstructed_data[i][j],
-                                              safe_load(X[ii][jj]))
+                    assert_array_almost_equal(
+                        reconstructed_data[i][j], safe_load(X[ii][jj])
+                    )
 
-            reconstructed_data = srm.inverse_transform(shared_response_raw,
-                                                       subjects_indexes=None,
-                                                       sessions_indexes=None)
+            reconstructed_data = srm.inverse_transform(
+                shared_response_raw,
+                subjects_indexes=None,
+                sessions_indexes=None,
+            )
 
             for i in range(len(X)):
                 for j in range(len(X[i])):
-                    assert_array_almost_equal(reconstructed_data[i][j],
-                                              safe_load(X[i][j]))
+                    assert_array_almost_equal(
+                        reconstructed_data[i][j], safe_load(X[i][j])
+                    )
+
+
+@pytest.mark.parametrize("method", ["isrm", "srm"])
+def test_error_small_n_voxels(method):
+    X = [np.random.rand(10, 12) for _ in range(2)]
+
+    if method == "isrm":
+        srm = IdentifiableFastSRM(n_components=12, n_iter=10)
+    if method == "srm":
+        srm = FastSRM(n_components=12, n_iter=10)
+
+    with pytest.raises(
+        ValueError,
+        match=("Number of components is larger " "than the number "),
+    ):
+        srm.fit(X)
+
+
+@pytest.mark.parametrize("method", ["isrm", "srm"])
+@pytest.mark.parametrize("atlas", [np.random.rand(10, 20)])
+def test_error_small_n_regions(method, atlas):
+    X = [np.random.rand(20, 12) for _ in range(2)]
+
+    if method == "isrm":
+        srm = IdentifiableFastSRM(n_components=12, n_iter=10, atlas=atlas)
+    if method == "srm":
+        srm = FastSRM(n_components=12, n_iter=10, atlas=atlas)
+
+    with pytest.raises(
+        ValueError,
+        match=("Number of components is larger " "than the number "),
+    ):
+        srm.fit(X)
 
 
 @pytest.mark.parametrize("tempdir", (True, False))
 def test_addsubs_wo_fit(tempdir):
 
     with tempfile.TemporaryDirectory() as datadir:
-        X, W, S = generate_data(n_voxels, [24, 25], n_subjects, n_components,
-                                datadir, 0, "list_of_list")
+        X, W, S = generate_data(
+            n_voxels,
+            [24, 25],
+            n_subjects,
+            n_components,
+            datadir,
+            0,
+            "list_of_list",
+        )
 
         if tempdir:
             temp_dir = datadir
@@ -768,5 +1004,3 @@ def test_ncomponents():
     srm = FastSRM(n_components=10)
     srm.fit(X_train)
     srm.transform(X_test)
-
-
