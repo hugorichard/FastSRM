@@ -107,8 +107,8 @@ def test_check_atlas():
     with pytest.raises(
         ValueError,
         match=(
-            r"Number of regions in the atlas is lower than "
-            r"the number of components \(3 < 5\)"
+            r"Number of components is larger than the number of regions "
+            r"in the atlas \(5 > 3\)"
         ),
     ):
         check_atlas(np.random.rand(3, 10), n_components=5)

@@ -428,8 +428,8 @@ def check_atlas(atlas, n_components=None):
         if n_supervoxels < n_components:
             raise ValueError(
                 "Number of components is larger "
-                "than the number of regions in the atlas"
-                "(%i < %i)" % (n_components, n_supervoxels)
+                "than the number of regions in the atlas "
+                "(%i > %i)" % (n_components, n_supervoxels)
             )
     return shape
 
