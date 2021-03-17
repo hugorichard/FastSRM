@@ -284,9 +284,9 @@ def test_fastsrm_class(identifiability):
             srm.inverse_transform(shared_response, sessions_indexes=[0, 8])
 
         # Check behavior of .clean
-        assert os.path.exists(srm.temp_dir)
+        assert os.path.exists(srm.temp_dir_)
         srm.clean()
-        assert not os.path.exists(srm.temp_dir)
+        assert not os.path.exists(srm.temp_dir_)
 
 
 @pytest.mark.parametrize(
