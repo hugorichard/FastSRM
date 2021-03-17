@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>FastSRM’s documentation &mdash; FastSRM  documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -50,7 +52,7 @@
           
 
           
-            <a href="#" class="icon icon-home" alt="Documentation Home"> FastSRM
+            <a href="#" class="icon icon-home"> FastSRM
           
 
           
@@ -124,6 +126,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -135,7 +139,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -164,7 +168,7 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019
 </dl>
 <dl class="py class">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM">
-<em class="property">class </em><code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">IdentifiableFastSRM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atlas</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">n_iter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n_iter_reduced</span><span class="o">=</span><span class="default_value">10000</span></em>, <em class="sig-param"><span class="n">temp_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">low_ram</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">'warn'</span></em>, <em class="sig-param"><span class="n">aggregate</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">identifiability</span><span class="o">=</span><span class="default_value">'ica'</span></em>, <em class="sig-param"><span class="n">n_subjects_ica</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-12</span></em>, <em class="sig-param"><span class="n">memory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_pca</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">IdentifiableFastSRM</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_reduced</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_ram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifiability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ica'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_subjects_ica</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_pca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="Permalink to this definition">¶</a></dt>
 <dd><p>SRM decomposition using a very low amount of memory and computational power thanks to the use of an atlas as described in <a class="reference internal" href="#richard2019" id="id1"><span>[Richard2019]</span></a>.</p>
 <p>Given multi-subject data, factorize it as a shared response S among all subjects and an orthogonal transform (basis) W per subject:</p>
 <div class="math notranslate nohighlight">
@@ -198,7 +202,7 @@ By default this is used when n_iter &gt; 1</p></li>
 </dl>
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">`basis_list`</code></dt>
+<code class="sig-name descname"><span class="pre">`basis_list`</span></code></dt>
 <dd><ul class="simple">
 <li><p>if basis is a list of array, element i is the basis of subject i</p></li>
 <li><p>if basis is a list of str, element i is the path to the basis of subject i that is loaded with np.load yielding an array of shape [n_components, n_voxels].</p></li>
@@ -218,7 +222,7 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 </div>
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects">
-<code class="sig-name descname">add_subjects</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">shared_response</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">add_subjects</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add subjects to the current fit. Each new basis will be appended at the end of the list of basis (which can be accessed using self.basis)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -241,13 +245,13 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.clean">
-<code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.clean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.clean" title="Permalink to this definition">¶</a></dt>
 <dd><p>This erases temporary files and basis_list attribute to free memory. This method should be called when fitted model is not needed anymore.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes basis across subjects from input imgs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -267,7 +271,7 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">fit_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes basis across subjects and shared response from input imgs
 return shared response.</p>
 <dl class="field-list simple">
@@ -298,7 +302,7 @@ return shared response.</p>
 
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.inverse_transform">
-<code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shared_response</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sessions_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.inverse_transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">inverse_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.inverse_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>From shared response and basis from training data
 reconstruct subject’s data</p>
 <dl class="field-list simple">
@@ -331,7 +335,7 @@ reconstruct subject’s data</p>
 
 <dl class="py method">
 <dt id="fastsrm.identifiable_srm.IdentifiableFastSRM.transform">
-<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">subjects_indexes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.transform" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>From data in imgs and basis from training data,
 computes shared response.</p>
 <dl class="field-list simple">
@@ -364,7 +368,7 @@ computes shared response.</p>
 
 <dl class="py function">
 <dt id="fastsrm.identifiable_srm.apply_rotation">
-<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">apply_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">basis</span></em>, <em class="sig-param"><span class="n">rotation</span></em>, <em class="sig-param"><span class="n">temp_dir</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.apply_rotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">apply_rotation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.apply_rotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply rotation to matrix
 :param basis:
 :type basis: array of shape [n_components, n_voxels]
@@ -384,7 +388,7 @@ computes shared response.</p>
 
 <dl class="py function">
 <dt id="fastsrm.identifiable_srm.decorr_find_rotation">
-<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">decorr_find_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shared_response</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.decorr_find_rotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">decorr_find_rotation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shared_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.decorr_find_rotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds rotation r such that
 r.dot(W) is the appropriate basis</p>
 <dl class="field-list simple">
@@ -396,7 +400,7 @@ r.dot(W) is the appropriate basis</p>
 
 <dl class="py function">
 <dt id="fastsrm.identifiable_srm.fast_srm">
-<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">fast_srm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reduced_data_list</span></em>, <em class="sig-param"><span class="n">n_iter</span></em>, <em class="sig-param"><span class="n">n_components</span></em>, <em class="sig-param"><span class="n">save_basis</span></em>, <em class="sig-param"><span class="n">tol</span></em>, <em class="sig-param"><span class="n">verbose</span></em>, <em class="sig-param"><span class="n">temp_dir</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="n">transpose</span></em>, <em class="sig-param"><span class="n">random_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.fast_srm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">fast_srm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduced_data_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.fast_srm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes shared response and basis in reduced space</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -472,7 +476,7 @@ Each voxel’s timecourse is assumed to have mean 0 and variance 1</p></li>
 
 <dl class="py function">
 <dt id="fastsrm.identifiable_srm.ica_find_rotation">
-<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">ica_find_rotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">basis</span></em>, <em class="sig-param"><span class="n">n_subjects_ica</span></em>, <em class="sig-param"><span class="n">random_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.ica_find_rotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">ica_find_rotation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_subjects_ica</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.ica_find_rotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds rotation r such that
 r.dot(srm.basis_list[0]) is the appropriate basis</p>
 <dl class="field-list simple">
@@ -489,7 +493,7 @@ if True: basis[i] has shape [n_voxels, n_components]</p></li>
 
 <dl class="py function">
 <dt id="fastsrm.identifiable_srm.svd_reduce">
-<code class="sig-prename descclassname">fastsrm.identifiable_srm.</code><code class="sig-name descname">svd_reduce</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">imgs</span></em>, <em class="sig-param"><span class="n">n_jobs</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.svd_reduce" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></code><code class="sig-name descname"><span class="pre">svd_reduce</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.svd_reduce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reduce data using svd.
 Work done in parallel across subjects.</p>
 <dl class="field-list simple">
@@ -542,28 +546,25 @@ of arrays of shape (n_timeframes, n_timeframes)</p>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Hugo RICHARD
+        &#169; Copyright 2019, Hugo RICHARD.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
