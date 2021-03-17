@@ -517,6 +517,9 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self.memory = memory
         self.n_iter_reduced = n_iter_reduced
         self.random_state = check_random_state(random_state)
+        self.low_ram = low_ram
+        self.temp_dir = temp_dir
+        self.temp_dir_ = None
 
         if atlas is not None:
             self.use_pca = False
@@ -541,30 +544,19 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
                     "and/or sessions is large."
                 )
 
-            self.temp_dir = None
             self.low_ram = False
+        else:
+            self.low_ram = low_ram
 
         if self.verbose == "warn":
             self.verbose = False
-
-        if temp_dir is not None:
-            if memory is not None:
-                self.temp_dir = os.path.join(
-                    memory, "fastsrm" + str(uuid.uuid4())
-                )
-            else:
-                self.temp_dir = os.path.join(
-                    temp_dir, "fastsrm" + str(uuid.uuid4())
-                )
-
-            self.low_ram = low_ram
 
     def clean(self):
         """This erases temporary files and basis_list attribute to \
 free memory. This method should be called when fitted model \
 is not needed anymore.
         """
-        clean_temp_dir(self.temp_dir, self.memory)
+        clean_temp_dir(self.temp_dir_, self.memory)
         self.basis_list = []
 
     def fit(self, imgs):
@@ -594,6 +586,16 @@ that contains the data of subject i (number of sessions is implicitly 1)
            Returns the instance itself. Contains attributes listed \
 at the object level.
         """
+        if self.temp_dir is not None:
+            if self.memory is not None:
+                self.temp_dir_ = os.path.join(
+                    self.memory, "fastsrm" + str(uuid.uuid4())
+                )
+            else:
+                self.temp_dir_ = os.path.join(
+                    self.temp_dir, "fastsrm" + str(uuid.uuid4())
+                )
+
         mem = Memory(self.memory)
 
         @mem.cache(
@@ -736,7 +738,7 @@ at the object level.
             self.atlas,
             self.n_jobs,
             self.low_ram,
-            self.temp_dir,
+            self.temp_dir_,
             self.n_components,
             self.verbose,
             self.memory,
@@ -747,22 +749,22 @@ at the object level.
             self.random_state,
         )
 
-        if temp_dir != self.temp_dir:
-            clean_temp_dir(self.temp_dir, None)
-            create_temp_dir(self.temp_dir)
+        if temp_dir != self.temp_dir_:
+            clean_temp_dir(self.temp_dir_, None)
+            create_temp_dir(self.temp_dir_)
 
         # Basis can either be a list of path or arrays depending on tempdir
         # If memory is used we don't know in which form they are so we correct this here
         if self.memory is not None:
             # If basis is already an array nothing to do
             # If basis is not an array but we want an array we load it
-            if self.temp_dir is None and not isinstance(basis[0], np.ndarray):
+            if self.temp_dir_ is None and not isinstance(basis[0], np.ndarray):
                 basis = [safe_load(basis[i]) for i in range(len(basis))]
             # If we don't want an array we save the basis where we want
-            if self.temp_dir is not None:
+            if self.temp_dir_ is not None:
                 for i in range(len(basis)):
                     basis_i = safe_load(basis[i])
-                    path = os.path.join(self.temp_dir, "basis_%i" % i)
+                    path = os.path.join(self.temp_dir_, "basis_%i" % i)
                     np.save(path, basis_i)
                     basis[i] = path + ".npy"
 
@@ -774,14 +776,14 @@ at the object level.
                 random_state=self.random_state,
             )
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
+                delayed(apply_rotation)(b, r, self.temp_dir_) for b in basis
             )
 
         if self.identifiability == "decorr":
             shared = np.concatenate(shared_response_list, axis=0).T
             r = decorr_find_rotation(shared)
             basis = Parallel(n_jobs=self.n_jobs)(
-                delayed(apply_rotation)(b, r, self.temp_dir) for b in basis
+                delayed(apply_rotation)(b, r, self.temp_dir_) for b in basis
             )
 
         self.grads = grads
@@ -912,7 +914,7 @@ during session j in shared space.
         shared_response = _compute_shared_response_online(
             imgs,
             self.basis_list,
-            self.temp_dir,
+            self.temp_dir_,
             self.n_jobs,
             subjects_indexes,
             aggregate,
@@ -1050,7 +1052,7 @@ during session j in shared space.
         """
         if self.basis_list == []:
             self.clean()
-            create_temp_dir(self.temp_dir)
+            create_temp_dir(self.temp_dir_)
 
         atlas_shape = check_atlas(self.atlas, self.n_components)
         reshaped_input, imgs, shapes = check_imgs(
@@ -1079,17 +1081,17 @@ during session j in shared space.
                 basis_i = _compute_basis_subject_online(
                     sessions, shared_response_list
                 )
-                if self.temp_dir is None:
+                if self.temp_dir_ is None:
                     basis.append(basis_i)
                 else:
                     path = os.path.join(
-                        self.temp_dir, "basis_%i" % (len(self.basis_list) + i)
+                        self.temp_dir_, "basis_%i" % (len(self.basis_list) + i)
                     )
                     np.save(path, basis_i)
                     basis.append(path + ".npy")
                 del basis_i
         else:
-            if self.temp_dir is None:
+            if self.temp_dir_ is None:
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_basis_subject_online)(
                         sessions, shared_response_list
@@ -1099,7 +1101,7 @@ during session j in shared space.
             else:
                 Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_corr_mat)(
-                        imgs[i][j], shared_response_list[j], self.temp_dir
+                        imgs[i][j], shared_response_list[j], self.temp_dir_
                     )
                     for j in range(len(imgs[0]))
                     for i in range(len(imgs))
@@ -1107,7 +1109,7 @@ during session j in shared space.
 
                 basis = Parallel(n_jobs=self.n_jobs)(
                     delayed(_compute_and_save_subject_basis)(
-                        len(self.basis_list) + i, sessions, self.temp_dir
+                        len(self.basis_list) + i, sessions, self.temp_dir_
                     )
                     for i, sessions in enumerate(imgs)
                 )

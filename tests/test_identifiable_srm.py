@@ -1,4 +1,6 @@
 import os
+from glob import glob
+from sklearn.base import clone
 import tempfile
 from time import time
 import numpy as np
@@ -794,3 +796,32 @@ def test_random_state():
     for S in [S2, S3]:
         with pytest.raises(AssertionError,):
             np.testing.assert_allclose(S, S1)
+
+
+def test_temp_files():
+    n_voxels = 500
+    n_timeframes = 10
+    n_subjects = 4
+    X_train = [
+        np.random.rand(n_voxels, n_timeframes) for _ in range(n_subjects)
+    ]
+
+    X_train2 = [
+        np.random.rand(n_voxels, n_timeframes) for _ in range(n_subjects)
+    ]
+    srm = IdentifiableFastSRM(
+        identifiability=None,
+        n_components=5,
+        n_iter=1,
+        n_iter_reduced=3,
+        random_state=None,
+        temp_dir="./temp",
+    )
+    srm.fit(X_train)
+    srm2 = clone(srm)
+    srm2.fit(X_train2)
+    assert srm2.basis_list[0] != srm.basis_list[0]
+    assert srm2.temp_dir_ != srm.temp_dir_
+    srm2.clean()
+    srm.clean()
+    assert len(glob("./temp/*")) == 0
