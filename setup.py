@@ -13,7 +13,6 @@ setup(
     install_requires=[
         'scikit-learn',
         'joblib',
-        'python-picard',
         'tqdm',
         'matplotlib'
     ],
