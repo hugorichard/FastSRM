@@ -1,7 +1,32 @@
 # utilities mainly used for tests
 import os
+import scipy
 import numpy as np
 from scipy.optimize import linear_sum_assignment
+from fastsrm.srm import projection
+from fastsrm.check_inputs import get_safe_shape
+
+
+def extract_slices(img):
+    """
+    Extract slices from images shapes
+
+    Parameters
+    -----------
+    imgs: list of n_sessions arrays of shape\
+        (n_voxels, n_timeframes)
+
+    Returns
+    --------
+    slices: list of slices
+    """
+    slices = []
+    t_i = 0
+    for i in range(len(img)):
+        n_voxels, n_timeframes = get_safe_shape(img[i])
+        slices.append(slice(t_i, t_i + n_timeframes))
+        t_i = t_i + n_timeframes
+    return slices
 
 
 def apply_aggregate(shared_response, aggregate, input_format):
@@ -10,10 +35,14 @@ def apply_aggregate(shared_response, aggregate, input_format):
             return [np.mean(shared_response, axis=0)]
         else:
             return [
-                np.mean([
-                    shared_response[i][j] for i in range(len(shared_response))
-                ],
-                        axis=0) for j in range(len(shared_response[0]))
+                np.mean(
+                    [
+                        shared_response[i][j]
+                        for i in range(len(shared_response))
+                    ],
+                    axis=0,
+                )
+                for j in range(len(shared_response[0]))
             ]
     else:
         if input_format == "list_of_array":
@@ -25,8 +54,9 @@ def apply_aggregate(shared_response, aggregate, input_format):
 def apply_input_format(X, input_format):
     if input_format == "array":
         n_sessions = len(X[0])
-        XX = [[np.load(X[i, j]) for j in range(len(X[i]))]
-              for i in range(len(X))]
+        XX = [
+            [np.load(X[i, j]) for j in range(len(X[i]))] for i in range(len(X))
+        ]
     elif input_format == "list_of_array":
         XX = [[x] for x in X]
         n_sessions = 1
@@ -61,14 +91,17 @@ def to_path(X, dirpath):
     return np.array(paths)
 
 
-def generate_data(n_voxels,
-
-                  n_timeframes,
-                  n_subjects,
-                  n_components,
-                  datadir,
-                  noise_level=0.1,
-                  input_format="array"):
+def generate_data(
+    n_voxels,
+    n_timeframes,
+    n_subjects,
+    n_components,
+    datadir,
+    noise_level=0.1,
+    input_format="array",
+    seed=0,
+):
+    rng = np.random.RandomState(seed)
     n_sessions = len(n_timeframes)
     cumsum_timeframes = np.cumsum([0] + n_timeframes)
     slices_timeframes = [
@@ -76,39 +109,33 @@ def generate_data(n_voxels,
         for i in range(n_sessions)
     ]
 
-    # Create a Shared response S with K = 3
-    theta = np.linspace(-4 * np.pi, 4 * np.pi, int(np.sum(n_timeframes)))
-    z = np.linspace(-2, 2, int(np.sum(n_timeframes)))
-    r = z**2 + 1
-    x = r * np.sin(theta)
-    y = r * np.cos(theta)
+    n = np.sum(n_timeframes)
+    k = n_components
+    v = n_voxels
+    m = n_subjects
 
-    S = np.vstack((x, y, z))
+    Sigma = rng.dirichlet(np.ones(k), 1).flatten()
+    S = np.sqrt(Sigma)[:, None] * rng.randn(k, n)
+    Us, Ds, Vs = np.linalg.svd(S, full_matrices=False)
+    S = Ds[:, None] * Vs
+    W = np.array([projection(rng.randn(v, k)).dot(Us.T) for i in range(m)])
+    sigmas = noise_level * rng.rand(m)
+    N = np.array([np.sqrt(sigmas[i]) * rng.randn(v, n) for i in range(m)])
+    X = np.array([W[i].dot(S) + N[i] for i in range(m)])
 
-    # Generate fake data
-    W = []
-    X = []
-    for subject in range(n_subjects):
-        Q, R = np.linalg.qr(np.random.random((n_voxels, n_components)))
-        W.append(Q.T)
-        X_ = []
-        for session in range(n_sessions):
-            S_s = S[:, slices_timeframes[session]]
-            S_s = S_s - np.mean(S_s, axis=1, keepdims=True)
-            noise = noise_level * np.random.random(
-                (n_voxels, n_timeframes[session]))
-            noise = noise - np.mean(noise, axis=1, keepdims=True)
-            data = Q.dot(S_s) + noise
-            X_.append(data)
-        X.append(X_)
+    # Cut data
+    X = [[x[:, slices] for slices in slices_timeframes] for x in X]
 
     # create paths such that paths[i, j] contains data
     # of subject i during session j
     if datadir is not None:
         paths = to_path(X, datadir)
 
-    S = [(S[:, s] - np.mean(S[:, s], axis=1, keepdims=True))
-         for s in slices_timeframes]
+    # Cut sources
+    S = [
+        (S[:, s] - np.mean(S[:, s], axis=1, keepdims=True))
+        for s in slices_timeframes
+    ]
 
     if input_format == "array":
         return paths, W, S
@@ -117,10 +144,14 @@ def generate_data(n_voxels,
         return X, W, S
 
     elif input_format == "list_of_array":
-        return [
-            np.concatenate([X[i][j].T for j in range(n_sessions)]).T
-            for i in range(n_subjects)
-        ], W, S
+        return (
+            [
+                np.column_stack([X[i][j] for j in range(n_sessions)])
+                for i in range(n_subjects)
+            ],
+            W,
+            S,
+        )
     else:
         raise ValueError("Wrong input_format")
 
@@ -175,10 +206,42 @@ def align_sign(recov, source):
 def align_basis(recov, source, return_index=False):
     # Let us align components here
     _, ib = solve_hungarian(
-        np.concatenate(source, axis=1).T,
-        np.concatenate(recov, axis=1).T)[2]
+        np.concatenate(source, axis=1).T, np.concatenate(recov, axis=1).T
+    )[2]
 
     if return_index:
         return align_sign([w[ib] for w in recov], source), ib
     else:
         return align_sign([w[ib] for w in recov], source)
+
+
+def hungarian(M):
+    u, order = scipy.optimize.linear_sum_assignment(-abs(M))
+    vals = M[u, order]
+    return order, np.sign(vals)
+
+
+def error_dot(M):
+    order, _ = hungarian(M)
+    return 1 - M[np.arange(M.shape[0]), order]
+
+
+def error_source(S1, S2):
+    S1_ = S1 - np.mean(S1, axis=1, keepdims=True)
+    S1_ = S1_ / np.linalg.norm(S1_, axis=1, keepdims=True)
+
+    S2_ = S2 - np.mean(S2, axis=1, keepdims=True)
+    S2_ = S2_ / np.linalg.norm(S2_, axis=1, keepdims=True)
+    return error_dot(np.abs(S1_.dot(S2_.T)))
+
+
+def corr(x, y):
+    return np.sum(x * y) / np.sqrt(np.sum(x * x) * np.sum(y * y))
+
+
+def error_source_rotation(S1, S2):
+    S1_ = S1.copy()
+    S2_ = S2.copy()
+    S1_ = S1_ / np.linalg.norm(S1_, axis=1, keepdims=True)
+    S2_ = S2_ / np.linalg.norm(S2_, axis=1, keepdims=True)
+    return np.linalg.norm(projection(S2_.dot(S1_.T)).dot(S1_) - S2_)
