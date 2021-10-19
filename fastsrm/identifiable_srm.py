@@ -117,6 +117,13 @@ shape=[n_components, n_voxels] or list of str
 of subject i that is loaded with np.load yielding an array of \
 shape [n_components, n_voxels].
 
+
+    `noise_variance` : np array of shape (n_views,)
+        Noise variance
+
+    `source_covariance` : np array of shape (n_components,)
+        (Diagonal) Shared response covariance
+
         Note that any call to the clean method erases this attribute
 
     Note
@@ -273,6 +280,8 @@ at the object level.
                 )
 
         self.basis_list = W
+        self.noise_variance = sigmas
+        self.source_covariance = Sigma
         return self
 
     def fit_transform(self, imgs, subjects_indexes=None):

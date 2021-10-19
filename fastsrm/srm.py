@@ -136,6 +136,11 @@ def probsrm(
     S : np array of shape (n_components, n_timeframes)
         Shared response
 
+    sigmas : np array of shape (n_views,)
+        Noise variance
+
+    Sigma : np array of shape (n_components,)
+        (Diagonal) Shared response covariance
     """
     X = np.array([safe_load(x) for x in X])
     rng = check_random_state(random_state)
