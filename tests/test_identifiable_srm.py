@@ -2,20 +2,17 @@ import os
 from glob import glob
 from sklearn.base import clone
 import tempfile
-from time import time
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
 from sklearn.exceptions import NotFittedError
 from fastsrm.identifiable_srm import IdentifiableFastSRM, create_temp_dir
 from fastsrm.srm import safe_load
-from picard import picard
 from fastsrm.utils import (
     generate_data,
     apply_aggregate,
     apply_input_format,
 )
-from fastsrm.utils import align_basis
 from tqdm import tqdm
 
 n_voxels = 300
