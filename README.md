@@ -8,7 +8,9 @@ Implementation of FastSRM algorithms.
 The model of probabilistic SRM is given by:
 
 
-<img src="https://latex.codecogs.com/svg.image?\forall i \in \{1, \dots, n}, \enspace X_i = W_i S + n_i" />
+<!-- <img src="https://latex.codecogs.com/svg.image?\forall i \in \{1, \dots, n}, \enspace X_i = W_i S + n_i" /> -->
+
+<img src="https://latex.codecogs.com/svg.image?\begin{align*}&\forall&space;i&space;\in&space;\{1,&space;\dots,&space;n\},&space;\enspace&space;X_i&space;=&space;W_i&space;\mathbf{s}&space;&plus;&space;\mathbf{n}_i&space;\\&\text{where&space;}&space;\mathbf{n}_i&space;\sim&space;\mathcal{N}(0,&space;\sigma&space;I)&space;\text{&space;and&space;}&space;\\&\mathbf{s}&space;\sim&space;\mathcal{N}(0,&space;\mathrm{diag}(\Sigma))\end{align*}&space;" title="\begin{align*}&\forall i \in \{1, \dots, n\}, \enspace X_i = W_i \mathbf{s} + \mathbf{n}_i \\&\text{where } \mathbf{n}_i \sim \mathcal{N}(0, \sigma I) \text{ and } \\&\mathbf{s} \sim \mathcal{N}(0, \mathrm{diag}(\Sigma))\end{align*} " />
 
 ```math
 \forall i \in \{1, \dots, n}, \enspace X_i = W_i S + n_i
