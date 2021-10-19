@@ -7,13 +7,13 @@ Implementation of FastSRM algorithms.
 
 The model of probabilistic SRM is given by:
 
-<img src="https://latex.codecogs.com/svg.image?\mathbf{x}_i&space;=&space;W_i&space;\mathbf{s}&space;&plus;&space;\mathcal{n}_i" title="\mathbf{x}_i = W_i \mathbf{s} + \mathcal{n}_i" />
+<img src="https://latex.codecogs.com/svg.image?\mathbf{x}_i&space;=&space;W_i&space;\mathbf{s}&space;&plus;&space;\mathbf{n}_i" title="\mathbf{x}_i = W_i \mathbf{s} + \mathbf{n}_i" />
 
 where 
-* <img src="https://latex.codecogs.com/svg.image?\mathbf{x}_i&space;\in&space;\mathcal{R}^{v}" title="\mathbf{x}_i \in \mathcal{R}^{v}" /> is the data of subject <img src="https://latex.codecogs.com/svg.image?i&space;" title="i " />
+* <img src="https://latex.codecogs.com/svg.image?\mathbf{x}_i&space;\in&space;\mathbb{R}^v" title="\mathbf{x}_i \in \mathbb{R}^v" /> is the data of subject <img src="https://latex.codecogs.com/svg.image?i&space;" title="i " />
 * <img src="https://latex.codecogs.com/svg.image?W_i&space;\in&space;\mathbb{R}^{v&space;\times&space;k}&space;" title="W_i \in \mathbb{R}^{v \times k} " /> is the basis of subject <img src="https://latex.codecogs.com/svg.image?i&space;" title="i " />
-* <img src="https://latex.codecogs.com/svg.image?\mathbf{s}&space;\in&space;\mathcal{R}^k" title="\mathbf{s} \in \mathcal{R}^k" /> is the shared response assumed to be sampled from a centered Gaussian with covariance <img src="https://latex.codecogs.com/svg.image?\Sigma&space;\in&space;\mathbb{R}^{k&space;\times&space;k}" title="\Sigma \in \mathbb{R}^{k \times k}" />
-* <img src="https://latex.codecogs.com/svg.image?\mathbf{n}_i" title="\mathbf{n}_i" /> is  the noise in subject <img src="https://latex.codecogs.com/svg.image?i&space;" title="i " /> assumed to be sampled from a centered Gaussian with covariance <img src="https://latex.codecogs.com/svg.image?\sigma_i&space;I" title="\sigma_i I" /> where <img src="https://latex.codecogs.com/svg.image?I&space;\in&space;\mathbb{R}^{v,&space;v}" title="I \in \mathbb{R}^{v, v}" /> is the identity matrix
+* <img src="https://latex.codecogs.com/svg.image?\mathbf{s}&space;\in&space;\mathbb{R}^k" title="\mathbf{s} \in \mathbb{R}^k" /> is the shared response assumed to be sampled from a centered Gaussian with covariance <img src="https://latex.codecogs.com/svg.image?\Sigma&space;\in&space;\mathbb{R}^{k&space;\times&space;k}" title="\Sigma \in \mathbb{R}^{k \times k}" />
+* <img src="https://latex.codecogs.com/svg.image?\mathbf{n}_i&space;\in&space;\mathbb{R}^v" title="\mathbf{n}_i \in \mathbb{R}^v" /> is  the noise in subject <img src="https://latex.codecogs.com/svg.image?i&space;" title="i " /> assumed to be sampled from a centered Gaussian with covariance <img src="https://latex.codecogs.com/svg.image?\sigma_i&space;I" title="\sigma_i I" /> where <img src="https://latex.codecogs.com/svg.image?I&space;\in&space;\mathbb{R}^{v,&space;v}" title="I \in \mathbb{R}^{v, v}" /> is the identity matrix
 
 When the number of features in X_i is 
 
