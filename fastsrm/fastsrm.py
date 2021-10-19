@@ -98,7 +98,11 @@ def fastsrm(
     temp_dir=None,
     random_state=None,
 ):
-    """FastSRM documentation
+    """Performs an SRM decomposition on
+    input data with a number of features
+    much larger than the number of samples:
+    Reduces the data by PCA and apply an SRM
+    algorithm one reduced data.
 
     Parameters
     ----------
@@ -151,9 +155,10 @@ errors when the number of subjects and/or sessions is large
 
     W : list of n_subjects numpy array of shape (n_voxels, n_components) \
         or path to np array of shape (n_voxels, n_components)
-        mixing matrices
+        Subject specific basis
 
     S : np array of shape (n_components, n_timeframes)
+        Shared response
 
     sigmas: np array of shape (n_subjects,)
         Noise variance (only returned if method == "probsrm")

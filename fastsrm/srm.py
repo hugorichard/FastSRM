@@ -23,11 +23,42 @@ def projection(X):
 def detsrm(
     X, n_components, n_iter=100, random_state=None, verbose=False, tol=1e-5,
 ):
-    """Perform Deterministic SRM.
+    """Perform Deterministic SRM on numpy arrays.
+    To be used when data hold in memory and the number
+    of features is not much larger than the number
+    of samples (in which case fastsrm is preferable)
+
+    Parameters
+    -----------
+
+    X : np array of shape (n_views, n_features, n_samples)
+        Input data
+
+    n_components : int
+        Number of timecourses of the shared coordinates
+
+    n_iter : int
+        Number of iterations to perform
+
+    random_state: int, RandomState instance or None, default=None
+        Controls the randomness of the initialization.
+
+    verbose : bool
+        If True, logs are enabled. If False, logs are disabled.
+
+    tol: float
+        Stops if the norm of the gradient falls below tolerance value
 
     Returns
-    -------
-    W, S
+    --------
+
+    W : np array of shape \
+    (n_views, n_features, n_components)
+        Subject specific basis
+
+    S : np array of shape (n_components, n_timeframes)
+        Shared response
+
     """
     rng = check_random_state(random_state)
     X = np.array([safe_load(x) for x in X])
@@ -52,7 +83,11 @@ def detsrm(
             W[i] = Wi
 
     if gnorm > tol:
-        print("DetSRM did not converge. Current gradient norm is %.6f" % gnorm)
+        if verbose:
+            print(
+                "DetSRM did not converge. Current gradient norm is %.6f"
+                % gnorm
+            )
     return W, S
 
 
@@ -65,11 +100,42 @@ def probsrm(
     verbose=False,
     tol=1e-5,
 ):
-    """Perform Probabilistic SRM.
+    """Perform Probabilistic SRM on numpy arrays.
+    To be used when data hold in memory and the number
+    of features is not much larger than the number
+    of samples (in which case fastsrm is preferable)
+
+    Parameters
+    -----------
+
+    X : np array of shape (n_views, n_features, n_samples)
+        Input data
+
+    n_components : int
+        Number of timecourses of the shared coordinates
+
+    n_iter : int
+        Number of iterations to perform
+
+    random_state: int, RandomState instance or None, default=None
+        Controls the randomness of the initialization.
+
+    verbose : bool
+        If True, logs are enabled. If False, logs are disabled.
+
+    tol: float
+        Stops if the norm of the gradient falls below tolerance value
 
     Returns
-    -------
-    W, S, sigmas, Sigma
+    --------
+
+    W : np array of shape \
+    (n_views, n_features, n_components)
+        Subject specific basis
+
+    S : np array of shape (n_components, n_timeframes)
+        Shared response
+
     """
     X = np.array([safe_load(x) for x in X])
     rng = check_random_state(random_state)
@@ -119,5 +185,3 @@ def probsrm(
         print("ProbSRM did not converge. Current diff is %.6f" % diff)
 
     return W, S, sigmas, Sigma
-
-
