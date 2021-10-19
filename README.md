@@ -14,7 +14,8 @@ Install
 Usage
 --------
 
-When the input data is a list of m subjects containing arrays of shape (n_voxels, n_timeframes).
+
+
 ```python
 # Input data X: neuroimaging data 
 # X is a np array of shape (n_subjects, n_sessions)
@@ -23,11 +24,9 @@ from fastsrm.identifiable_srm import IdentifiableFastSRM
 srm = IdentifiableFastSRM(n_components=5, temp_dir="./", n_jobs=5)
 S = srm.fit_transform(X) # Shared response np array of shape (n_components, n_timeframes)
 W = srm.basis_list # Shared response np array of shape (n_components, n_timeframes)
-
-
+Sigma = srm.source_covariance # Covariance of the shared response
+sigmas = srm.noise_variance # Variance of the noise
 ```
-
-
 Documentation
 --------------
 

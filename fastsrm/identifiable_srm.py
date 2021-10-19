@@ -278,10 +278,10 @@ at the object level.
                     self.verbose,
                     self.tol,
                 )
+                self.noise_variance = sigmas
+                self.source_covariance = Sigma
 
         self.basis_list = W
-        self.noise_variance = sigmas
-        self.source_covariance = Sigma
         return self
 
     def fit_transform(self, imgs, subjects_indexes=None):
