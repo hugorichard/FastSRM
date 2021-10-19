@@ -9,8 +9,13 @@ FastSRM's documentation
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: fastsrm.identifiable_srm
+.. autoclass:: fastsrm.identifiable_srm.IdentifiableSRM
    :members:
 
+
+.. autofunction:: fastsrm.fastsrm.fastsrm
+
+.. autofunction:: fastsrm.srm.detsrm
+.. autofunction:: fastsrm.srm.probsrm
 
 
