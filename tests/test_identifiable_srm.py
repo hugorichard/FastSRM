@@ -132,9 +132,9 @@ def test_isrm_class():
     [
         ("array", True, 1, [25, 25], "mean", "prob"),
         ("list_of_list", False, 1, [25, 24], None, "det"),
-        ("list_of_list", False, 2, [25, 25], None, "prob"),
-        ("list_of_array", True, 2, [25, 24], None, "det"),
-        ("list_of_array", True, 2, [25, 25], None, "det"),
+        ("list_of_list", False, 1, [25, 25], None, "prob"),
+        ("list_of_array", True, 1, [25, 24], None, "det"),
+        ("list_of_array", True, 1, [25, 25], None, "det"),
         ("list_of_array", True, 1, [25, 25], None, "prob"),
         ("list_of_array", True, 2, [25, 24], "mean", "det"),
     ],

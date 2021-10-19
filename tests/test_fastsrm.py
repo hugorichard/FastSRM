@@ -15,12 +15,12 @@ n_components = 3  # number of components used for SRM model
 
 @pytest.mark.parametrize("method", ["prob", "det"])
 def test_equivalence_fastsrm_srm(method):
-    X = np.array([np.random.randn(1000, 100) for _ in range(10)])
+    X = np.array([np.random.randn(300, 30) for _ in range(10)])
     if method == "prob":
-        W, S, sigmas, Sigmas = probsrm(X, 20, random_state=0)
+        W, S, sigmas, Sigmas = probsrm(X, 20, random_state=0, n_iter=10)
     else:
-        W, S = detsrm(X, 20, random_state=0)
-    W2, S2 = fastsrm([[x] for x in X], 20, random_state=0, method=method)[:2]
+        W, S = detsrm(X, 20, random_state=0, n_iter=10)
+    W2, S2 = fastsrm([[x] for x in X], 20, random_state=0, method=method, n_iter=10)[:2]
     assert_allclose(S, S2)
     assert_allclose(W, W2)
 
