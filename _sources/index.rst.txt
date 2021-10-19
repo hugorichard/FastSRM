@@ -3,18 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-FastSRM's documentation
+IdentifiableFastSRM
 ===================================
 
 .. toctree::
    :maxdepth: 2
 
-.. autoclass:: fastsrm.identifiable_srm.IdentifiableSRM
+.. autoclass:: fastsrm.identifiable_srm.IdentifiableFastSRM
    :members:
 
 
-.. autofunction:: fastsrm.fastsrm.fastsrm
+FastSRM, DetSRM and ProbSRM
+===================================
 
+.. autofunction:: fastsrm.fastsrm.fastsrm
 .. autofunction:: fastsrm.srm.detsrm
 .. autofunction:: fastsrm.srm.probsrm
 
