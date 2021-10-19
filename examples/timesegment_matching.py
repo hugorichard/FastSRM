@@ -108,12 +108,8 @@ def cross_validated_timesegment_matching(algo, paths, win_size):
 
 # Usage example
 # srm = IdentifiableFastSRM(
-#     identifiability="ica",
 #     n_components=20,
 #     verbose=True,
-#     n_jobs=1,
-#     n_iter_reduced=10000,
-#     tol=1e-12,
 #     aggregate=None,
 # )
 # cv_scores = cross_validated_timesegment_matching(srm, input_paths)
@@ -187,13 +183,9 @@ def repeated_sessions_timesegment_matching(data,
 
 # Usage example
 # srm = IdentifiableFastSRM(
-#     identifiability="ica",
 #     n_components=20,
 #     verbose=True,
 #     n_jobs=1,
-#     n_iter_reduced=10000,
-#     tol=1e-12,
-#     aggregate=None,
 # )
 # S = srm.fit_transform(paths)
 # data = [s[0] for s in S]
