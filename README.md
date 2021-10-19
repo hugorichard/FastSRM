@@ -10,7 +10,7 @@ The model of probabilistic SRM is given by:
 
 <img src="https://latex.codecogs.com/svg.image?\forall i \in \{1, \dots, n}, \enspace X_i = W_i S + n_i" />
 
-```
+```math
 \forall i \in \{1, \dots, n}, \enspace X_i = W_i S + n_i
 ```
 where 
