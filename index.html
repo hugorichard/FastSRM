@@ -103,7 +103,6 @@ if n_iter &gt; 1 and n_voxels &gt; 10 * n_timeframes.</p></li>
 <li><p>if basis is a list of array, element i is the basis of subject i</p></li>
 <li><p>if basis is a list of str, element i is the path to the basis of subject i that is loaded with np.load yielding an array of shape [n_components, n_voxels].</p></li>
 </ul>
-<p>Note that any call to the clean method erases this attribute</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>list of array, element i has shape=[n_components, n_voxels] or list of str</p>
@@ -111,6 +110,13 @@ if n_iter &gt; 1 and n_voxels &gt; 10 * n_timeframes.</p></li>
 </dl>
 </dd></dl>
 
+<dl>
+<dt><cite>noise_variance</cite><span class="classifier">np array of shape (n_views,)</span></dt><dd><p>Noise variance</p>
+</dd>
+<dt><cite>source_covariance</cite><span class="classifier">np array of shape (n_components,)</span></dt><dd><p>(Diagonal) Shared response covariance</p>
+<p>Note that any call to the clean method erases this attribute</p>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>References:</strong>
@@ -352,6 +358,8 @@ of samples (in which case fastsrm is preferable)</p>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>W</strong> (<em>np array of shape     (n_views, n_features, n_components)</em>) – Subject specific basis</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
+<li><p><strong>sigmas</strong> (<em>np array of shape (n_views,)</em>) – Noise variance</p></li>
+<li><p><strong>Sigma</strong> (<em>np array of shape (n_components,)</em>) – (Diagonal) Shared response covariance</p></li>
 </ul>
 </p>
 </dd>
