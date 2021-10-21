@@ -71,10 +71,13 @@ def do_srm(config, n_components, algo):
                     n_iter=1000,
                     method="prob",
                     temp_dir=temp_dir,
+                    tol=0,
                 )[1]
 
             if algo == "brainiak":
-                srm = SRM(n_iter=1000, features=n_components, rand_seed=0)
+                srm = SRM(
+                    n_iter=1000, features=n_components, rand_seed=0, tol=0
+                )
                 srm.fit(
                     [
                         np.column_stack([np.load(XX) for XX in X])
