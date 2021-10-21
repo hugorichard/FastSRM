@@ -76,7 +76,7 @@ def do_srm(config, n_components, algo):
 
             if algo == "brainiak":
                 srm = SRM(
-                    n_iter=1000, features=n_components, rand_seed=0
+                    n_iter=500, features=n_components, rand_seed=0
                 )
                 srm.fit(
                     [
