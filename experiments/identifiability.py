@@ -90,12 +90,13 @@ def do_srm(config, n_components, algo):
             dt = time() - t0
             save_time = os.path.join(
                 time_dir,
-                "%i-%i-%s-%i-%s"
+                "%i-%i-%s-%i-%s.npy"
                 % (i_sub, is_train, config, n_components, algo),
             )
             np.save(save_time, dt)
 
-            save_dir = os.path.join(result_directory, "shared", algo)
+            save_dir = os.path.join(result_directory, "shared")
+            os.makedirs(save_dir, exist_ok=True)
             save_path = os.path.join(
                 save_dir,
                 "%i-%i-%s-%i-%s.npy"
