@@ -52,6 +52,7 @@ def do_srm(config, n_components, algo):
     cv = ShuffleSplit(n_splits=10, train_size=0.5, random_state=0)
     for i_sub, subs in enumerate(cv.split(np.arange(n_subjects))):
         for is_train, c_sub in enumerate(subs):
+            print(is_train, i_sub, c_sub)
             time_dir = os.path.join(result_directory, "time",)
             os.makedirs(time_dir, exist_ok=True)
             temp_dir = os.path.join(
