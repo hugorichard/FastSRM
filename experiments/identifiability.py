@@ -68,7 +68,7 @@ def do_srm(config, n_components, algo):
                     n_components=n_components,
                     n_jobs=10,
                     verbose=True,
-                    n_iter=1000,
+                    n_iter=500,
                     method="prob",
                     temp_dir=temp_dir,
                     tol=0,
