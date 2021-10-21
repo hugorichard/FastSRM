@@ -72,6 +72,7 @@ def do_srm(config, n_components, algo):
                     method="prob",
                     temp_dir=temp_dir,
                     tol=0,
+                    random_state=0,
                 )[1]
 
             if algo == "brainiak":
