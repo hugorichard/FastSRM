@@ -74,14 +74,14 @@ def do_srm(config, n_components, algo):
                 )[1]
 
             if algo == "brainiak":
-                SRM(n_iter=1000, features=n_components, rand_seed=0)
-                SRM.fit(
+                srm = SRM(n_iter=1000, features=n_components, rand_seed=0)
+                srm.fit(
                     [
                         np.column_stack([np.load(XX) for XX in X])
                         for X in paths[c_sub]
                     ]
                 )
-                S = SRM.s_
+                S = srm.s_
             dt = time() - t0
             save_time = os.path.join(
                 time_dir,
