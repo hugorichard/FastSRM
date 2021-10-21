@@ -52,6 +52,8 @@ def do_srm(config, n_components, algo):
     cv = ShuffleSplit(n_splits=10, train_size=0.5, random_state=0)
     for i_sub, subs in enumerate(cv.split(np.arange(n_subjects))):
         for is_train, c_sub in enumerate(subs):
+            time_dir = os.path.join(result_directory, "time",)
+            os.makedirs(time_dir, exist_ok=True)
             temp_dir = os.path.join(
                 result_directory,
                 "temp",
@@ -59,6 +61,7 @@ def do_srm(config, n_components, algo):
                 % (i_sub, is_train, config, n_components, algo),
             )
             os.makedirs(temp_dir, exist_ok=True)
+            t0 = time()
             if algo == "fast":
                 S = fastsrm(
                     paths[c_sub],
@@ -79,6 +82,13 @@ def do_srm(config, n_components, algo):
                     ]
                 )
                 S = SRM.s_
+            dt = time() - t0
+            save_time = os.path.join(
+                time_dir,
+                "%i-%i-%s-%i-%s"
+                % (i_sub, is_train, config, n_components, algo),
+            )
+            np.save(save_time, dt)
 
             save_dir = os.path.join(result_directory, "shared", algo)
             save_path = os.path.join(
