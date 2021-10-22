@@ -106,8 +106,8 @@ def do_srm(config, n_components, algo):
 
 
 datasets = ["forrest", "sherlock"]
-algos = ["brainiak", "fast"]
-Parallel(n_jobs=4, verbose=True)(
+algos = ["brainiak"]
+Parallel(n_jobs=2, verbose=True)(
     delayed(do_srm)(dataset, 10, algo)
     for algo in algos
     for dataset in datasets
