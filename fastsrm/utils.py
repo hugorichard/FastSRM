@@ -245,3 +245,126 @@ def error_source_rotation(S1, S2):
     S1_ = S1_ / np.linalg.norm(S1_, axis=1, keepdims=True)
     S2_ = S2_ / np.linalg.norm(S2_, axis=1, keepdims=True)
     return np.linalg.norm(projection(S2_.dot(S1_.T)).dot(S1_) - S2_)
+
+
+def time_segment_matching(
+    data, win_size=10, verbose=True, l=None,
+):
+    """
+    data list of n_voxels, n_timeframes data
+    l: np array of shape n_subjects, n_components:
+    noise level
+    """
+    if l is None:
+        l = np.ones((len(data), len(data[0])))
+
+    # Pull out shape information
+    n_subjs = len(data)
+    (n_features, n_TR) = data[0].shape  # Voxel/feature by timepoint
+
+    # How many segments are there (account for edges)
+    n_seg = n_TR - win_size + 1
+
+    # mysseg prediction prediction
+    train_data = np.zeros((n_features * win_size, n_seg))
+
+    # train data
+    # n_features x n_timeframes
+    # Ex: n_features=2, n_timeframes=6, windows_size=2
+    # data_i   train_data_i
+    # X1Y1       X1 X2 X3 X4 # first
+    # X2Y2       Y1 Y2 Y3 Y4
+    # X3Y3       X2 X3 X4 X5 # second
+    # X4Y4       Y2 Y3 Y4 Y5
+    # X5Y5  ->   X3 X4 X5 X6 # last
+    # X6Y6  ->   Y3 Y4 Y5 Y6
+
+    # Concatenate the data across participants
+    for ppt_counter in range(n_subjs):
+        for window_counter in range(win_size):
+            train_data[
+                window_counter
+                * n_features : (window_counter + 1)
+                * n_features,
+                :,
+            ] += data[ppt_counter][:, window_counter : window_counter + n_seg]
+
+    # Iterate through the participants, leaving one out
+    accuracy = np.zeros(shape=n_subjs)
+    for ppt_counter in range(n_subjs):
+
+        # Preset
+        test_data = np.zeros((n_features * win_size, n_seg))
+        for window_counter in range(win_size):
+            test_data[
+                window_counter
+                * n_features : (window_counter + 1)
+                * n_features,
+                :,
+            ] = data[ppt_counter][:, window_counter : (window_counter + n_seg)]
+
+        normalized_test_data = np.zeros((n_features * win_size, n_seg))
+        for window_counter in range(win_size):
+            normalized_test_data[
+                window_counter
+                * n_features : (window_counter + 1)
+                * n_features,
+                :,
+            ] = data[ppt_counter][
+                :, window_counter : (window_counter + n_seg)
+            ] / (
+                l[ppt_counter].reshape(-1, 1) ** 2
+            )
+
+        # Take this participant data away
+        train_ppts = stats.zscore((train_data - test_data), axis=0, ddof=1)
+        test_ppts = stats.zscore(normalized_test_data, axis=0, ddof=1)
+
+        # Correlate the two data sets
+        corr_mtx = test_ppts.T.dot(train_ppts)
+
+        # If any segments have a correlation difference less than the window size and they aren't the same segments then set the value to negative infinity
+        for seg_1 in range(n_seg):
+            for seg_2 in range(n_seg):
+                if abs(seg_1 - seg_2) < win_size and seg_1 != seg_2:
+                    corr_mtx[seg_1, seg_2] = -np.inf
+
+        # Find the segement with the max value
+        rank = np.argmax(corr_mtx, axis=1)
+
+        # Find the number of segments that were matched for this participant
+        accuracy[ppt_counter] = sum(rank == range(n_seg)) / float(n_seg)
+
+        # Print accuracy
+        if verbose:
+            print(
+                "Accuracy for subj %d is: %0.2f"
+                % (ppt_counter, accuracy[ppt_counter])
+            )
+
+    if verbose:
+        print(
+            "The average accuracy among all subjects is {0:f} +/- {1:f}".format(
+                np.mean(accuracy), np.std(accuracy)
+            )
+        )
+    return accuracy
+
+
+def load_and_concat(paths):
+    """
+    Take list of path and yields input data for ProbSRM
+    Parameters
+    ----------
+    paths
+    Returns
+    -------
+    X
+    """
+    X = []
+    for i in range(len(paths)):
+        X_i = np.concatenate(
+            [np.load(paths[i, j]) for j in range(len(paths[i]))], axis=1
+        )
+        X.append(X_i)
+    return X

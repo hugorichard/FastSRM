@@ -1,17 +1,10 @@
 from time import time
-import sys
-from cogspaces.datasets import fetch_mask
 import os
 from fastsrm.fastsrm import fastsrm
-from memory_profiler import memory_usage
 import numpy as np
-from joblib import Parallel, delayed, dump, load
+from joblib import Parallel, delayed
 from sklearn.model_selection import ShuffleSplit
 
-from fastsrm_age.timesegments import time_segment_matching
-from fastsrm_age.utils import load_and_concat
-import string
-import random
 from brainiak.funcalign.srm import SRM
 
 data_dir = "/storage/store/work/hrichard/"

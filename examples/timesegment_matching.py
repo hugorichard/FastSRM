@@ -2,16 +2,205 @@
 
 import numpy as np
 from scipy import stats
-from sklearn.model_selection import KFold
-from fastsrm.identifiable_srm import IdentifiableFastSRM
 
+from time import time
+import sys
+from cogspaces.datasets import fetch_mask
+import os
+from fastsrm2.fastsrm import (
+    fastsrm,
+    reduce_all,
+    probsrm,
+    detsrm,
+    reduce_optimal,
+    reduce_rena,
+    reduce_randomproj,
+)
+from memory_profiler import memory_usage
+import numpy as np
+from joblib import Parallel, delayed, dump, load
+from sklearn.model_selection import KFold
+
+from fastsrm_age.timesegments import time_segment_matching
+from fastsrm_age.utils import load_and_concat
+import string
+import random
+
+data_dir = "/storage/store/work/hrichard/"
+storage_dir = "/storage/store2/work/hrichard/"
+mask = fetch_mask("/storage/store/work/hrichard/")
+
+
+def random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = "".join(random.choice(letters) for i in range(length))
+    return result_str
+
+
+def get_shape(path):
+    """Get shape of saved np array
+    Parameters
+    ----------
+    path: str
+        path to np array
+    """
+    f = open(path, "rb")
+    version = np.lib.format.read_magic(f)
+    shape, fortran_order, dtype = np.lib.format._read_array_header(f, version)
+    f.close()
+    return shape
+
+
+def do_srm(config, n_components, algo):
+    result_directory = os.path.join(
+        storage_dir,
+        "fastsrm_age",
+        "timesegment",
+        "results_sm_None_rm_hv_False",
+    )
+    os.makedirs(result_directory, exist_ok=True)
+    print("Start experiment with config %s" % config)
+    n_subjects = 16
+    n_sessions = 5
+    paths = np.array(
+        [
+            [
+                os.path.join(
+                    data_dir,
+                    "masked_data",
+                    "smoothing_None",
+                    "rm_hv_confounds_False",
+                    "%s/subject_%i_session_%i.npy" % (config, i, j),
+                )
+                for j in range(n_sessions)
+            ]
+            for i in range(n_subjects)
+        ]
+    )
+    cv = KFold(n_splits=5, shuffle=False)
+    for i_ses, (sessions_train, sessions_test) in enumerate(
+        cv.split(np.arange(n_sessions))
+    ):
+        print(
+            "../results/cv_accuracy_timesegment_matching-%i-%i-%s-%s"
+            % (i_ses, n_components, algo, config)
+        )
+        to_clean = []
+        if os.path.exists(
+            "../results/cv_accuracy_timesegment_matching-%i-%i-%s-%s.npy"
+            % (i_ses, n_components, algo, config),
+        ):
+            print(
+                "Done: %s"
+                % "../results/cv_accuracy_timesegment_matching-%i-%i-%s-%s"
+                % (i_ses, n_components, algo, config)
+            )
+            continue
+        paths_train = paths[:, sessions_train]
+        t0 = time()
+        if algo == "detsrm":
+            X_train = load_and_concat(paths_train)
+            W = detsrm(
+                X_train,
+                n_components,
+                n_iter=1000,
+                random_state=0,
+                tol=1e-2,
+                verbose=True,
+            )[0]
+        if algo == "probsrm":
+            X_train = load_and_concat(paths_train)
+            W = probsrm(
+                X_train,
+                n_components,
+                n_iter=1000,
+                random_state=0,
+                tol=1e-2,
+                verbose=True,
+            )[0]
+        if "fastsrm" in algo:
+            algo_name, method, func_name, n_regions = algo.split("_")
+            if func_name == "pca":
+                func = reduce_optimal
+            if func_name == "rena":
+                func = reduce_rena
+            if func_name == "proj":
+                func = reduce_randomproj
+
+            paths_atlas = [
+                "/storage/store2/work/hrichard/temp_srm/U%i_%i_%s_%s_timesegmentmaching_%s.npy"
+                % (isub, i_ses, random_string(10), config, algo)
+                for isub in range(n_subjects)
+            ]
+
+            paths_basis = [
+                "/storage/store2/work/hrichard/temp_srm/W%i_%i_%s_%s_timesegmentmaching_%s.npy"
+                % (isub, i_ses, random_string(10), config, algo)
+                for isub in range(n_subjects)
+            ]
+
+            W = fastsrm(
+                paths_train,
+                n_components,
+                n_iter=1000,
+                method=method,
+                n_regions=n_regions,
+                mask=mask,
+                func=func,
+                random_state=0,
+                paths_basis=paths_basis,
+                paths_atlas=paths_atlas,
+                tol=1e-2,
+            )[0]
+
+            to_clean += paths_basis + paths_atlas
+        dt = time() - t0
+        np.save(
+            "../results/fit_time_timesegmentmatching-%i-%i-%s-%s.npy"
+            % (i_ses, n_components, algo, config),
+            dt,
+        )
+
+        paths_test = paths[:, sessions_test]
+        X_test = load_and_concat(paths_test)
+        shared_response = [W[i].T.dot(X_test[i]) for i in range(n_subjects)]
+        cv_scores = time_segment_matching(shared_response, win_size=9)
+        np.save(
+            "../results/cv_accuracy_timesegment_matching-%i-%i-%s-%s"
+            % (i_ses, n_components, algo, config),
+            cv_scores,
+        )
+
+        # clean paths
+        for p in to_clean:
+            os.system("rm %s" % p)
+
+
+def algos_k(k):
+    algos = []
+    for method in ["prob", "det"]:
+        # algos.append("fastsrm_%s_%s_%s" % (method, "rena", "1n"))
+        # algos.append("fastsrm_%s_%s_%s" % (method, "proj", "5n"))
+        # algos.append("fastsrm_%s_%s_%i" % (method, "pca", k + 1))
+        algos.append("fastsrm_%s_%s_%s" % (method, "pca", "2n"))
+    return algos
+
+
+datasets = ["forrest", "sherlock"]
+Parallel(n_jobs=8, verbose=True)(
+    delayed(do_srm)(dataset, n_components, algo)
+    for n_components in [5, 10, 20, 50]
+    for algo in algos_k(n_components)
+    for dataset in datasets
+)
 
 def time_segment_matching(
-        data,
-        win_size=10,
+    data, win_size=10,
 ):
     """
     This does subjects wise time segment matching (like in SRM paper)
+    Code taken from their repository
     Parameters
     ----------
     data: list of np array of shape n_voxels, n_timeframes
@@ -37,10 +226,12 @@ def time_segment_matching(
     # Concatenate the data across participants
     for ppt_counter in range(n_subjs):
         for window_counter in range(win_size):
-            train_data[window_counter * n_features:(window_counter + 1) *
-                       n_features, :, ] += data[ppt_counter][:, window_counter:
-                                                             window_counter +
-                                                             n_seg]
+            train_data[
+                window_counter
+                * n_features : (window_counter + 1)
+                * n_features,
+                :,
+            ] += data[ppt_counter][:, window_counter : window_counter + n_seg]
 
     # Iterate through the participants, leaving one out
     accuracy = np.zeros(shape=n_subjs)
@@ -50,9 +241,12 @@ def time_segment_matching(
         test_data = np.zeros((n_features * win_size, n_seg))
 
         for window_counter in range(win_size):
-            test_data[window_counter * n_features:(window_counter + 1) *
-                      n_features, :, ] = data[ppt_counter][:, window_counter:(
-                          window_counter + n_seg)]
+            test_data[
+                window_counter
+                * n_features : (window_counter + 1)
+                * n_features,
+                :,
+            ] = data[ppt_counter][:, window_counter : (window_counter + n_seg)]
 
         # Take this participant data away
         train_ppts = stats.zscore((train_data - test_data), axis=0, ddof=1)
@@ -74,124 +268,14 @@ def time_segment_matching(
         accuracy[ppt_counter] = sum(rank == range(n_seg)) / float(n_seg)
 
         # Print accuracy
-        print("Accuracy for subj %d is: %0.2f" %
-              (ppt_counter, accuracy[ppt_counter]))
+        print(
+            "Accuracy for subj %d is: %0.2f"
+            % (ppt_counter, accuracy[ppt_counter])
+        )
 
-    print("The average accuracy among all subjects is {0:f} +/- {1:f}".format(
-        np.mean(accuracy), np.std(accuracy)))
+    print(
+        "The average accuracy among all subjects is {0:f} +/- {1:f}".format(
+            np.mean(accuracy), np.std(accuracy)
+        )
+    )
     return accuracy
-
-
-def cross_validated_timesegment_matching(algo, paths, win_size):
-    """
-    This does subjects wise time segment matching (like in SRM paper) cross validated
-    Parameters
-    ----------
-    algo: IdentifiableSRM instance
-    paths: str np array of shape (n_subjects, n_sessions)
-        paths[i, j] is the path to masked data
-        np.load(paths[i, j]) is of shape n_voxels, n_components
-    win_size: int
-        Length of time segment to recover
-    """
-    cv = KFold(n_splits=5, shuffle=False)
-    n_sessions = len(paths[0])
-    cv_scores = []
-    for i, (sessions_train,
-            sessions_test) in enumerate(cv.split(np.arange(n_sessions))):
-        algo.fit(paths[:, sessions_train])
-        shared_response = algo.transform(paths[:, sessions_test])
-        shared_response = [np.concatenate(s, axis=1) for s in shared_response]
-        cv_scores.append(time_segment_matching(shared_response, win_size=win_size))
-    return np.array(cv_scores)
-
-
-# Usage example
-# srm = IdentifiableFastSRM(
-#     n_components=20,
-#     verbose=True,
-#     aggregate=None,
-# )
-# cv_scores = cross_validated_timesegment_matching(srm, input_paths)
-
-
-def stack_t(S, win):
-    """
-    Utility function that stacks time segments"""
-    S_ = np.copy(S)
-    n_components = S_.shape[0]
-    S__ = np.zeros((n_components * win, len(S_[0]) - win))
-    for i in range(len(S_[0]) - win):
-        S__[:, i] = np.concatenate([S_[:, k] for k in range(i, i + win)])
-    S__ = S__ - np.mean(S__, axis=0, keepdims=True)
-    S__ = S__ / np.linalg.norm(S__, axis=0, keepdims=True)
-    return S__
-
-
-def repeated_sessions_timesegment_matching(data,
-                                           repeated_data,
-                                           other_data,
-                                           win_size=50):
-    """
-    This does timesegment matching between repeated sessions
-    (sample segment is data, target segment
-    is the corresponding segment in repeated_data).
-    Possible targets are target timesegment and
-    timesegments in repeated_data and other data
-    non overlapping with the target.
-    Parameters
-    ----------
-    data: list of np array of shape n_components, n_timeframes
-        Subject-specific shared response of some sessions
-    repeated_data: list of np array of shape n_components,n_timeframes
-        Subject-specific shared response of some sessions (same stimuli as in data)
-        length of repeated sessions should match.
-    other_data: list of np array of shape n_components,n_timeframes
-        Subject-specific shared response on other sessions
-    win_size: int
-        Length of time segment to recover
-    Returns
-    -------
-    accuracy: np array of shape n_subjects, n_components, n_timesegments
-        leave one subject out accuracy per subjects per components
-    """
-    import matplotlib.pyplot as plt
-    assert len(data) == len(repeated_data) == len(other_data)
-    accuracy = []
-    for i in range(len(data)):
-        n_components, n_timeframes = data[i].shape
-        assert (n_components, n_timeframes) == repeated_data[i].shape
-        assert n_components == other_data[i].shape[0]
-        n_t = len(data[i][0])
-        S = np.concatenate([data[i], repeated_data[i], other_data[i]], axis=1)
-        accuracy_ = []
-        for comp in range(n_components):
-            S_ = [S[comp]]
-            S__ = stack_t(S_, win_size)
-            C = S__.T.dot(S__)
-            C = C[:n_t - win_size]
-            C = C[:, n_t:]
-            for i in range(len(C)):
-                for j in range(max(0, i - win_size), min(n_t, i + win_size)):
-                    if i != j:
-                        C[i, j] = 0
-            A = np.argmax(C, axis=1)
-            accuracy_.append(np.array(np.arange(n_t - win_size) == A))
-        accuracy.append(accuracy_)
-    return np.array(accuracy)
-
-
-# Usage example
-# srm = IdentifiableFastSRM(
-#     n_components=20,
-#     verbose=True,
-#     n_jobs=1,
-# )
-# S = srm.fit_transform(paths)
-# data = [s[0] for s in S]
-# repeated_data = [s[10] for s in S]
-# other_data = [
-#     np.concatenate([s[i] for i in [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]], axis=1)
-#     for s in S
-# ]
-# accuracy = repeated_sessions_timesegment_matching(data, repeated_data, other_data, win_size=50)
