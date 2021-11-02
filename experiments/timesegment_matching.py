@@ -14,7 +14,7 @@ from fastsrm.utils import load_and_concat
 from memory_profiler import memory_usage
 
 
-os.makedirs("./results")
+os.makedirs("./results", exist_ok=True)
 
 
 def do_find_basis(config, algo, paths_train, n_components, i_ses):
@@ -39,7 +39,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
             verbose=True,
         )[0]
     if "fastprob" in algo:
-        os.makedirs("./tempprob/%i-%i-%s-%s")
+        os.makedirs("./tempprob/%i-%i-%s-%s", exist_ok=True)
         W = fastsrm(
             paths_train,
             n_components,
@@ -52,7 +52,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
         )[0]
 
     if "fastdet" in algo:
-        os.makedirs("./tempdet/%i-%i-%s-%s")
+        os.makedirs("./tempdet/%i-%i-%s-%s", exist_ok=True)
         W = fastsrm(
             paths_train,
             n_components,
