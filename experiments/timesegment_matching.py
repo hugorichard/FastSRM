@@ -78,7 +78,7 @@ def do_srm(n_components, algo):
     paths = np.array(
         [
             [
-                "./data/masked_data/subject_%i_session_%i.npy" % (i, j)
+                "./data/masked_sherlock/subject_%i_session_%i.npy" % (i, j)
                 for j in range(n_sessions)
             ]
             for i in range(n_subjects)
