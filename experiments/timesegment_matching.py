@@ -138,7 +138,7 @@ def do_srm(n_components, algo):
         )
 
 
-Parallel(n_jobs=4, verbose=True)(
+Parallel(n_jobs=1, verbose=True)(
     delayed(do_srm)(n_components, algo)
     for n_components in [5, 10, 20, 50]
     for algo in ["prob", "det", "fastprob", "fastdet"]
