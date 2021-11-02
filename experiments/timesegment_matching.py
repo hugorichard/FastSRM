@@ -18,7 +18,7 @@ os.makedirs("./results", exist_ok=True)
 
 
 def do_find_basis(config, algo, paths_train, n_components, i_ses):
-    if algo == "detsrm":
+    if algo == "det":
         X_train = load_and_concat(paths_train)
         W = detsrm(
             X_train,
@@ -28,7 +28,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
             tol=1e-2,
             verbose=True,
         )[0]
-    if algo == "probsrm":
+    if algo == "prob":
         X_train = load_and_concat(paths_train)
         W = probsrm(
             X_train,
