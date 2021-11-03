@@ -2,6 +2,7 @@
 import os
 import scipy
 import numpy as np
+from scipy import stats
 from scipy.optimize import linear_sum_assignment
 from fastsrm.srm import projection
 from fastsrm.check_inputs import get_safe_shape
@@ -248,36 +249,32 @@ def error_source_rotation(S1, S2):
 
 
 def time_segment_matching(
-    data, win_size=10, verbose=True, l=None,
+    data, win_size=10,
 ):
     """
-    data list of n_voxels, n_timeframes data
-    l: np array of shape n_subjects, n_components:
-    noise level
+    This does subjects wise time segment matching (like in SRM paper)
+    Code taken from their repository
+    Parameters
+    ----------
+    data: list of np array of shape n_voxels, n_timeframes
+        Input subject specific shared response
+        data[i] is the shared response of subject i
+    win_size: int
+        Length of time segment to recover
+    Returns
+    -------
+    accuracy: np array of shape n_subjects
+    leave-one out accuracy among subjects
     """
-    if l is None:
-        l = np.ones((len(data), len(data[0])))
-
     # Pull out shape information
     n_subjs = len(data)
     (n_features, n_TR) = data[0].shape  # Voxel/feature by timepoint
 
     # How many segments are there (account for edges)
-    n_seg = n_TR - win_size + 1
+    n_seg = n_TR - win_size
 
     # mysseg prediction prediction
     train_data = np.zeros((n_features * win_size, n_seg))
-
-    # train data
-    # n_features x n_timeframes
-    # Ex: n_features=2, n_timeframes=6, windows_size=2
-    # data_i   train_data_i
-    # X1Y1       X1 X2 X3 X4 # first
-    # X2Y2       Y1 Y2 Y3 Y4
-    # X3Y3       X2 X3 X4 X5 # second
-    # X4Y4       Y2 Y3 Y4 Y5
-    # X5Y5  ->   X3 X4 X5 X6 # last
-    # X6Y6  ->   Y3 Y4 Y5 Y6
 
     # Concatenate the data across participants
     for ppt_counter in range(n_subjs):
@@ -295,6 +292,7 @@ def time_segment_matching(
 
         # Preset
         test_data = np.zeros((n_features * win_size, n_seg))
+
         for window_counter in range(win_size):
             test_data[
                 window_counter
@@ -303,22 +301,9 @@ def time_segment_matching(
                 :,
             ] = data[ppt_counter][:, window_counter : (window_counter + n_seg)]
 
-        normalized_test_data = np.zeros((n_features * win_size, n_seg))
-        for window_counter in range(win_size):
-            normalized_test_data[
-                window_counter
-                * n_features : (window_counter + 1)
-                * n_features,
-                :,
-            ] = data[ppt_counter][
-                :, window_counter : (window_counter + n_seg)
-            ] / (
-                l[ppt_counter].reshape(-1, 1) ** 2
-            )
-
         # Take this participant data away
         train_ppts = stats.zscore((train_data - test_data), axis=0, ddof=1)
-        test_ppts = stats.zscore(normalized_test_data, axis=0, ddof=1)
+        test_ppts = stats.zscore(test_data, axis=0, ddof=1)
 
         # Correlate the two data sets
         corr_mtx = test_ppts.T.dot(train_ppts)
@@ -336,18 +321,16 @@ def time_segment_matching(
         accuracy[ppt_counter] = sum(rank == range(n_seg)) / float(n_seg)
 
         # Print accuracy
-        if verbose:
-            print(
-                "Accuracy for subj %d is: %0.2f"
-                % (ppt_counter, accuracy[ppt_counter])
-            )
-
-    if verbose:
         print(
-            "The average accuracy among all subjects is {0:f} +/- {1:f}".format(
-                np.mean(accuracy), np.std(accuracy)
-            )
+            "Accuracy for subj %d is: %0.2f"
+            % (ppt_counter, accuracy[ppt_counter])
         )
+
+    print(
+        "The average accuracy among all subjects is {0:f} +/- {1:f}".format(
+            np.mean(accuracy), np.std(accuracy)
+        )
+    )
     return accuracy
 
 

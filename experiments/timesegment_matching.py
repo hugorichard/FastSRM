@@ -113,7 +113,7 @@ def do_srm(n_components, algo):
         )
         dt = time() - t0
         np.save(
-            "../results/memory_usage_timesegmentmatching-%i-%i-%s-%s.npy"
+            "./results/memory_usage_timesegmentmatching-%i-%i-%s-%s.npy"
             % (i_ses, n_components, algo, config),
             memory,
         )
