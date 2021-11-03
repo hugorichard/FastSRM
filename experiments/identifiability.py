@@ -1,42 +1,26 @@
 from time import time
+import sys
 import os
 from fastsrm.fastsrm import fastsrm
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.model_selection import ShuffleSplit
-
 from brainiak.funcalign.srm import SRM
 
 data_dir = "/storage/store/work/hrichard/"
 storage_dir = "/storage/store3/work/hrichard/"
 
 
-def do_srm(config, n_components, algo):
-    result_directory = os.path.join(storage_dir, "fastsrm", "identifiability",)
+def do_srm(n_components, algo):
+    result_directory = "./results/identifiability"
     os.makedirs(result_directory, exist_ok=True)
-    print("Start experiment with config %s" % config)
-    if config == "forrest":
-        n_subjects = 19
-        n_sessions = 7
-    elif config == "gallant":
-        n_subjects = 12
-        n_sessions = 12
-    elif config == "sherlock":
-        n_subjects = 16
-        n_sessions = 5
-    elif config == "raiders":
-        n_subjects = 11
-        n_sessions = 10
+    config = "sherlock"
+    n_subjects = 16
+    n_sessions = 5
     paths = np.array(
         [
             [
-                os.path.join(
-                    data_dir,
-                    "masked_data",
-                    "smoothing_None",
-                    "rm_hv_confounds_False",
-                    "%s/subject_%i_session_%i.npy" % (config, i, j),
-                )
+                "./data/masked_sherlock/subject_%i_session_%i.npy" % (i, j)
                 for j in range(n_sessions)
             ]
             for i in range(n_subjects)
@@ -70,9 +54,7 @@ def do_srm(config, n_components, algo):
                 )[1]
 
             if algo == "brainiak":
-                srm = SRM(
-                    n_iter=500, features=n_components, rand_seed=0
-                )
+                srm = SRM(n_iter=500, features=n_components, rand_seed=0)
                 srm.fit(
                     [
                         np.column_stack([np.load(XX) for XX in X])
@@ -98,10 +80,6 @@ def do_srm(config, n_components, algo):
             np.save(save_path, S)
 
 
-datasets = ["forrest", "sherlock"]
-algos = ["brainiak"]
-Parallel(n_jobs=2, verbose=True)(
-    delayed(do_srm)(dataset, 10, algo)
-    for algo in algos
-    for dataset in datasets
-)
+if __name__ == '__main__':
+    algo = sys.argv[1]
+    do_srm(10, algo)

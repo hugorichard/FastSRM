@@ -26,31 +26,6 @@ def do_expe(it, seed, algo):
     X = np.array([W[i].dot(S) + N[i] for i in range(m)])
     S_true = S
 
-    def to_niimgs(Xt, dim):
-        X = np.copy(Xt).T
-        from nilearn.masking import _unmask_from_to_3d_array
-        import nibabel
-
-        p = np.prod(dim)
-        assert len(dim) == 3
-        assert X.shape[-1] <= p
-        mask = np.zeros(p).astype(np.bool)
-        mask[: X.shape[-1]] = 1
-        assert mask.sum() == X.shape[1]
-        mask = mask.reshape(dim)
-        X = np.rollaxis(
-            np.array([_unmask_from_to_3d_array(x, mask) for x in X]),
-            0,
-            start=4,
-        )
-        affine = np.eye(4)
-        return (
-            nibabel.Nifti1Image(X, affine),
-            nibabel.Nifti1Image(mask.astype(np.float), affine),
-        )
-
-    _, mask = to_niimgs(X[0], dim)
-
     t0 = time()
     if algo == "brainiakdetsrm":
         S = DetSRM(n_iter=it, features=k, rand_seed=0).fit(X).s_
@@ -61,20 +36,12 @@ def do_expe(it, seed, algo):
     if algo == "probsrm":
         S = probsrm(X, k, n_iter=it, random_state=rng)[1]
     if "fastsrm" in algo:
-        algo_name, method, func_name, n_regions = algo.split("_")
-        if func_name == "pca":
-            func = reduce_optimal
-        if func_name == "rena":
-            func = reduce_rena
-        if func_name == "proj":
-            func = reduce_randomproj
         S = fastsrm(
             X,
             k,
             n_iter=it,
             method=method,
             n_regions=int(n_regions),
-            mask=mask,
             func=func,
             random_state=rng,
         )[1]
