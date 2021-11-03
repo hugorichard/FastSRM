@@ -6,6 +6,6 @@ do
     do
         export i;
         export j;
-        sbatch timesegment_matching.sbatch
+        sbatch timesegment.sbatch
     done
 done
