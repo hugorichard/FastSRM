@@ -142,4 +142,5 @@ def do_srm(n_components, algo):
 if __name__ == "__main__":
     n_components = int(sys.argv[1])
     algo = sys.argv[2]
+    print(n_components, algo)
     do_srm(n_components, algo)

@@ -6,6 +6,6 @@ do
     do
         export i;
         export j;
-        sbatch timesegment_matching.sbatch $i $j
+        sbatch timesegment_matching.sbatch
     done
 done
