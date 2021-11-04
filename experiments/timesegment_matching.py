@@ -56,7 +56,10 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
         )[0]
 
     if "fastdet" in algo:
-        os.makedirs("./tempdet/%i-%i-%s-%s", exist_ok=True)
+        os.makedirs(
+            "./tempdet/%i-%i-%s-%s" % (i_ses, n_components, algo, config),
+            exist_ok=True,
+        )
         W = fastsrm(
             paths_train,
             n_components,
