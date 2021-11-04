@@ -351,3 +351,16 @@ def load_and_concat(paths):
         )
         X.append(X_i)
     return X
+
+
+def reg_error(S1, S2):
+    """Regression error.
+
+    S1: S_true
+    S2: S_pred
+    """
+    k, t = S1.shape
+    varS2 = S2.dot(S2.T)
+    S1S2 = S1.dot(S2.T)
+    theta = S1S2.dot(np.linalg.inv(varS2))
+    return np.sum((theta.dot(S2) - S1) ** 2) / t

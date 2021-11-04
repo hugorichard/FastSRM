@@ -1,15 +1,13 @@
 from fastsrm2.srm import projection, detsrm, probsrm
+import os
 from time import time
-from fastsrm2.fastsrm import (
-    fastsrm,
-    reduce_rena,
-    reduce_optimal,
-    reduce_randomproj,
-)
+from fastsrm.fastsrm import fastsrm
+from fastsrm.srm import detsrm, probsrm
 from fastsrm2.exp_utils import reg_error
 import numpy as np
 from joblib import delayed, Parallel
-from brainiak.funcalign.srm import SRM, DetSRM
+
+# from brainiak.funcalign.srm import SRM, DetSRM
 
 
 dim = (50, 50, 50)
@@ -25,76 +23,44 @@ def do_expe(it, seed, algo):
     N = np.array([sigmas[i] * rng.randn(v, n) for i in range(m)])
     X = np.array([W[i].dot(S) + N[i] for i in range(m)])
     S_true = S
+    t_init = time()
 
-    t0 = time()
-    if algo == "brainiakdetsrm":
-        S = DetSRM(n_iter=it, features=k, rand_seed=0).fit(X).s_
-    if algo == "brainiakprobsrm":
-        S = SRM(n_iter=it, features=k, rand_seed=0).fit(X).s_
+    def callback(source, gnorm, current_iter, current_time):
+        return (
+            float(reg_error(np.copy(S_true), np.copy(source))),
+            float(current_time - t_init),
+            current_iter,
+            seed,
+            algo,
+            float(gnorm),
+        )
+
     if algo == "detsrm":
-        S = detsrm(X, k, n_iter=it, random_state=rng)[1]
+        S = detsrm(
+            X, k, n_iter=it, random_state=rng, callback=callback, tol=-1,
+        )[-1]
     if algo == "probsrm":
-        S = probsrm(X, k, n_iter=it, random_state=rng)[1]
+        S = probsrm(
+            X, k, n_iter=it, random_state=rng, callback=callback, tol=-1,
+        )[-1]
     if "fastsrm" in algo:
         S = fastsrm(
-            X,
+            [[x] for x in X],
             k,
             n_iter=it,
-            method=method,
-            n_regions=int(n_regions),
-            func=func,
             random_state=rng,
-        )[1]
-    return reg_error(S_true, S), time() - t0, it, seed, algo, grad
+            callback=callback,
+            tol=-1,
+        )[-1]
+    return np.array(S)
 
 
-# algos = ["probsrm", "detsrm", "brainiakdetsrm", "brainiakprobsrm"]
-# # for method in ["prob", "det"]:
-# #     for func_name in ["pca", "rena", "proj"]:
-# #         for n_regions in [str(n), str(k)]:
-# #             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-# for method in ["prob"]:
-#     for func_name in ["pca", "rena", "proj"]:
-#         for n_regions in [str(int(2 * n))]:
-#             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-#     algos.append("fastsrm_%s_%s_%s" % (method, "pca", str(2 * k)))
-# algos = []
-# for method in ["prob"]:
-#     for func_name in ["proj"]:
-#         for n_regions in [str(int(20 * n))]:
-#             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-
-# for method in ["prob"]:
-#     for func_name in ["proj"]:
-#         for n_regions in [str(int(v))]:
-#             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-
-# algos = []
-# for method in ["prob"]:
-#     for func_name in ["proj"]:
-#         for n_regions in [str(int(50 * n))]:
-#             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-
-# # algos = []
-# for method in ["prob"]:
-#     for func_name in ["proj"]:
-#         for n_regions in [str(int(100 * n))]:
-#             algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-
-algos = []
-for method in ["prob", "det"]:
-    algos.append("fastsrm_%s_%s_%s" % (method, func_name, n_regions))
-
-iters = np.arange(1, 41, 5)
 seeds = np.arange(30)
-res = Parallel(n_jobs=10, verbose=10)(
-    delayed(do_expe)(it, seed, algo)
-    for it in iters
-    for seed in seeds
-    for algo in algos
-)
-a, b, c = len(iters), len(seeds), len(algos)
-res = np.array(res)
-res = res.reshape((a, b, c, -1))
-for a, algo in enumerate(algos):
-    np.save("../results/synthetic_%s.npy" % algo, res[:, :, a, :])
+iters = 100
+for algo in ["detsrm", "probsrm", "fastsrm"]:
+    res = Parallel(n_jobs=3, verbose=10)(
+        delayed(do_expe)(iters, seed, algo) for seed in seeds
+    )
+    res = np.array(res)
+    res = res.reshape((len(seeds), iters, -1))
+    np.save("./results/synthetic_grad_%s.npy" % algo, res)
