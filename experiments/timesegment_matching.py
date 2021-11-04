@@ -133,7 +133,7 @@ def do_srm(n_components, algo):
 
         paths_test = paths[:, sessions_test]
         X_test = load_and_concat(paths_test)
-        print(W[i])
+        print(W[0])
         shared_response = [W[i].T.dot(X_test[i]) for i in range(n_subjects)]
         cv_scores = time_segment_matching(shared_response, win_size=9)
         np.save(
