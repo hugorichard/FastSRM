@@ -1,9 +1,8 @@
-from fastsrm2.srm import projection, detsrm, probsrm
 import os
 from time import time
 from fastsrm.fastsrm import fastsrm
-from fastsrm.srm import detsrm, probsrm
-from fastsrm2.exp_utils import reg_error
+from fastsrm.srm import detsrm, probsrm, projection
+from fastsrm.utils import reg_error
 import numpy as np
 from joblib import delayed, Parallel
 
@@ -58,7 +57,7 @@ def do_expe(it, seed, algo):
 seeds = np.arange(30)
 iters = 100
 for algo in ["detsrm", "probsrm", "fastsrm"]:
-    res = Parallel(n_jobs=3, verbose=10)(
+    res = Parallel(n_jobs=10, verbose=10)(
         delayed(do_expe)(iters, seed, algo) for seed in seeds
     )
     res = np.array(res)
