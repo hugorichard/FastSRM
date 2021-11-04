@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in 'brainiak' 'fastsrm'
+for i in 'brainiak' 'fast'
 do
     export i;
     sbatch identifiability.sbatch
