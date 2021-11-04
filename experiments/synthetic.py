@@ -56,6 +56,7 @@ def do_expe(it, seed, algo):
 
 seeds = np.arange(30)
 iters = 100
+os.makedirs("./results", exist_ok=True)
 for algo in ["detsrm", "probsrm", "fastsrm"]:
     res = Parallel(n_jobs=3, verbose=10)(
         delayed(do_expe)(iters, seed, algo) for seed in seeds
