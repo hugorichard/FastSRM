@@ -1,5 +1,6 @@
 from sklearn.utils import check_random_state
 import numpy as np
+from time import time
 
 
 def safe_load(data):
@@ -21,7 +22,13 @@ def projection(X):
 
 
 def detsrm(
-    X, n_components, n_iter=100, random_state=None, verbose=False, tol=1e-5,
+    X,
+    n_components,
+    n_iter=100,
+    random_state=None,
+    verbose=False,
+    tol=1e-5,
+    callback=None,
 ):
     """Perform Deterministic SRM on numpy arrays.
     To be used when data hold in memory and the number
@@ -49,6 +56,13 @@ def detsrm(
     tol: float
         Stops if the norm of the gradient falls below tolerance value
 
+    callback: function or None
+        At each iteration calls callback(S, gnorm, it, t0) where `S` is the
+        current estimate of the shared response, `gnorm` is the current
+        `gradient norm`, `it` is the current iteration and `t0` the current
+        time. The result is saved in a list `record`.
+        If callback is None, nothing is done.
+
     Returns
     --------
 
@@ -58,6 +72,10 @@ def detsrm(
 
     S : np array of shape (n_components, n_timeframes)
         Shared response
+
+    records : list of shape (n_iter,)
+        The recorded information from callback.
+        Only returned if callback is not None
 
     """
     rng = check_random_state(random_state)
@@ -70,6 +88,7 @@ def detsrm(
         W.append(projection(X[i].dot(S.T)))
     W = np.array(W)
     Y = np.array([W[i].T.dot(X[i]) for i in range(m)])
+    record = []
     for it in range(n_iter):
         gnorm = np.max(np.abs(m * S - np.sum(Y, axis=0)))
         if verbose:
@@ -81,6 +100,9 @@ def detsrm(
             Wi = projection(X[i].dot(S.T))
             Y[i] = Wi.T.dot(X[i])
             W[i] = Wi
+        if callback is not None:
+            t0 = time()
+            record.append(callback(S, gnorm, it, t0))
 
     if gnorm > tol:
         if verbose:
@@ -88,6 +110,8 @@ def detsrm(
                 "DetSRM did not converge. Current gradient norm is %.6f"
                 % gnorm
             )
+    if callback is not None:
+        return W, S, record
     return W, S
 
 
@@ -99,6 +123,7 @@ def probsrm(
     corrective_factor=1,
     verbose=False,
     tol=1e-5,
+    callback=None,
 ):
     """Perform Probabilistic SRM on numpy arrays.
     To be used when data hold in memory and the number
@@ -123,8 +148,15 @@ def probsrm(
     verbose : bool
         If True, logs are enabled. If False, logs are disabled.
 
-    tol: float
+    tol : float
         Stops if the norm of the gradient falls below tolerance value
+
+    callback : function or None
+        At each iteration calls callback(S, gnorm, it, t0) where `S` is the
+        current estimate of the shared response, `gnorm` is the current
+        `gradient norm`, `it` is the current iteration and `t0` the current
+        time. The result is saved in a list `record`.
+        If callback is None, nothing is done.
 
     Returns
     --------
@@ -141,6 +173,11 @@ def probsrm(
 
     Sigma : np array of shape (n_components,)
         (Diagonal) Shared response covariance
+
+    records : list of shape (n_iter,)
+        The recorded information from callback.
+        Only returned if callback is not None
+
     """
     X = np.array([safe_load(x) for x in X])
     rng = check_random_state(random_state)
@@ -158,6 +195,7 @@ def probsrm(
     normX = [np.sum(x ** 2) for x in X]
     likelihood = np.inf
     vap = v / corrective_factor
+    record = []
     for it in range(n_iter):
         V = 1 / (np.sum(1 / sigmas) + 1 / Sigma)
         S = V[:, None] * np.sum(
@@ -186,7 +224,12 @@ def probsrm(
             norm = normX[i] + normS - 2 * np.trace(XST.T.dot(W[i]))
             sigmas[i] = 1 / vap * (norm / n + np.sum(V ** 2))
         Sigma = V + np.diag(S.dot(S.T)) / n
+        if callback is not None:
+            t0 = time()
+            record.append(callback(S, diff, it, t0))
     if diff > tol:
         print("ProbSRM did not converge. Current diff is %.6f" % diff)
 
+    if callback is not None:
+        return W, S, sigmas, Sigma, record
     return W, S, sigmas, Sigma
