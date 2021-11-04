@@ -6,6 +6,6 @@ do
     do
         export i;
         export j;
-        sbatch timesegment.sbatch -o logs/timesegment_$i_$j.out
+        sbatch timesegment.sbatch
     done
 done
