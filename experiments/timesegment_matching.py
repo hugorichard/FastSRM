@@ -12,6 +12,7 @@ from sklearn.model_selection import KFold
 
 from fastsrm.utils import time_segment_matching
 from fastsrm.utils import load_and_concat
+from fastsrm.srm import safe_load
 from memory_profiler import memory_usage
 
 
@@ -74,7 +75,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
     np.save(
         "./results/basis_timesegmentmatching-%i-%i-%s-%s.npy"
         % (i_ses, n_components, algo, config),
-        W,
+        np.array([safe_load(w) for w in W]),
     )
 
 
