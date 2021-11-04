@@ -273,7 +273,7 @@ computes shared response.</p>
 <h1>FastSRM, DetSRM and ProbSRM<a class="headerlink" href="#fastsrm-detsrm-and-probsrm" title="Permalink to this headline"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="fastsrm.fastsrm.fastsrm">
-<span class="sig-prename descclassname"><span class="pre">fastsrm.fastsrm.</span></span><span class="sig-name descname"><span class="pre">fastsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prob'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.fastsrm.fastsrm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">fastsrm.fastsrm.</span></span><span class="sig-name descname"><span class="pre">fastsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prob'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.fastsrm.fastsrm" title="Permalink to this definition"></a></dt>
 <dd><p>Performs an SRM decomposition on
 input data with a number of features
 much larger than the number of samples:
@@ -294,6 +294,11 @@ imgs can also be a list of arrays where element i of the array is a numpy array 
 if “det”, uses Deterministic SRM</p></li>
 <li><p><strong>temp_dir</strong> (<em>str</em><em> or </em><em>None</em>) – Path to dir where temporary results are stored. If None temporary results will be stored in memory. This can results in memory errors when the number of subjects and/or sessions is large</p></li>
 <li><p><strong>random_state</strong> (<em>int</em><em>, </em><em>RandomState instance</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Controls the randomness of the initialization.</p></li>
+<li><p><strong>callback</strong> (<em>function</em><em> or </em><em>None</em>) – At each iteration calls callback(S, gnorm, it, t0) where <cite>S</cite> is the
+current estimate of the shared response, <cite>gnorm</cite> is the current
+<cite>gradient norm</cite>, <cite>it</cite> is the current iteration and <cite>t0</cite> the current
+time. The result is saved in a list <cite>record</cite>.
+If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -302,6 +307,8 @@ if “det”, uses Deterministic SRM</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
 <li><p><strong>sigmas</strong> (<em>np array of shape (n_subjects,)</em>) – Noise variance (only returned if method == “probsrm”)</p></li>
 <li><p><strong>Sigma</strong> (<em>np array of shape (n_components,)</em>) – (Diagonal) source covariance         (only returned if method == “probsrm”)</p></li>
+<li><p><strong>records</strong> (<em>list of shape (n_iter,)</em>) – The recorded information from callback.
+Only returned if callback is not None</p></li>
 </ul>
 </p>
 </dd>
@@ -310,7 +317,7 @@ if “det”, uses Deterministic SRM</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fastsrm.srm.detsrm">
-<span class="sig-prename descclassname"><span class="pre">fastsrm.srm.</span></span><span class="sig-name descname"><span class="pre">detsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.srm.detsrm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">fastsrm.srm.</span></span><span class="sig-name descname"><span class="pre">detsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.srm.detsrm" title="Permalink to this definition"></a></dt>
 <dd><p>Perform Deterministic SRM on numpy arrays.
 To be used when data hold in memory and the number
 of features is not much larger than the number
@@ -324,12 +331,19 @@ of samples (in which case fastsrm is preferable)</p>
 <li><p><strong>random_state</strong> (<em>int</em><em>, </em><em>RandomState instance</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Controls the randomness of the initialization.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, logs are enabled. If False, logs are disabled.</p></li>
 <li><p><strong>tol</strong> (<em>float</em>) – Stops if the norm of the gradient falls below tolerance value</p></li>
+<li><p><strong>callback</strong> (<em>function</em><em> or </em><em>None</em>) – At each iteration calls callback(S, gnorm, it, t0) where <cite>S</cite> is the
+current estimate of the shared response, <cite>gnorm</cite> is the current
+<cite>gradient norm</cite>, <cite>it</cite> is the current iteration and <cite>t0</cite> the current
+time. The result is saved in a list <cite>record</cite>.
+If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>W</strong> (<em>np array of shape     (n_views, n_features, n_components)</em>) – Subject specific basis</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
+<li><p><strong>records</strong> (<em>list of shape (n_iter,)</em>) – The recorded information from callback.
+Only returned if callback is not None</p></li>
 </ul>
 </p>
 </dd>
@@ -338,7 +352,7 @@ of samples (in which case fastsrm is preferable)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="fastsrm.srm.probsrm">
-<span class="sig-prename descclassname"><span class="pre">fastsrm.srm.</span></span><span class="sig-name descname"><span class="pre">probsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrective_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.srm.probsrm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">fastsrm.srm.</span></span><span class="sig-name descname"><span class="pre">probsrm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrective_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.srm.probsrm" title="Permalink to this definition"></a></dt>
 <dd><p>Perform Probabilistic SRM on numpy arrays.
 To be used when data hold in memory and the number
 of features is not much larger than the number
@@ -352,6 +366,11 @@ of samples (in which case fastsrm is preferable)</p>
 <li><p><strong>random_state</strong> (<em>int</em><em>, </em><em>RandomState instance</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Controls the randomness of the initialization.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – If True, logs are enabled. If False, logs are disabled.</p></li>
 <li><p><strong>tol</strong> (<em>float</em>) – Stops if the norm of the gradient falls below tolerance value</p></li>
+<li><p><strong>callback</strong> (<em>function</em><em> or </em><em>None</em>) – At each iteration calls callback(S, gnorm, it, t0) where <cite>S</cite> is the
+current estimate of the shared response, <cite>gnorm</cite> is the current
+<cite>gradient norm</cite>, <cite>it</cite> is the current iteration and <cite>t0</cite> the current
+time. The result is saved in a list <cite>record</cite>.
+If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -360,6 +379,8 @@ of samples (in which case fastsrm is preferable)</p>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
 <li><p><strong>sigmas</strong> (<em>np array of shape (n_views,)</em>) – Noise variance</p></li>
 <li><p><strong>Sigma</strong> (<em>np array of shape (n_components,)</em>) – (Diagonal) Shared response covariance</p></li>
+<li><p><strong>records</strong> (<em>list of shape (n_iter,)</em>) – The recorded information from callback.
+Only returned if callback is not None</p></li>
 </ul>
 </p>
 </dd>
