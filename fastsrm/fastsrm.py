@@ -230,6 +230,4 @@ errors when the number of subjects and/or sessions is large
         else:
             path_w = None
         W.append(save(projection(w), path_w))
-
-    ressrm[0] = W
-    return ressrm
+    return [W] + list(ressrm)[1:]
