@@ -80,6 +80,7 @@ def do_srm(n_components, algo):
             np.save(save_path, S)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     algo = sys.argv[1]
+    print(algo)
     do_srm(10, algo)
