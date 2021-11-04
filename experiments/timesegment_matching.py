@@ -50,6 +50,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
             n_components,
             n_iter=1000,
             method="prob",
+            verbose=True,
             random_state=0,
             tol=1e-2,
             temp_dir="./tempprob/%i-%i-%s-%s"
@@ -66,6 +67,7 @@ def do_find_basis(config, algo, paths_train, n_components, i_ses):
             n_components,
             n_iter=1000,
             method="det",
+            verbose=True,
             random_state=0,
             tol=1e-2,
             temp_dir="./tempdet/%i-%i-%s-%s"
