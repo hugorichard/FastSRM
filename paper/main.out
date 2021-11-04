@@ -1,0 +1,14 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Background: the shared response model \(SRM\)}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Deterministic shared response model}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Probabilistic SRM}{section.2}% 4
+\BOOKMARK [1][-]{section.3}{The FastSRM algorithm}{}% 5
+\BOOKMARK [2][-]{subsection.3.1}{Reducing the computational burden by use of atlases}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.2}{An optimal atlas}{section.3}% 7
+\BOOKMARK [1][-]{section.4}{Related work}{}% 8
+\BOOKMARK [1][-]{section.5}{Experiments}{}% 9
+\BOOKMARK [2][-]{subsection.5.1}{Comparing Fitting time and performance of FastSRM and SRM on synthetic data}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.2}{Experiment on fMRI data: identifiability increases stability}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.3}{Identifiability increases stability}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.4}{Comparing fitting time, memory usage and performance on a timesegment matching experiment}{section.5}% 13
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 14
