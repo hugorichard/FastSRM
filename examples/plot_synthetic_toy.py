@@ -89,17 +89,6 @@ for algo in algos:
 index = {a: k for k, a in enumerate(algos)}
 loc = plticker.MultipleLocator(base=10)
 
-rc = {
-    "pdf.fonttype": 42,
-    "text.usetex": True,
-    "font.size": 16,
-    "xtick.labelsize": 16,
-    "ytick.labelsize": 16,
-    "text.latex.preview": True,
-    "font.family": "serif",
-}
-plt.rcParams.update(rc)
-
 NAMES = {}
 NAMES["probsrm"] = "None"
 NAMES["detsrm"] = "None"
