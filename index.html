@@ -4,9 +4,13 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IdentifiableFastSRM &mdash; FastSRM  documentation</title>
+  <title>Examples Gallery &mdash; FastSRM  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -18,7 +22,8 @@
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FastSRM : running time and convergence" href="auto_examples/plot_synthetic_toy.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,12 +41,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">IdentifiableFastSRM</a></li>
-<li><a class="reference internal" href="#fastsrm-detsrm-and-probsrm">FastSRM, DetSRM and ProbSRM</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/plot_synthetic_toy.html">FastSRM : running time and convergence</a></li>
 </ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -56,7 +59,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>IdentifiableFastSRM</li>
+      <li>Examples Gallery</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -66,14 +69,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="identifiablefastsrm">
+  <section id="examples-gallery">
+<span id="sphx-glr-auto-examples"></span><h1>Examples Gallery<a class="headerlink" href="#examples-gallery" title="Permalink to this headline"></a></h1>
+<p>The examples gallery provides working code samples demonstrating what
+can be done with the FastSRM library.</p>
+<div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates on a very small dataset that the optimal atlas used in FastSRM speeds..."><figure class="align-default" id="id1">
+<img alt="FastSRM : running time and convergence" src="_images/sphx_glr_plot_synthetic_toy_thumb.png" />
+<figcaption>
+<p><span class="caption-text"><a class="reference internal" href="auto_examples/plot_synthetic_toy.html#sphx-glr-auto-examples-plot-synthetic-toy-py"><span class="std std-ref">FastSRM : running time and convergence</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="_downloads/07fcc19ba03226cd3d83d4e40ec44385/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="_downloads/6f1e7a639e0699d6164445b55e6c116d/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+<section id="identifiablefastsrm">
 <h1>IdentifiableFastSRM<a class="headerlink" href="#identifiablefastsrm" title="Permalink to this headline"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="fastsrm.identifiable_srm.IdentifiableFastSRM">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fastsrm.identifiable_srm.</span></span><span class="sig-name descname"><span class="pre">IdentifiableFastSRM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prob'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'warn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_pca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="Permalink to this definition"></a></dt>
-<dd><p>SRM decomposition using a very low amount of memory and computational power thanks to the use of an atlas as described in <span id="id1">[Richard2019]</span>.</p>
+<dd><p>SRM decomposition using a very low amount of memory and computational power thanks to the use of an atlas as described in [Richard2019].</p>
 <p>Given multi-subject data, factorize it as a shared response S among all subjects and an orthogonal transform (basis) W per subject:</p>
 <div class="math notranslate nohighlight">
 \[X_i \approx W_i S, \forall i=1 \dots N\]</div>
@@ -392,7 +417,9 @@ Only returned if callback is not None</p></li>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="auto_examples/plot_synthetic_toy.html" class="btn btn-neutral float-right" title="FastSRM : running time and convergence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
