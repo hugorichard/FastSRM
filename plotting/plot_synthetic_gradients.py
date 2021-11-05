@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.ticker as plticker
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
-from parameters import NAMES, add
+from parameters import NAMES
 import os
 
 os.makedirs("../figures", exist_ok=True)
@@ -22,29 +22,15 @@ plt.rcParams.update(rc)
 dim = (50, 50, 50)
 m, v, k, n = 10, np.prod(dim), 50, 1000
 
-algos = ["probsrm", "detsrm"]
-for method in ["prob", "det"]:
-    algos.append("fastsrm_%s_%s_%s" % (method, "rena", "1n"))
-    algos.append("fastsrm_%s_%s_%s" % (method, "proj", "5n"))
-    algos.append("fastsrm_%s_%s_%i" % (method, "pca", k + 1))
-    algos.append("fastsrm_%s_%s_%s" % (method, "pca", "2n"))
+algos_det = ["detsrm", "fastdet"]
+algos_prob = ["probsrm", "fastprob"]
 
-
-algos_prob = ["probsrm"]
-for method in ["prob"]:
-    algos_prob.append("fastsrm_%s_%s_%s" % (method, "pca", "2n"))
-
-
-algos_det = ["detsrm"]
-for method in ["det"]:
-    algos_det.append("fastsrm_%s_%s_%s" % (method, "pca", "2n"))
-
-NAMES = add(NAMES, algos_det + algos_prob, atlas_only=True, display_regions=False)
-print(NAMES)
+NAMES = {}
 NAMES["probsrm"] = "None"
 NAMES["detsrm"] = "None"
-NAMES["fastsrm_det_pca_2n"] = "Optimal"
-NAMES["fastsrm_prob_pca_2n"] = "Optimal"
+NAMES["fastdet"] = "Optimal"
+NAMES["fastprob"] = "Optimal"
+
 seeds = np.arange(30)
 
 

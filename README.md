@@ -43,6 +43,53 @@ Sigma = srm.source_covariance # (Diagonal) Covariance of the shared response: np
 sigmas = srm.noise_variance # Variance of the noise: np array of shape (n_subjects)
 
 ```
+
+Run experiments
+---------------
+
+## Synthetic experiment
+
+1. In the `experiments` folder run 
+`ipython synthetic.py`
+
+2. Go in the `plotting` folder and run
+`ipython plot_synthetic_gradients.py`
+
+The figure is now available in the `figures` folder under the name
+`synthetic_gradient.pdf`
+
+
+## Timesegment matching experiment
+
+1. Go in the experiments folder and download the sherlock dataset by running:
+`ipython get_sherlock.py`
+
+2. Go in the `experiments` folder and run 
+`bash timesegment.bash` if you have access to a cluster with slurm otherwise run `bash timesegment_local.bash`
+
+4. Go in the `plotting` folder and run
+`ipython plot_identifiability.py`
+
+The figure is now available in the `figures` folder under the name
+`timesegment.pdf`
+
+
+## Identifiability experiment
+
+1. Go in the experiments folder and download the sherlock dataset by running:
+`ipython get_sherlock.py`
+
+2. Download and install Brainiak (see https://github.com/brainiak/brainiak) 
+
+3. Go in the `experiments` folder and run 
+`bash identifiability.bash` if you have access to a cluster with slurm otherwise run `bash identifiability_local.bash`
+
+4. Go in the `plotting` folder and run
+`ipython plot_identifiability.py`
+
+The figure is now available in the `figures` folder under the name
+`identifiability.pdf`
+
 Documentation
 --------------
 
