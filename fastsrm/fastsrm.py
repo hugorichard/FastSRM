@@ -205,7 +205,13 @@ errors when the number of subjects and/or sessions is large
 
     if method == "det":
         ressrm = detsrm(
-            Xred, n_components, n_iter, random_state, verbose=verbose, tol=tol,
+            Xred,
+            n_components,
+            n_iter,
+            random_state,
+            verbose=verbose,
+            tol=tol,
+            callback=callback,
         )
 
     S = ressrm[1]
