@@ -3,10 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Example Gallery
-==================================
-
-    auto_examples/index.rst
+.. include:: auto_examples/index.rst
 
 IdentifiableFastSRM
 ===================================
