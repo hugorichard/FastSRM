@@ -1,3 +1,12 @@
+"""
+============================================================
+FastSRM : running time and convergence
+============================================================
+
+This example demonstrates on a very small dataset that
+the optimal atlas used in FastSRM speeds up the computation
+of shared components but without any loss of accuracy.
+"""
 import os
 from time import time
 from fastsrm.fastsrm import fastsrm
