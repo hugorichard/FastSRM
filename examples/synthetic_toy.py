@@ -10,7 +10,7 @@ from matplotlib.cm import get_cmap
 from joblib import delayed, Parallel
 
 
-dim = (10, 10, 10)
+dim = (15, 15, 15)
 m, v, k, n = 10, np.prod(dim), 20, 100
 
 
@@ -73,9 +73,7 @@ algos_prob = ["probsrm", "fastprob"]
 algos = algos_det + algos_prob
 S = []
 for algo in algos:
-    resS = do_expe(20, 0, algo)
-    print(algo, "len", len(resS), len(resS[0]))
-    print(resS[0])
+    resS = np.array([do_expe(20, seed, algo) for seed in range(5)])
     S.append(resS)
 
 index = {a: k for k, a in enumerate(algos)}
@@ -121,7 +119,7 @@ for j, algos_group in enumerate([algos_det, algos_prob]):
             marker=marker,
             linestyle=linestyle,
             color=vir(c),
-            markevery=10,
+            markevery=1,
         )
         axes[1, j].plot(
             iters,
@@ -130,7 +128,7 @@ for j, algos_group in enumerate([algos_det, algos_prob]):
             linestyle=linestyle,
             color=vir(c),
             label=NAMES[algo],
-            markevery=10,
+            markevery=1,
         )
         axes[2, j].plot(
             iters,
@@ -139,7 +137,7 @@ for j, algos_group in enumerate([algos_det, algos_prob]):
             linestyle=linestyle,
             color=vir(c),
             label=NAMES[algo],
-            markevery=10,
+            markevery=1,
         )
         axes[0, j].fill_between(
             iters,
@@ -168,8 +166,8 @@ axes[2, 0].set_yscale("log")
 y_minor = plticker.LogLocator(
     base=10.0, subs=np.arange(1.0, 10.0) * 0.1, numticks=10
 )
-axes[1, 0].set_ylim([1e1, 1e5])
-axes[1, 0].set_yticks([1e1, 1e2, 1e3, 1e4, 1e5])
+axes[1, 0].set_ylim([1e-2, 1e0])
+axes[1, 0].set_yticks([1e-2, 1e-1, 1e0])
 axes[0, 0].yaxis.set_minor_locator(y_minor)
 axes[1, 0].yaxis.set_minor_locator(y_minor)
 axes[0, 0].set_title("DetSRM")
@@ -182,4 +180,3 @@ axes[2, 1].set_xlabel("Number of iterations")
 plt.tick_params(axis="y", which="minor")
 plt.legend(loc="upper center", bbox_to_anchor=(-0.1, 4), ncol=5, title="ATLAS")
 plt.show()
-# plt.savefig("../figures/synthetic_gradient.pdf", bbox_inches="tight")
