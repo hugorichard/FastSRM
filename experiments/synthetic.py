@@ -42,7 +42,7 @@ def do_expe(it, seed, algo):
         S = probsrm(
             X, k, n_iter=it, random_state=rng, callback=callback, tol=-1,
         )[-1]
-    if "fastsrm" in algo:
+    if algo == "fastdet":
         S = fastsrm(
             [[x] for x in X],
             k,
@@ -50,6 +50,17 @@ def do_expe(it, seed, algo):
             random_state=rng,
             callback=callback,
             tol=-1,
+            method="det",
+        )[-1]
+    if algo == "fastprob":
+        S = fastsrm(
+            [[x] for x in X],
+            k,
+            n_iter=it,
+            random_state=rng,
+            callback=callback,
+            tol=-1,
+            method="prob",
         )[-1]
     return np.array(S)
 
