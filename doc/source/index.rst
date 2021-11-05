@@ -6,7 +6,7 @@
 Example Gallery
 ==================================
 
-.. include:: auto_examples/index.rst
+    auto_examples/index.rst
 
 IdentifiableFastSRM
 ===================================
