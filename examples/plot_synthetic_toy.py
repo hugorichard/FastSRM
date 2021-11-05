@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 from matplotlib.cm import get_cmap
 from joblib import delayed, Parallel
+print("Starting FastSRM example")
 
 
 dim = (15, 15, 15)
@@ -187,6 +188,5 @@ axes[2, 0].set_xlabel("Number of iterations")
 axes[2, 1].set_xlabel("Number of iterations")
 plt.tick_params(axis="y", which="minor")
 plt.legend(loc="upper center", bbox_to_anchor=(-0.1, 4), ncol=5, title="ATLAS")
-f.tight_layout()
 plt.show()
 print("Done")
