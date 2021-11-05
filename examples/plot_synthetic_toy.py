@@ -20,7 +20,7 @@ from joblib import delayed, Parallel
 
 
 dim = (15, 15, 15)
-m, v, k, n = 10, np.prod(dim), 20, 100
+m, v, k, n = 5, np.prod(dim), 20, 30
 
 
 def do_expe(it, seed, algo):
@@ -175,7 +175,6 @@ axes[2, 0].set_yscale("log")
 y_minor = plticker.LogLocator(
     base=10.0, subs=np.arange(1.0, 10.0) * 0.1, numticks=10
 )
-axes[1, 0].set_ylim([1e-2, 1e0])
 axes[1, 0].set_yticks([1e-2, 1e-1, 1e0])
 axes[0, 0].yaxis.set_minor_locator(y_minor)
 axes[1, 0].yaxis.set_minor_locator(y_minor)
@@ -189,3 +188,4 @@ axes[2, 1].set_xlabel("Number of iterations")
 plt.tick_params(axis="y", which="minor")
 plt.legend(loc="upper center", bbox_to_anchor=(-0.1, 4), ncol=5, title="ATLAS")
 plt.show()
+plt.savefig("./fig.pdf", bbox_inches="tight")
