@@ -22,8 +22,31 @@ See https://arxiv.org/pdf/1909.12537.pdf
 
 Install
 ---------
+Clone the repository
 
-`pip install fastsrm`
+`git clone https://github.com/hugorichard/FastSRM`
+
+In the cloned directory execute
+
+`pip install -e .`
+
+Requirements:
+
+```
+scipy>=0.18.0
+numpy>=1.12
+scikit-learn>=0.23
+joblib
+tqdm
+scipy>=0.18.0
+matplotlib>=2.0.0
+pytest
+pytest-timeout
+pytest-cov
+coverage
+```
+
+To run the experiments on identifiability, brainiak is necessary (see https://github.com/brainiak/brainiak)
 
 Usage
 --------
