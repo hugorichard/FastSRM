@@ -69,7 +69,7 @@ seeds = np.arange(30)
 iters = 100
 os.makedirs("./results", exist_ok=True)
 for algo in ["detsrm", "probsrm", "fastdet", "fastprob"]:
-    res = Parallel(n_jobs=2, verbose=10)(
+    res = Parallel(n_jobs=4, verbose=10)(
         delayed(do_expe)(iters, seed, algo) for seed in seeds
     )
     res = np.array(res)
