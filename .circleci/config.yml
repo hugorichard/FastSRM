@@ -44,6 +44,9 @@ jobs:
           command: |
             source activate testenv
             # conda install --no-update-deps nilearn sphinx numpydoc sphinx-gallery -c conda-forge -yq
+            OPENBLAS_NUM_THREADS=2
+            MKL_NUM_THREADS=2
+            OMP_NUM_THREADS=2
             pip install -r doc/doc-requirements.txt
             wget https://github.com/jgm/pandoc/releases/download/2.9.2.1/pandoc-2.9.2.1-linux-amd64.tar.gz
             mkdir pandoc
