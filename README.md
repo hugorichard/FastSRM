@@ -94,7 +94,7 @@ The figure is now available in the `figures` folder under the name
 `ipython plot_identifiability.py`
 
 The figure is now available in the `figures` folder under the name
-`timesegment.pdf`
+`timesegment_matching_sherlock.pdf`
 
 
 ## Identifiability experiment
