@@ -17,8 +17,9 @@ rc = {
 }
 plt.rcParams.update(rc)
 shared_dir = (
-    "/home/hugo/Research/drago/store3/work/hrichard/fastsrm/identifiability/shared/"
+    "../experiments/results/identifiability/shared/"
 )
+
 
 def standardize(X):
     X_ = X - np.mean(X, axis=1)
@@ -49,4 +50,4 @@ plt.xlim(np.min(errors) - 0.1, np.max(errors) + 0.1)
 plt.ylim(np.min(errors) - 0.1, np.max(errors) + 0.1)
 plt.xlabel("Stability index \n (General covariance)")
 plt.ylabel("Stability index \n (Diagonal covariance)")
-plt.savefig("../paper/figures/identifiability.pdf", bbox_inches="tight")
+plt.savefig("../figures/identifiability.pdf", bbox_inches="tight")
