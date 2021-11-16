@@ -32,8 +32,13 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.githubpages",
+    "sphinx_gallery.gen_gallery",
 ]
 
+sphinx_gallery_conf = {
+     'examples_dirs': '../../examples',   # path to your example scripts
+     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+}
 napoleon_numpy_docstring = True
 
 # Add any paths that contain templates here, relative to this directory.

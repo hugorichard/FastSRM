@@ -58,7 +58,7 @@ def clean_temp_dir(temp_dir):
 class IdentifiableFastSRM(BaseEstimator, TransformerMixin):
     """SRM decomposition using a very low amount of memory and \
 computational power thanks to the use of an atlas \
-as described in [Richard2019]_.
+as described in [Richard2019].
 
     Given multi-subject data, factorize it as a shared response S \
 among all subjects and an orthogonal transform (basis) W per subject:

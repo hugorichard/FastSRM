@@ -97,6 +97,7 @@ def fastsrm(
     method="prob",
     temp_dir=None,
     random_state=None,
+    callback=None,
 ):
     """Performs an SRM decomposition on
     input data with a number of features
@@ -150,6 +151,13 @@ errors when the number of subjects and/or sessions is large
     random_state: int, RandomState instance or None, default=None
         Controls the randomness of the initialization.
 
+    callback : function or None
+        At each iteration calls callback(S, gnorm, it, t0) where `S` is the
+        current estimate of the shared response, `gnorm` is the current
+        `gradient norm`, `it` is the current iteration and `t0` the current
+        time. The result is saved in a list `record`.
+        If callback is None, nothing is done.
+
     Returns
     -------
 
@@ -166,6 +174,11 @@ errors when the number of subjects and/or sessions is large
     Sigma: np array of shape (n_components,)
         (Diagonal) source covariance \
         (only returned if method == "probsrm")
+
+    records : list of shape (n_iter,)
+        The recorded information from callback.
+        Only returned if callback is not None
+
     """
     # Get the number of voxels and timeframes
     reshaped_input, imgs_, shapes = check_imgs(imgs, n_components=n_components)
@@ -179,7 +192,7 @@ errors when the number of subjects and/or sessions is large
     if verbose is True:
         print("[FastSRM.fit] Finds shared " "response using reduced data")
     if method == "prob":
-        W, S, sigmas, Sigma = probsrm(
+        ressrm = probsrm(
             Xred,
             n_components,
             n_iter,
@@ -187,11 +200,21 @@ errors when the number of subjects and/or sessions is large
             corrective_factor=n_timeframes / n_voxels,
             verbose=verbose,
             tol=tol,
+            callback=callback,
         )
+
     if method == "det":
-        W, S = detsrm(
-            Xred, n_components, n_iter, random_state, verbose=verbose, tol=tol,
+        ressrm = detsrm(
+            Xred,
+            n_components,
+            n_iter,
+            random_state,
+            verbose=verbose,
+            tol=tol,
+            callback=callback,
         )
+
+    S = ressrm[1]
 
     if method not in ["det", "prob"]:
         raise ValueError("method %s does not exists" % method)
@@ -213,9 +236,4 @@ errors when the number of subjects and/or sessions is large
         else:
             path_w = None
         W.append(save(projection(w), path_w))
-
-    if method == "det":
-        return W, S
-
-    if method == "prob":
-        return W, S, sigmas, Sigma
+    return [W] + list(ressrm)[1:]

@@ -1,13 +1,10 @@
-from fastsrm2.srm import projection, detsrm, probsrm
 import os
 from time import time
 from fastsrm.fastsrm import fastsrm
-from fastsrm.srm import detsrm, probsrm
-from fastsrm2.exp_utils import reg_error
+from fastsrm.srm import detsrm, probsrm, projection
+from fastsrm.utils import reg_error
 import numpy as np
 from joblib import delayed, Parallel
-
-# from brainiak.funcalign.srm import SRM, DetSRM
 
 
 dim = (50, 50, 50)
@@ -43,7 +40,7 @@ def do_expe(it, seed, algo):
         S = probsrm(
             X, k, n_iter=it, random_state=rng, callback=callback, tol=-1,
         )[-1]
-    if "fastsrm" in algo:
+    if algo == "fastdet":
         S = fastsrm(
             [[x] for x in X],
             k,
@@ -51,14 +48,27 @@ def do_expe(it, seed, algo):
             random_state=rng,
             callback=callback,
             tol=-1,
+            method="det",
+        )[-1]
+    if algo == "fastprob":
+        S = fastsrm(
+            [[x] for x in X],
+            k,
+            n_iter=it,
+            random_state=rng,
+            callback=callback,
+            tol=-1,
+            method="prob",
         )[-1]
     return np.array(S)
 
 
 seeds = np.arange(30)
 iters = 100
-for algo in ["detsrm", "probsrm", "fastsrm"]:
-    res = Parallel(n_jobs=3, verbose=10)(
+os.makedirs("./results", exist_ok=True)
+# for algo in ["detsrm", "probsrm", "fastdet", "fastprob"]:
+for algo in ["fastdet"]:
+    res = Parallel(n_jobs=4, verbose=10)(
         delayed(do_expe)(iters, seed, algo) for seed in seeds
     )
     res = np.array(res)

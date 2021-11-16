@@ -1,0 +1,425 @@
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\ifx\proof\undefined 
+\RequirePackage{amsthm}
+\fi
+\RequirePackage{bm} 
+\RequirePackage{url}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\bbR{\mathbb{R}}
+\def\bbE{\mathbb{E}}
+\def\loss{\mathcal{L}}
+\def\peq{\mathrel{\mathop:}=}
+% \DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\Sp}{Sp}
+
+% Bold Alphabet 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ab}{\mathbf{a}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\cbb}{\mathbf{c}}
+\newcommand{\db}{\mathbf{d}}
+\newcommand{\eb}{\mathbf{e}}
+\newcommand{\fb}{\mathbf{f}}
+\newcommand{\gb}{\mathbf{g}}
+\newcommand{\hb}{\mathbf{h}}
+\newcommand{\ib}{\mathbf{i}}
+\newcommand{\jb}{\mathbf{j}}
+\newcommand{\kb}{\mathbf{k}}
+\newcommand{\lb}{\mathbf{l}}
+\newcommand{\mb}{\mathbf{m}}
+\newcommand{\nbb}{\mathbf{n}}
+\newcommand{\ob}{\mathbf{o}}
+\newcommand{\pb}{\mathbf{p}}
+\newcommand{\qb}{\mathbf{q}}
+\newcommand{\rb}{\mathbf{r}}
+\newcommand{\sbb}{\mathbf{s}}
+\newcommand{\tb}{\mathbf{t}}
+\newcommand{\ub}{\mathbf{u}}
+\newcommand{\vb}{\mathbf{v}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\xb}{\mathbf{x}}
+\newcommand{\yb}{\mathbf{y}}
+\newcommand{\zb}{\mathbf{z}}
+% \newcommand{\sb}{\mathbf{s}}
+\newcommand{\nb}{\mathbf{n}}
+% Upper case
+\newcommand{\Ab}{\mathbf{A}}
+\newcommand{\Bb}{\mathbf{B}}
+\newcommand{\Cb}{\mathbf{C}}
+\newcommand{\Db}{\mathbf{D}}
+\newcommand{\Eb}{\mathbf{E}}
+\newcommand{\Fb}{\mathbf{F}}
+\newcommand{\Gb}{\mathbf{G}}
+\newcommand{\Hb}{\mathbf{H}}
+\newcommand{\Ib}{\mathbf{I}}
+\newcommand{\Jb}{\mathbf{J}}
+\newcommand{\Kb}{\mathbf{K}}
+\newcommand{\Lb}{\mathbf{L}}
+\newcommand{\Mb}{\mathbf{M}}
+\newcommand{\Nb}{\mathbf{N}}
+\newcommand{\Ob}{\mathbf{O}}
+\newcommand{\Pb}{\mathbf{P}}
+\newcommand{\Qb}{\mathbf{Q}}
+\newcommand{\Rb}{\mathbf{R}}
+\newcommand{\Sbb}{\mathbf{S}}
+\newcommand{\Tb}{\mathbf{T}}
+\newcommand{\Ub}{\mathbf{U}}
+\newcommand{\Vb}{\mathbf{V}}
+\newcommand{\Wb}{\mathbf{W}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\Zb}{\mathbf{Z}}
+
+
+% Calligraphic fonts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Acal}{\mathcal{A}}
+\newcommand{\Bcal}{\mathcal{B}}
+\newcommand{\Ccal}{\mathcal{C}}
+\newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Ical}{\mathcal{I}}
+\newcommand{\Jcal}{\mathcal{J}}
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\Lcal}{\mathcal{L}}
+\newcommand{\Mcal}{\mathcal{M}}
+\newcommand{\Ncal}{\mathcal{N}}
+\newcommand{\Ocal}{\mathcal{O}}
+\newcommand{\Pcal}{\mathcal{P}}
+\newcommand{\Qcal}{\mathcal{Q}}
+\newcommand{\Rcal}{\mathcal{R}}
+\newcommand{\Scal}{{\mathcal{S}}}
+\newcommand{\Tcal}{{\mathcal{T}}}
+\newcommand{\Ucal}{\mathcal{U}}
+\newcommand{\Vcal}{\mathcal{V}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Ycal}{\mathcal{Y}}
+\newcommand{\Zcal}{\mathcal{Z}}
+
+% Widely accepted definitions (from MKolar, James & Akshay)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\CC}{\mathbb{C}} % Complex numbers
+\newcommand{\DD}{\mathbb{D}} % \mathbb(D) 
+\newcommand{\EE}{\mathbb{E}} % Expectation
+\newcommand{\VV}{\mathbb{V}} % Variance
+\newcommand{\II}{\mathbb{I}} % Indicator
+\newcommand{\KK}{\mathbb{K}} % Arbitrary field
+\newcommand{\LL}{\mathbb{L}} % Loss
+\newcommand{\MM}{\mathbb{M}} % Median
+\newcommand{\NN}{\mathbb{N}} % Natural numbers
+\newcommand{\PP}{\mathbb{P}} % Probability
+\newcommand{\QQ}{\mathbb{Q}} % Rationals
+\newcommand{\RR}{\mathbb{R}} % Real numbers
+\newcommand{\XX}{\mathbb{X}} %
+\newcommand{\YY}{\mathbb{Y}} %
+\newcommand{\ZZ}{\mathbb{Z}} % Integers
+
+% Stuff mostly appearing in Statistics
+\newcommand{\Xbar}{\bar{X}}
+\newcommand{\Ybar}{\bar{Y}}
+\newcommand{\Zbar}{\bar{Z}}
+
+% Indicator function
+\newcommand{\indfone}{\mathbbm{1}}
+\newcommand{\indfI}{I}
+% For Covar
+\newcommand{\Covar}{\mathbb{C} \mathrm{ov} } % Co-Variance
+
+% Some standard definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*{\mini}{\mathop{\mathrm{minimize}}}
+\newcommand*{\maxi}{\mathop{\mathrm{maximize}}}
+\newcommand*{\subto}{\mathop{\mathrm{subject}\;\mathrm{to}}}
+% repeating these 3 mainly for writing optimization problems
+\newcommand*{\minip}{\mathop{\mathrm{minimize}\;\;}}
+\newcommand*{\maxip}{\mathop{\mathrm{maximize}\;\;}}
+\newcommand*{\subtop}{\mathop{\mathrm{subject}\;\mathrm{to}\;\;}}
+\newcommand*{\argmin}{\mathop{\mathrm{argmin}}}
+\newcommand*{\argmax}{\mathop{\mathrm{argmax}}}
+\newcommand{\sgn}{\mathop{\mathrm{sign}}}
+\newcommand{\suchthat}{\mathrm{s.t.}}
+\newcommand{\tr}{\mathop{\mathrm{tr}}}
+\DeclareMathOperator*{\Var}{{\rm Var}}
+\DeclareMathOperator*{\Corr}{Corr}
+\DeclareMathOperator*{\Cov}{Cov}
+\DeclareMathOperator*{\ind}{1{\hskip -2.5 pt}\hbox{I}}  % Indicator
+\newcommand{\smallfrac}[2]{{\textstyle \frac{#1}{#2}}}  
+
+% Upright d for differentials
+\newcommand{\ud}{\mathrm{d}}
+                                                        
+\newcommand*{\zero}{{\bf 0}}
+\newcommand*{\one}{{\bf 1}}
+
+\newcommand*{\Risk}{{\rm Risk}}
+\newcommand*{\Bias}{{\rm Bias}}
+
+\newcommand{\pen}{{\rm pen}}
+\newcommand{\diag}{{\rm diag}}
+\newcommand{\diam}{{\bf{\rm diam}}}
+\newcommand{\spann}{{\bf{\rm span}}}
+\newcommand{\nulll}{{\bf{\rm null}}}
+\newcommand{\vol}{{\bf{\rm vol}}}
+
+% Other Generic Math stuff 
+\newcommand{\rank}{{\bf{\rm rank}}}
+\newcommand{\dimension}{{\bf{\rm dim}}}
+
+% Hypographs and Epigraphs
+\newcommand{\epi}{{\bf{\rm epi}}\;}
+\newcommand{\hypo}{{\bf{\rm hypo}}\;}
+
+% suppport domain etc
+%\newcommand{\supp}{{\bf{\rm supp}}\;} % support of a function
+\newcommand{\dom}{{\bf{\rm dom}}\;} % domain of a function
+\newcommand{\interior}{{\bf{\rm int}}\;} % interior of a set
+
+% Big O notation
+\newcommand{\bigO}{\tilde{O}}
+\newcommand{\bigOtilde}{\tilde{\mathcal{O}}}
+\newcommand{\littleO}{\mathcal{o}}
+\newcommand{\bigOmega}{\mathcal{\Omega}}
+\newcommand{\littleOmega}{\mathcal{\omega}}
+
+% Distributions
+\newcommand{\Bern}{{\bf{\rm Bern}}\,} % support of a function
+\newcommand{\Categ}{{\bf{\rm Categ}}\,} % support of a function
+\newcommand{\Mult}{{\bf{\rm Mult}}\,} % support of a function
+\newcommand{\Dir}{{\bf{\rm Dir}}\,} % support of a function
+
+% derivatives and partial fractions
+\newcommand{\differentiate}[2]{ \frac{ \ud #2}{\ud #1} }
+\newcommand{\differentiateat}[3]{ \frac{ \ud #2}{\ud #1}  \Big|_{#1=#3} }
+\newcommand{\partialfrac}[2]{ \frac{ \partial #2}{\partial #1} }
+\newcommand{\partialfracat}[3]{ \frac{ \partial #2}{\partial #1} \Big|_{#1=#3} }
+\newcommand{\partialfracorder}[3]{ \frac{ \partial^{#3} #2}{\partial^{#3} #1} }
+\newcommand{\partialfracatorder}[4]{ \frac{ \partial^{#3} #2}
+  {\partial^{#3} #1} \Big|_{#1=#4} }
+
+% Equal signs
+\newcommand{\defeq}{\stackrel{\Delta}{=}}
+
+% probabilistic convergence
+\newcommand{\indistribution}{\xrightarrow[]{\Dcal}}
+\newcommand{\inprobability}{\xrightarrow[]{\Pcal}}
+
+\def\iid{{i.i.d }}
+\newcommand{\iidsim}{\stackrel{{iid}}{\sim}}
+\def\bks{\backslash}
+
+% Ceil & Floor
+\newcommand{\ceil}[1]{\lceil #1 \rceil}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+
+% Sets
+\renewcommand{\emptyset}{\varnothing}
+
+% bold greek letters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*{\alphab}{\bm{\alpha}}
+\newcommand*{\betab}{\bm{\beta}}
+\newcommand*{\Sigmab}{\bm{\Sigma}}
+\newcommand*{\Omegab}{\bm{\Omega}}
+\newcommand*{\omegab}{{\bm{\omega}}}
+\newcommand*{\Gammab}{\bm{\Gamma}}
+\newcommand*{\Psib}{\bm{\Psi}}
+\newcommand*{\Thetab}{\bm{\Theta}}
+\newcommand*{\thetab}{\bm{\theta}}
+\newcommand*{\taub}{\bm{\tau}}
+\newcommand*{\epsilonb}{\bm{\epsilon}}
+\newcommand*{\etab}{\bm{\eta}}
+\newcommand*{\xib}{\bm{\xi}}
+\newcommand*{\gammab}{\bm{\gamma}}
+\newcommand*{\deltab}{\bm{\delta}}
+\newcommand*{\Deltab}{\bm{\Delta}}
+\newcommand*{\mub}{\bm{\mu}}
+\newcommand*{\rhobb}{\bm{\rho}}
+\newcommand*{\Phib}{\bm{\Phi}}
+\newcommand*{\phib}{\bm{\phi}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%% Norms %%%%%
+\newcommand{\orlnorm}[2]{||#1||_{\Psi_{#2}}}
+\newcommand{\norm}[1]{||#1||}
+\newcommand{\bignorm}[1]{\bigg|\bigg|#1\bigg|\bigg|}
+\newcommand{\opnorm}[2]{| \! | \! | #1 | \! | \! |_{{#2}}}
+
+%%%%% Dot product
+\newcommand{\dotp}[2]{\langle{#1},{#2}\rangle}
+
+%%%%  brackets
+\newcommand{\inner}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\rbr}[1]{\left(#1\right)}
+\newcommand{\sbr}[1]{\left[#1\right]}
+\newcommand{\cbr}[1]{\left\{#1\right\}}
+\newcommand{\nbr}[1]{\left\|#1\right\|}
+\newcommand{\abr}[1]{\left|#1\right|}
+
+
+%%%%%%%%%  Other commands
+\newcommand{\mcomment}[1]{\marginpar{\tiny{#1}}}
+\newcommand{\fcomment}[1]{\footnote{\tiny{#1}}}
+
+
+%%%%%%%%  amsmath %%%%%%%%%%
+% Proofs/ Theorems/ Lemmas etc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ifx\BlackBox\undefined
+\newcommand{\BlackBox}{\rule{1.5ex}{1.5ex}}  % end of proof
+\fi
+
+\ifx\QED\undefined
+\def\QED{~\rule[-1pt]{5pt}{5pt}\par\medskip}
+\fi
+
+\ifx\proof\undefined
+\newenvironment{proof}{\par\noindent{\bf Proof\ }}{\hfill\BlackBox\\[2mm]}
+\fi
+% Proof Sketch
+\ifx\proofsketch\undefined
+\newenvironment{proofsketch}{\par\noindent{\bf Proof Sketch\ }}{\hfill\BlackBox\\[2mm]}
+\fi
+
+\ifx\theorem\undefined
+\newtheorem{theorem}{Theorem}
+\fi
+\ifx\example\undefined
+\newtheorem{example}{Example}
+\fi
+\ifx\property\undefined
+\newtheorem{property}{Property}
+\fi
+\ifx\lemma\undefined
+\newtheorem{lemma}[theorem]{Lemma}
+\fi
+\ifx\proposition\undefined
+\newtheorem{proposition}[theorem]{Proposition}
+\fi
+\ifx\remark\undefined
+\newtheorem{remark}[theorem]{Remark}
+\fi
+\ifx\corollary\undefined
+\newtheorem{corollary}[theorem]{Corollary}
+\fi
+\ifx\definition\undefined
+\newtheorem{definition}[theorem]{Definition}
+\fi
+\ifx\conjecture\undefined
+\newtheorem{conjecture}[theorem]{Conjecture}
+\fi
+\ifx\fact\undefined
+\newtheorem{fact}[theorem]{Fact}
+\fi
+\ifx\claim\undefined
+\newtheorem{claim}[theorem]{Claim}
+\fi
+\ifx\assum\undefined
+\newtheorem{assumption}[theorem]{Assumption}
+\fi
+\ifx\assum\undefined
+\newtheorem{observation}[theorem]{Observation}
+\fi
+
+
+% Colours
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\definecolor{darkblue}{rgb}{0.0,0.0,0.7} % for hyper-links
+
+
+% Hyperlinks
+%\hypersetup{colorlinks,breaklinks, linkcolor=darkblue, urlcolor=darkblue, anchorcolor=darkblue, citecolor=darkblue}
+%\providecommand*\url[1]{\href{#1}{#1}} % url
+%\renewcommand*\url[1]{\href{#1}{\texttt{#1}}} %url
+
+
+% Other random stuff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\horizontalline}{\noindent\rule[0.5ex]{\linewidth}{1pt}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 
+\newcommand{\Hrule}{\rule{\linewidth}{0.3mm}}
+\newcommand{\HRuleN}{\HRule\\} 
+\newcommand{\HruleN}{\Hrule\\}
+\newcommand{\superscript}[1]{{\scriptsize \ensuremath{^{\textrm{#1}}}}}
+\newcommand{\supindex}[2]{#1^{(#2)}}
+\newcommand{\xii}[1]{\supindex{\xb}{#1}}
+\newcommand{\yii}[1]{\supindex{y}{#1}}
+\newcommand{\zii}[1]{\supindex{\zb}{#1}}
+\newcommand{\Xii}[1]{\supindex{\Xb}{#1}}
+\newcommand{\Wii}[1]{\supindex{\Wb}{#1}}
+\newcommand{\Yii}[1]{\supindex{Y}{#1}}
+\newcommand{\Zii}[1]{\supindex{Z}{#1}}
+
+\newcommand{\mut}[2]{\mu_{#1}({#2})}
+\newcommand{\sigmat}[2]{\sigma_{#1}({#2})}
+\newcommand{\tmut}[2]{\tilde{\mu}_{#1}({#2})}
+\newcommand{\tyb}{\tilde{\yb}}
+\newcommand{\ty}{\tilde{y}}
+\newcommand{\tO}{\tilde{O}}
+\newcommand{\tf}{\tilde{f}}
+\newcommand{\tz}{\tilde{\zb}}
+\newcommand{\tT}{\tilde{T}}
+\newcommand{\tx}{\tilde{\xb}}
+\newcommand{\sigb}{\mathbf{\Sigma}}
+\newcommand{\bzero}{\mathbf{0}}
+\newcommand{\txii}[1]{\supindex{\tx}{#1}}
+
+% Equation Numbering - Numbers only one equation in align*, equation*
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+
+
+
+% project specific
+\newcommand{\xbm}{{\bm{x}}}
+\newcommand{\sbm}{{\bm{s}}}
+\newcommand{\ybm}{{\bm{y}}}
+\newcommand{\zbm}{{\bm{z}}}
+\newcommand{\vbm}{{\bm{v}}}
+\newcommand{\Xbm}{{\bm{X}}}
+\newcommand{\Ybm}{{\bm{Y}}}
+\newcommand{\Zbm}{{\bm{Z}}}
+\newcommand{\Vbm}{{\bm{V}}}
+\newcommand{\Xset}{{\set{X}}}
+\newcommand{\Yset}{{\set{Y}}}
+\newcommand{\Zset}{{\set{Z}}}
+\newcommand{\Vset}{{\set{V}}}
+
+\def\-{\raisebox{.75pt}{-}}
+\newcommand{\shortminus}{\scalebox{0.75}[1.0]{\( - \)}}
+\newcommand{\thetagen}{{\bm{\theta}^{}_g}}
+\newcommand{\thetadopt}{{\bm{\theta}^*_d}}
+\newcommand{\thetagopt}{{\bm{\theta}^*_g}}
+\newcommand{\thetad}{{\bm{\theta}_d}}
+\newcommand{\thetade}{{\bm{\theta}_d^e}}
+\newcommand{\thetadd}{{\bm{\theta}_d^d}}
+\newcommand{\supp}{{\mathrm{supp}}}
+\newcommand{\vj}{{\bm{v}_j}}
+\newcommand{\vjs}{{\{\bm{v}_j\}_{j=1}^J}}
+\newcommand{\allparams}{{(\bm{\theta}_g, \bm{\theta}_d, \mathbf{V})}}
+\newcommand{\allparamsours}{{(\bm{\theta}_g, \set{V})}}
+\newcommand{\yvbm}{{\bm{yv}}}
+\newcommand{\vybm}{{\bm{vy}}}
+\newcommand{\vxbm}{{\bm{vx}}}
+\newcommand{\xvbm}{{\bm{xv}}}
+\newcommand{\xybm}{{\bm{xy}}}
+\newcommand{\yxbm}{{\bm{yx}}}
+\newcommand{\thetabm}{{\bm{\theta}}}
+\newcommand{\omegabm}{{\bm{\omega}}}
+
+
+\newcommand{\exvj}{{\bm{e}_{\bm{xv}}^j}}
+\newcommand{\eyvj}{{\bm{e}_{\bm{yv}}^j}}
+
+\newcommand*{\tran}{^{\mkern-1.5mu\mathsf{T}}}
+%\newcommand{\dim}{{\mathrm{dim}}}

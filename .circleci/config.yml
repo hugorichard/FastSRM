@@ -4,7 +4,10 @@ jobs:
   test:
     docker:
       - image: circleci/python:3.8
-
+    environment:
+      - OMP_NUM_THREADS: 2
+      - MKL_NUM_THREADS: 2
+      - OPENBLAS_NUM_THREADS: 2
     steps:
       - checkout
       - restore_cache:
