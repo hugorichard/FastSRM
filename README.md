@@ -91,7 +91,7 @@ The figure is now available in the `figures` folder under the name
 `bash timesegment.bash` if you have access to a cluster with slurm otherwise run `bash timesegment_local.bash`
 
 4. Go in the `plotting` folder and run
-`ipython plot_identifiability.py`
+`ipython plot_timesegment.py`
 
 The figure is now available in the `figures` folder under the name
 `timesegment_matching_sherlock.pdf`
