@@ -12,7 +12,7 @@
 %
 
 \usepackage{microtype}      % microtypography
-\usepackage{todonotes}
+% \usepackage{todonotes}
 \usepackage{longtable}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{amsmath}
@@ -25,6 +25,10 @@
   shared response model}
 \date{\today} % clear date
 
+\usepackage[colorinlistoftodos,textwidth=2.1cm]{todonotes}
+\newcommand{\bt}[1]{\todo[color=orange, size=\tiny]{BT: #1}}
+
+
 \begin{document}
 \maketitle
 
@@ -33,12 +37,12 @@
   fMRI data of subjects exposed to naturalistic stimuli.
   %
   However when the number
-of subjects or runs is large, fitting the model requires a large amount of memory
+of subjects or runs is large,\bt{True, but we the experiments don't make it so explicit ?} fitting the model requires a large amount of memory
 and computational power, which limits its use in practice.
 %
 Furthermore, SRM is
 not identifiable which makes the shared response difficult to interpret.
-%
+
 
 In this work, we implement an identifiable version of SRM and show on real data
 that it improves the stability of the recovered shared response.
@@ -50,7 +54,7 @@ algorithm trajectory.
 We show experimentally using synthetic and real fMRI data
 that FastSRM is considerably faster and more memory efficient
 than competitive implementations.
-%
+
 
 The experiments performed in the paper are \emph{fully} reproducible: our
 code available at \url{https://github.com/hugorichard/FastSRM} downloads the
@@ -60,11 +64,20 @@ data, runs the experiments and plot the figures.
 \end{abstract}
 
 \section{Introduction}
-What makes the analysis of functional magnetic resonance imaging (fMRI) data
-particularly difficult is that the number of features (voxels) is usually much
-larger than the number of available samples (timeframes).
+\bt{We need to start with a more application-oriented intro}
 %
-In such cases, dimension reduction methods are precious tools that allow to
+There is a solid tradition of multivariate analysis of neuroimaging
+data, that makes it possible to assess the information carried by the
+data even under complex stimulation frameworks, eg movie watching,
+story or music listening \bt{to be continued}.
+%
+%
+What makes the analysis of functional magnetic resonance imaging (fMRI)
+\bt{Question of scope: do want to target only fMRI or only MEEG ? Or only mention MEEG as possible extension in the discussion ?} data
+particularly difficult is that the number of features (voxels) is usually much
+larger than the number of available samples (time frames).
+%
+In such cases, dimension reduction methods are needed to
 reduce the computational burden of subsequent data analysis.
 %
 The shared response
@@ -93,7 +106,7 @@ interpret the extracted shared components as they are defined up to a rotation.
 
 
 In this work, we introduce FastSRM, an identifiable model that uses an optimal
-atlas based decomposition to speed up the computations with provably no loss of
+atlas-based decomposition to speed up the computations with provably no loss of
 performance.
 %
 FastSRM gains identifiability by imposing that the covariance of the shared
@@ -110,9 +123,9 @@ on full data.
 %
 We show that FastSRM brings several practical benefits: on real data, it produces more stable
 estimates of the shared components than its non-identifiable counter-part and 
-on synthetic as well as on real data, it is much faster and more memory
+ it is much faster and more memory
 efficient than other implementations that do not make use of the optimal atlas.
-%
+% on synthetic as well as on real data,
 
 
 Our python implementation is available at
@@ -174,7 +187,7 @@ response model are introduced which we now present.
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.3]{figures/srm/conceptual_figure31.png}
+  \includegraphics[scale=0.3]{figures/srm/conceptual_figure31.png}\bt{in the figure, can you reaplce ``timeframe'' with ``time frame'' ?}
   \caption{\textbf{Shared response model}: The raw fMRI data are modeled as a
     weighted combination of subject-specific spatial components with additive
     noise.
@@ -191,20 +204,20 @@ response model are introduced which we now present.
 \label{sec:deterministicsrm}
 Let us consider $n$ observations of $\xb_i$ and $\sbb$ that we stack into
 matrices $X_i \in \RR^{v, n}$ and $S \in \RR^{p, n}$.
-%
 
-The deterministic shared response model sees both the mixing matrices $A_i$ and
+
+The deterministic shared response model considers both the mixing matrices $A_i$ and
 the $n$ observations of the shared response $S$ as parameters to be
 estimated.
 %
 The noise variance is fixed to a multiple of identity: $\forall i,
 \Sigma_i=\sigma^2 I_v$ where $\sigma$ is an hyper-parameter to choose.
-%
 
-The model is optimized by maximizing the log-likelihood.
-%
 
-The likelihood is given by: $p(\xb) = \prod_i \Ncal(\xb_i; A_i \sbb, \sigma^2 I)$ and
+The model is optimized by maximizing the log-likelihood, assuming that
+the noise is Gaussian distributed.
+%
+The likelihood is then given by: $p(\xb) = \prod_i \Ncal(\xb_i; A_i \sbb, \sigma^2 I)$ and
 therefore the empirical expected negative log-likelihood is given up to a constant independent of
 $A_i$ and $S$ by:
 \begin{align}
@@ -215,8 +228,8 @@ $\loss$ is optimized by performing alternate minimization on $(A_1 \dots A_m)$
 and $S$.
 %
 Note that the hyper-parameter $\sigma$ does not have an influence on
-the loss and can therefore be safely ignored.
-%
+the loss and can therefore be ignored.
+
 
 
 The gradient with respect to $S$ is given by $\sum_i A_i^{\top}(A_i S -
@@ -281,8 +294,8 @@ Denoting $\VV[\sbb | \xb] = (\sum_i \frac1{\sigma_i^2} I +
 \Sigma_s^{-1})^{-1}$ and $\EE[\sbb | \xb] = \VV[\sbb | \xb] \sum_i \frac1{\sigma_i^2}
 A_i^{\top}\xb_i$, we have
 \begin{align}
-  p(\xb, \sbb) &= \prod_i \frac{\exp(-\frac{\|\xb_i - A_i \sbb \|^2}{2 \sigma_i^2})}{(2 \pi \sigma_i^{2v})^{\frac12}} \frac{\exp(-\frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb } )}{(2 \pi | \Sigma_s|)^{\frac12}} \\
-               &= c_1 \exp(-\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - 2  \dotp{ \sum_i \frac1{\sigma_i^2} A_i^{\top}\xb_i}{ \sbb } \right. \\& \left.+ \sum_i \frac1{\sigma_i^2} \| \sbb \|^2 + \dotp{ \sbb}{ \Sigma_s^{-1} \sbb }  \right)) \\
+  p(\xb, \sbb) &= \prod_i \frac{\exp \left(-\frac{\|\xb_i - A_i \sbb \|^2}{2 \sigma_i^2} \right) }{(2 \pi \sigma_i^{2v})^{\frac12}} \frac{\exp(-\frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb } )}{(2 \pi | \Sigma_s|)^{\frac12}} \\
+               &= c_1 \exp (-\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - 2  \dotp{ \sum_i \frac1{\sigma_i^2} A_i^{\top}\xb_i}{ \sbb } \right. \\& \left.+ \sum_i \frac1{\sigma_i^2} \| \sbb \|^2 + \dotp{ \sbb}{ \Sigma_s^{-1} \sbb }  \right)) \\
                &= c_2(\xb) \exp(-\frac12 \left( \dotp{  \sbb - \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} ( \sbb - \EE[\sbb | \xb])  } \right)) \label{probsrmcompleted}
 \end{align}
 where
@@ -292,11 +305,11 @@ where
 \end{align}
 and
 \begin{align}
-  c_2(\xb) = c_1 \exp(-\frac12( \sum_i
+  c_2(\xb) = c_1 \exp \left( -\frac12( \sum_i
   \frac1{\sigma_i^2}\|\xb_i\|^2 - \dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1}
-  \EE[\sbb | \xb] }))
+  \EE[\sbb | \xb] }) \right)
 \end{align}
-are independent of $\sbb$.
+are independent from $\sbb$.
 %
 Therefore,
 \begin{align}
@@ -309,7 +322,8 @@ The negative expected completed log-likelihood is given by
 \end{align}
 updates are therefore given by:
 \begin{align}
-&\sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|^2) \\
+  &\sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|) \\
+  % no square here, right ?
   &A_i \leftarrow \Pcal(\EE[\xb_i \EE[\sbb|\xb]^{\top}]) \label{eq:psrm:Aiupdate} \\
   & \Sigma_s \leftarrow \VV[\sbb | \xb] + \EE[\EE[\sbb | \xb] \EE[\sbb | \xb]^{\top}]
 \end{align}
@@ -347,9 +361,9 @@ $\bigO(mvn)$ which simply means that the dataset needs to hold in memory.
 \subsection{Reducing the computational burden by use of atlases}
 SRM algorithms use different set of parameters $\theta$ to represent the data.
 %
-In deterministic SRM $\theta = (A_i)_{i=1}^m, S$ where $(A_i)_{i=1}^m$ are the
-mixing matrices and $S$ are the $n$ observations of the shared response $S$ while in probabilistic SRM $\theta
-= (A_i)_{i=1}^m, \Sigma_s, (\sigma_i)_{i=1}^m$ where $(A_i)_{i=1}^m$ are the
+In deterministic SRM $\theta = \left((A_i)_{i=1}^m, S \right)$ where $(A_i)_{i=1}^m$ are the
+mixing matrices and $S$ is the shared response, while in probabilistic SRM $\theta
+= \left( (A_i)_{i=1}^m, \Sigma_s, (\sigma_i)_{i=1}^m \right) $ where $(A_i)_{i=1}^m$ are the
 mixing matrices, $(\sigma_i)_{i=1}^m$ the noise levels and $\Sigma_s$ the
 components variance.
 %
@@ -371,7 +385,7 @@ Therefore, the image reduction can be done with a matrix product.
 %
 
 
-In FastSRM we consider a set of view specific atlases $U_i \in \RR^{v \times r}$ such that
+In FastSRM we consider a set of view-specific atlases $U_i \in \RR^{v \times r}$ such that
 $U_i^{\top}U_i = I_r$ where $r$ is the number of regions in the atlas.
 %
 Data are reduced using $\zb_i = U_i^{\top} \xb_i$ and an SRM algorithm is applied
@@ -386,9 +400,9 @@ from the parameters obtained with the corresponding SRM algorithm $\theta$ (the
 unmixing matrices in $\theta'$ do not even have the same shape as the unmixing
 matrices in $\theta$).
 %
-However, as we will see in the next section, there exists atlases such as the
-correspondence between $\theta$ and
-$\theta'$ can be made explicit.
+However, as we will see in the next section, there exists atlases such that the
+models parametrized by $\theta$ and
+$\theta'$ are equivalent.
 %
 
 
@@ -405,7 +419,7 @@ $\theta'$ can be made explicit.
   \label{fig:srm:conceptual}
 \end{figure}
 
-From a computational stand point, the dimension reduction provides
+From a computational stand point, dimension reduction provides
 a large reduction in memory usage.
 %
 Indeed as the original data are seen only
@@ -414,7 +428,7 @@ data $X_i$ one after the other and similarly for the atlases $U_i$).
 %
 Therefore
 the memory consumption is only in $\bigO(vn)$ (where $v$ is the number of voxels
-and $n$ is the number of samples) which is lower than SRM by a factor of $m$,
+and $n$ is the number of samples) which is lower than that of SRM by a factor of $m$,
 the number of subjects.
 %
 The number of subjects is typically between $10$ and
@@ -435,8 +449,8 @@ After preprocessing, the reduced representation $\zb_i$ is used instead of the
 original data $\xb_i$ yielding a time complexity of $\bigO(
 \mathrm{T_{preprocessing}} + \mathrm{n_{iter}} mpnr)$.
 %
-Let us highlight that an experiment is often run
-multiple times such as when cross validated results are needed.
+Let us highlight that an experiment is often run multiple times,
+typically when the analysis requires cross-validation procedures.
 %
 In these cases,
 the pre-processing is performed only once and the apparent complexity becomes
@@ -445,9 +459,9 @@ a factor of $\frac{v}{r}$.
 %
 The number of regions in large atlases is about $r=1000$ and in full brain data,
 the number of voxels is about $300~000$ so that $\frac{v}{r}$ is typically about
-$1000$.
+$300$.
 %
-It remains to show how to draw a correspondence between FastSRM and SRM which is
+It remains to be shown how to draw a correspondence between FastSRM and SRM which is
 addressed in the following section.
 %
 
@@ -464,10 +478,9 @@ obtained from SRM from the parameters of FastSRM.
 %
 Yet, we show that there exists an optimal atlas in the
 sense that SRM and FastSRM yield the same results.
-%
 
 
-Let us consider $\xb_i = U_{\xb_i} \zb_i$ a PCA of $\xb_i$ with the maximum
+Let us consider $\xb_i = U_{\xb_i} \zb_i$ \bt{But any fill-rank orthogonal basis would work equally well (i.e. any orthogonal transform of the PCA basis)} a PCA of $\xb_i$ with the maximum
 number of components.
 %
 As the number of
@@ -497,7 +510,7 @@ FastSRM.
 Updates of the mixing matrices $A_i$ in deterministic SRM
 equation~\eqref{eq:detsrm:Aiupdate} can be written:
 \begin{align}
-  A_i &\leftarrow \Pcal(\frac1{n}X_i S^{\top})= U_{X_i}\Pcal(\frac1{n}Z_i S^{\top})
+  A_i &\leftarrow \Pcal \left(\frac1{n}X_i S^{\top} \right)= U_{X_i}\Pcal \left(\frac1{n}Z_i S^{\top} \right)
   \label{eq:fastdetsrm:Aiupdate}
 \end{align}
 where $\Pcal$ is the projection on the Stiefel manifold: $\Pcal(M) = M
@@ -539,8 +552,8 @@ However the
 algorithm applied on reduced data need to be slightly modified.
 %
 
-We call probSRM($\psi$) the probabilistic SRM algorithm modified such that
-updates
+We call probSRM($\psi$)\bt{I don't unserstand what $\psi$ represents}
+the probabilistic SRM algorithm modified such that updates
 \begin{align}
 \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|^2)
 \end{align}
@@ -647,10 +660,10 @@ $\bigO(mvp^2)$.
 %
 In practice the cost of the matrix products $X_i^{\top} X_i$ is often still the
 limiting step of the pipeline (this depends on the number of iterations) but as
-we show in the next chapter, it is much more efficient than performing SRM on
+we show next, it is much more efficient than performing SRM on
 the full data.
 %
-Note than if memory allows it, these matrix products can be
+Note that if memory allows it, these matrix products can be
 computed in parallel.
 %
 
@@ -678,10 +691,10 @@ analysis~\cite{li2009joint}, ShICA~\cite{richard2021model},
 MultiViewICA~\cite{richard2020modeling} optimal
 transport~\cite{bazeille2019local} and many more.
 %
-In this work, we do not claim that FastSRM is the best method. We only see that
-SRM is widely used and aim to provide a faster, more memory efficient and
-identifiable implementation.  In our view FastSRM should be seen as a plugin
-replacement for SRM.
+In this work, we do not discuss the merit of FastSRM with respect to
+other methods. We only see that SRM is widely used and aim to provide
+a faster, more memory efficient and identifiable implementation.  In
+our view FastSRM should be seen as a plugin replacement for SRM.
 
 
 \section{Experiments}
@@ -693,6 +706,7 @@ implements the work of~\cite{chen2015reduced} and~\cite{anderson2016enabling}, N
 array processing, Scipy~\cite{2020SciPy-NMeth} its implementation of the
 Hungarian algorithm, Matplotlib~\cite{hunter2007matplotlib} for plotting and
 Sklearn~\cite{pedregosa2011scikit} for machine learning pipelines.
+\bt{Please provide versions of the software used}
 
 \subsection{Comparing Fitting time and performance of FastSRM and
   SRM on synthetic data}
@@ -701,7 +715,7 @@ We generate synthetic data $\xb_i$ according to the model of probabilistic SRM.
 The parameters $\sigma_i$, $A_i$ and $\Sigma_s$ are generated randomly.
 %
 We sample the value of the subject specific noise level from a normal
-distribution: $\sigma_i \sim \Ncal(0, 0.1)$.
+distribution: $\sigma_i \sim \Ncal(0, 0.1)$ \bt{$\sigma_i$ has to be non-negative}.
 %
 The mixing matrices $A_i$
 are obtained by sampling their coefficient from a standardized normal
@@ -729,9 +743,9 @@ as \emph{None} because no atlas is used and FastSRM algorithms will have the
 label \emph{Optimal}.
 %
 Note that it would be possible to use FastSRM with sub-optimal
-atlases (there exists a wide variety of atlases
-available~\cite{schaefer2017local, bellec2010multi, mensch2018extracting}) but
-without any guarantees that the performance are the same as SRM.
+atlases (there exists a wide variety of brain atlases
+~\cite{schaefer2017local, bellec2010multi, mensch2018extracting}) but
+using them does not brain any guarantee that the performance is the same as SRM.
 %
 
 
@@ -744,7 +758,7 @@ unmixing matrices but only the shared response.
 We measure the performance of an algorithm by computing the error between the true component $S \in \RR^{p \times n}$ and
 the predicted component $\hat{S} \in \RR^{p \times n}$ using the quantity:
 \begin{align}
-\mathrm{mse}(\hat{S}, S) = min_{A \in \RR^{p \times p}} \|A \hat{S} - S \|^2_F =  \|S
+\mathrm{mse}(\hat{S}, S) = min_{B \in \RR^{p \times p}} \|B \hat{S} - S \|^2_F =  \|S
 \hat{S}^{\dagger}\hat{S} - S \|^2_F
 \end{align}
 %
@@ -786,8 +800,8 @@ when the optimal atlas is used.
 Lastly, looking at the convergence curves, we see that even after $100$ iterations, algorithms did
 not fully converge.
 %
-This means that in practice a much larger number of
-iterations is needed which would yield an even higher difference in fitting time
+This means that in practice a larger number of
+iterations is needed, which would yield an even higher difference in fitting time
 between methods using no atlas and methods using the optimal atlas.
 %
 
@@ -850,7 +864,7 @@ computational resources.
 
 \subsection{Identifiability increases stability}
 Assuming that the data follow the model, identifiability ensures that the
-correct parameters can be recovered without ambiguity.
+correct parameters can be recovered without ambiguity.\bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
 %
 In real fMRI data, the model cannot be expected to hold perfectly, but we can
 hope for greater stability in the parameters recovered than if an unidentifiable
@@ -904,7 +918,7 @@ We see that introducing a diagonal source covariance improves stability.
   timesegment matching experiment}
 \label{sec:timesegment_expe}
 \label{timesegment_expe}
-The timesegment matching experiment is first introduced
+Time-segment matching experiment is first introduced
 in~\cite{chen2015reduced}.
 %
 In a nutshell, the time-segment matching accuracy measures the similarity
