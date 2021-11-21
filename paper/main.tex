@@ -918,17 +918,18 @@ We see that introducing a diagonal source covariance improves stability.
   timesegment matching experiment}
 \label{sec:timesegment_expe}
 \label{timesegment_expe}
-Time-segment matching experiment is first introduced
+Time-segment matching has first been introduced
 in~\cite{chen2015reduced}.
 %
 In a nutshell, the time-segment matching accuracy measures the similarity
 between two multivariate time-series by trying to localize a time-segment in one
 time-series by correlation with the other.
 %
-In the context of movie watching, this measure has a lot of sense: if we split
-the movies in scenes and compute a representation per scene and per subject, it makes
-sense to assume that different subjects watching the movie would still have
-closer representation of the same scenes than of different scenes.
+In the context of movie watching, this measure is quite meaningful: if
+we split the movies in scenes and compute a representation per scene
+and per subject, it can be assumed that different subjects watching
+the movie would still have closer representation of the same scenes
+than of different scenes.
 %
 This explains why timesegment matching is a standard evaluation of SRM-like methods also used in  \cite{guntupalli2018computational}, \cite{Nastase741975} or
 \cite{zhang2016searchlight}.
@@ -963,11 +964,12 @@ the runs and the test set 20\%, and repeat the experiment using all possible
 choices for left-out subjects.
 %
 % 
-The mean accuracy is reported in Figure~\ref{fig:srm:timesegment} (bottom).
+The mean accuracy is reported in Figure~\ref{fig:srm:timesegment} (top).
 %
-When the
-optimal atlas is used, the accuracy is the same as when no atlas is used but
-the fitting time is reduced by a factor 10 to 100 and so is the memory usage.
+When the optimal atlas is used, the accuracy is the same as when no
+atlas is used but the fitting time is reduced by a factor 10 to 100
+and so is the memory usage (see Figure~\ref{fig:srm:timesegment},
+bottom).
 %
 
 % 
@@ -989,6 +991,8 @@ the fitting time is reduced by a factor 10 to 100 and so is the memory usage.
 As studies using naturalistic stimuli will tend to become more common and large
 within and across subjects, we need scalable models in terms of computation time
 and memory usage.
+%
+This is particularly related to the development of ddep phenotyping models \bt{cite current intensive acquisition endeavours, such as courtois-Neuromod}.
 %
 This is what FastSRM provides.
 
@@ -1012,9 +1016,11 @@ remains to be seen whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
 %
-Our optimal atlas provide the intuition that SRM-like methods do not need the
+Our optimal atlas apprach shows that SRM-like methods do not need the
 full data to provide accurate estimates of shared components. We believe such
 insights may guide the design of future methods.
+\bt{Add a paragraph on implementation, sofwtare quality, documentation, examples, availability...}
+\bt{Discuss the use for other brain imaging modelities (MEEG) if relevant ?}
 
 \bibliographystyle{plain}
 \bibliography{utils/biblio}
