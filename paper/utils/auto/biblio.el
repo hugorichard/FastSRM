@@ -338,6 +338,11 @@
     "gill1972quasi"
     "harmeling2010multiframe"
     "bazeille2021empirical"
-    "boser1992training"))
+    "boser1992training"
+    "baldassano2017discovering"
+    "cohen2017computational"
+    "baldassano2018representation"
+    "jolly2020custom"
+    "lee2021anticipation"))
  :bibtex)
 

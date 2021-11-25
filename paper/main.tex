@@ -26,7 +26,7 @@
 \date{\today} % clear date
 
 \usepackage[colorinlistoftodos,textwidth=2.1cm]{todonotes}
-\newcommand{\bt}[1]{\todo[color=orange, size=\tiny]{BT: #1}}
+\newcommand{\bt}[1]{\todo[color=orange, inline=True]{BT: #1}}
 
 
 \begin{document}
@@ -37,7 +37,9 @@
   fMRI data of subjects exposed to naturalistic stimuli.
   %
   However when the number
-of subjects or runs is large,\bt{True, but we the experiments don't make it so explicit ?} fitting the model requires a large amount of memory
+  of subjects or runs is large,
+  % \bt{True, but we the experiments don't make it so explicit ?}
+  fitting the model requires a large amount of memory
 and computational power, which limits its use in practice.
 %
 Furthermore, SRM is
@@ -64,33 +66,56 @@ data, runs the experiments and plot the figures.
 \end{abstract}
 
 \section{Introduction}
-\bt{We need to start with a more application-oriented intro}
+%\bt{We need to start with a more application-oriented intro}
 %
-There is a solid tradition of multivariate analysis of neuroimaging
-data, that makes it possible to assess the information carried by the
-data even under complex stimulation frameworks, eg movie watching,
-story or music listening \bt{to be continued}.
+Complex stimulations such as movie-watching, story or music listening are more
+and more popular in the neuro-scientific community. Indeed such naturalistic
+paradigms are unconstrained from behavioral manipulations and thus, more
+ecological with respect to real-world conditions.
 %
+However and in contrast to more traditional designs, these so-called
+naturalistic stimuli do not come with a design matrix that quantifies the
+features of interest in the stimuli.
 %
-What makes the analysis of functional magnetic resonance imaging (fMRI)
-\bt{Question of scope: do want to target only fMRI or only MEEG ? Or only mention MEEG as possible extension in the discussion ?} data
-particularly difficult is that the number of features (voxels) is usually much
-larger than the number of available samples (time frames).
+Without a design matrix, models such as the general linear
+model~\cite{poline2012general} cannot be used. Although some works have used
+natural annotations~\cite{huth2012continuous} or deep neural
+networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing} to create an
+estimate of the design matrix of naturalistic
+stimuli it is by no means a simple task.
+
+Another approach is to learn jointly the design matrix and the spatial maps in
+an unsupervised way.
 %
-In such cases, dimension reduction methods are needed to
-reduce the computational burden of subsequent data analysis.
+In the case where the dataset contains only one subject
+independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
 %
-The shared response
-model~\cite{chen2015reduced} provides a principled way to perform dimension
-reduction of brain imaging data from subjects performing the same task and is
-therefore a natural basis for common source
+ICA assumes that components are independent, a rather realistic assumption which
+ensures identifiability up to permutation and scaling of the model and can be fit efficiently.
+%
+
+But when the dataset contains multiple subjects, a natural assumption is to
+assume that the design matrix is shared across subjects.
+%
+Many different methods
+can produce shared components from different subjects. Some assume independent
+components~\cite{richard2021model}~\cite{richard2020modeling}~\cite{varoquaux2009canica}~\cite{calhoun2001method}.
+while others are only based on second order information such as Multiset
+Canonical Correlation Analysis~\cite{via2011joint} or the Shared Response Model (SRM)~\cite{chen2015reduced}.
+%
+
+This work focuses on the SRM. Because of its
+simplicity and its built-in dimension reduction, this model is widely
+used~\cite{baldassano2017discovering}~\cite{cohen2017computational}~\cite{baldassano2018representation}~\cite{jolly2020custom}~\cite{lee2021anticipation}
+including as a preprocessing step for source
 identification~\cite{richard2021model}~\cite{richard2020modeling},
-classification~\cite{turek2018capturing}~\cite{chen2017shared}\cite{zhang2016searchlight}
-or transfer learning~\cite{zhang2018transfer}.
-%
+classification~\cite{turek2018capturing}~\cite{chen2017shared}\cite{zhang2016searchlight} or as a basis for transfer learning~\cite{zhang2018transfer}. 
 
 
-However SRM has initially been designed to work within regions of interest using
+What makes the analysis of fMRI data particularly difficult is that
+the number of features (voxels) is usually much
+larger than the number of available samples (time frames).
+Yet, SRM has initially been designed to work within regions of interest using
 only few subjects.
 %
 When using full brain data, computational costs become
@@ -99,7 +124,7 @@ high.
 In addition, memory requirements are difficult to meet since the full dataset
 needs to hold in memory.
 %
-Another issue of SRM is its non-identifiability (see the proof
+Lastly, another issue of SRM is its non-identifiability (see the proof
 in~\cite{richard2020modeling} Appendix D) which makes it challenging to
 interpret the extracted shared components as they are defined up to a rotation.
 %
@@ -187,7 +212,7 @@ response model are introduced which we now present.
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.3]{figures/srm/conceptual_figure31.png}\bt{in the figure, can you reaplce ``timeframe'' with ``time frame'' ?}
+  \includegraphics[scale=0.3]{figures/srm/conceptual_figure33.png}
   \caption{\textbf{Shared response model}: The raw fMRI data are modeled as a
     weighted combination of subject-specific spatial components with additive
     noise.
@@ -480,7 +505,12 @@ Yet, we show that there exists an optimal atlas in the
 sense that SRM and FastSRM yield the same results.
 
 
-Let us consider $\xb_i = U_{\xb_i} \zb_i$ \bt{But any fill-rank orthogonal basis would work equally well (i.e. any orthogonal transform of the PCA basis)} a PCA of $\xb_i$ with the maximum
+Let us consider $\xb_i = U_{\xb_i} \zb_i$
+%
+% \bt{But any fill-rank orthogonal basis would work equally well (i.e. any
+%   orthogonal transform of the PCA basis)}
+%
+a PCA of $\xb_i$ with the maximum
 number of components.
 %
 As the number of
@@ -492,7 +522,8 @@ We also have $U_{\xb_i}^{\top}U_{\xb_i} = I$.
 Therefore $U_{\xb_i}$ constitutes a possible choice of subject specific atlas.
 %
 As the next property shows, $U_{\xb_i}$ is an optimal atlas for deterministic
-FastSRM.
+FastSRM. Note that this optimal atlas is not unique: any orthogonal matrix with
+the same span as $X_i$ would also work.
 %
 
 \begin{proposition}[Optimal atlas for deterministic FastSRM]
@@ -552,21 +583,19 @@ However the
 algorithm applied on reduced data need to be slightly modified.
 %
 
-We call probSRM($\psi$)\bt{I don't unserstand what $\psi$ represents}
-the probabilistic SRM algorithm modified such that updates
-\begin{align}
-\sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|^2)
-\end{align}
-are replaced by updates
-\begin{align}
-  \sigma_i^2 \leftarrow \frac1{\psi} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|^2)
-\end{align}
-
 We have the following result:
 \begin{proposition}[Optimal atlas for probabilistic FastSRM]
   Let $(A_i)_i, \sigma_i, \Sigma_s$ be the solution obtained by probabilistic SRM on data
-  $\xb_i$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM($v$) on
-  data $\zb_i = U_{\xb_i}^{\top} \xb_i$.
+  $\xb_i$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM on
+  data $\zb_i = U_{\xb_i}^{\top} \xb_i$ but where updates:
+  \begin{align}
+    \sigma_i^2 \leftarrow \frac1{k} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+  \end{align}
+  are replaced by updates
+  \begin{align}
+    \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+  \end{align}
+  .
   %
   Then $A_i = U_{\xb_i}A_i'$, $\sigma_i =
   \sigma_i'$ and $\Sigma_s = \Sigma_s'$.
@@ -700,22 +729,24 @@ our view FastSRM should be seen as a plugin replacement for SRM.
 \section{Experiments}
 We make several experiments on both synthetic and real data.
 %
-We used nilearn~\cite{abraham2014machine} for fMRI data preprocessing,
-Brainiak~\cite{kumar2020brainiak2} for the non-identifiable version of SRM that
-implements the work of~\cite{chen2015reduced} and~\cite{anderson2016enabling}, Numpy~\cite{harris2020array} for
-array processing, Scipy~\cite{2020SciPy-NMeth} its implementation of the
-Hungarian algorithm, Matplotlib~\cite{hunter2007matplotlib} for plotting and
-Sklearn~\cite{pedregosa2011scikit} for machine learning pipelines.
-\bt{Please provide versions of the software used}
+We used nilearn~\cite{abraham2014machine} (version 0.8.1) for fMRI data preprocessing,
+Brainiak~\cite{kumar2020brainiak2} (version 0.9) for the non-identifiable version of SRM that
+implements the work of~\cite{chen2015reduced} and~\cite{anderson2016enabling},
+Numpy~\cite{harris2020array} (version 1.19.0) for
+array processing, Scipy~\cite{2020SciPy-NMeth} (version 1.5.3) its implementation of the
+Hungarian algorithm, Matplotlib~\cite{hunter2007matplotlib} (version 3.1.2) for plotting and
+Sklearn~\cite{pedregosa2011scikit} (version 0.23.2) for machine learning pipelines.
 
 \subsection{Comparing Fitting time and performance of FastSRM and
   SRM on synthetic data}
 We generate synthetic data $\xb_i$ according to the model of probabilistic SRM.
 %
-The parameters $\sigma_i$, $A_i$ and $\Sigma_s$ are generated randomly.
+The parameters $\sigma_i^2$, $A_i$ and $\Sigma_s$ are generated randomly.
 %
 We sample the value of the subject specific noise level from a normal
-distribution: $\sigma_i \sim \Ncal(0, 0.1)$ \bt{$\sigma_i$ has to be non-negative}.
+distribution: $\sigma_i \sim \Ncal(0, 0.1)$
+%\bt{$\sigma_i$ has to be non-negative}.
+% No only $\sigma_i^2$.
 %
 The mixing matrices $A_i$
 are obtained by sampling their coefficient from a standardized normal
@@ -847,7 +878,7 @@ Subject 5 is removed because of missing data, leaving us with 16 participants.
 %
 % 
 Although SHERLOCK data contains originally only 1 run, we split it into 4 blocks
-of 395 timeframes and one block of 396 timeframes for the needs of our
+of 395 time frames and one block of 396 time frames for the needs of our
 experiments.
 %
 
@@ -864,7 +895,10 @@ computational resources.
 
 \subsection{Identifiability increases stability}
 Assuming that the data follow the model, identifiability ensures that the
-correct parameters can be recovered without ambiguity.\bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
+problem is well posed since the parameters of the model are not ambiguous. Note however that SRM
+stays non-convex so there is no guarantee that the optimal solution is found.
+%
+% \bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
 %
 In real fMRI data, the model cannot be expected to hold perfectly, but we can
 hope for greater stability in the parameters recovered than if an unidentifiable
@@ -947,7 +981,7 @@ the test set yielding individual components matrices.
 We estimate the shared responses by averaging the individual components of each
 subjects but one.
 %
-We select a target time-segment (9 consecutive timeframes) in the shared
+We select a target time-segment (9 consecutive time frames) in the shared
 responses and try to localize the corresponding time segment in the components
 of the left-out subject using a maximum-correlation classifier.
 %
@@ -986,13 +1020,31 @@ bottom).
   \label{fig:srm:timesegment}
 \end{figure}
 
+\section{Implementation and reproducibility}
+Our work is fully reproducible and our code is tested and well documented. All
+material is available in our github repository \url{https://github.com/hugorichard/FastSRM}.
+
+The API is reminiscent of the scikit-learn one where the model object is
+instantiated with its parameters and then fitted on data via a method
+\emph{fit()}. After the model is fit, the learned parameters can be accessed.
+Then, a \emph{transform()} method computes the shared
+response from the learned parameters and the data passed as the argument of the \emph{transform()} method.
+
+While brainiak and nilearn are useful to reproduce some of our experiments, they
+are not strong dependencies and FastSRM only needs numpy ($\geq 1.12$), scipy
+($\geq 0.18.0$), matplotlib ($\geq 2.0.0$), scikit-learn ($geq 0.23), 
+
+
+
+Our API is very simple and reminiscent of the one used in scikit-learn with a clear documentation.
 
 \section{Conclusion}
 As studies using naturalistic stimuli will tend to become more common and large
 within and across subjects, we need scalable models in terms of computation time
 and memory usage.
 %
-This is particularly related to the development of ddep phenotyping models \bt{cite current intensive acquisition endeavours, such as courtois-Neuromod}.
+This is particularly related to the development of deep phenotyping
+models such as the Courtois project on Neural Modeling (see \url{https://docs.cneuromod.ca}).
 %
 This is what FastSRM provides.
 
