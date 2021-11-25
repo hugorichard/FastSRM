@@ -13,7 +13,6 @@ from fastsrm.utils import (
     apply_aggregate,
     apply_input_format,
 )
-from tqdm import tqdm
 
 n_voxels = 300
 n_subjects = 5
@@ -341,7 +340,7 @@ def test_ncomponents():
 
 @pytest.mark.parametrize("method", ("prob", "det"))
 def test_use_pca(method):
-    for i in tqdm(range(20)):
+    for i in range(20):
         X_train = [np.random.rand(100, 10) for _ in range(3)]
         srm = IdentifiableFastSRM(
             n_components=5,
