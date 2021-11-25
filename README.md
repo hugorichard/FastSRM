@@ -36,17 +36,12 @@ Requirements:
 scipy>=0.18.0
 numpy>=1.12
 scikit-learn>=0.23
-joblib
-tqdm
-scipy>=0.18.0
+joblib>=1.1.0
 matplotlib>=2.0.0
-pytest
-pytest-timeout
-pytest-cov
-coverage
+pytest>=6.2.5
 ```
 
-To run the experiments on identifiability, brainiak is necessary (see https://github.com/brainiak/brainiak)
+To run the experiments on identifiability, brainiak (https://github.com/brainiak/brainiak) and nilearn (https://nilearn.github.io/stable/index.html) are necessary.
 
 Usage
 --------
