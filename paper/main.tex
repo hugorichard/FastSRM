@@ -149,7 +149,7 @@ on full data.
 We show that FastSRM brings several practical benefits: on real data, it produces more stable
 estimates of the shared components than its non-identifiable counter-part and 
  it is much faster and more memory
-efficient than other implementations that do not make use of the optimal atlas.
+efficient than other implementations that do not make use of an optimal atlas.
 % on synthetic as well as on real data,
 
 
@@ -661,7 +661,7 @@ generative model of the data.
 %
 
 
-A complexity analysis shows that finding the optimal atlas becomes the limiting
+A complexity analysis shows that finding an optimal atlas becomes the limiting
 step of the pipeline.
 %
 Even with fast implementations, the subject specific PCA
@@ -826,14 +826,14 @@ In terms of fitting time, FastSRM is about a thousand time faster than SRM after
 %
 When no atlas is used, the number
 of iterations has a very strong impact on performance while it has a small impact
-when the optimal atlas is used.
+when an optimal atlas is used.
 %
 Lastly, looking at the convergence curves, we see that even after $100$ iterations, algorithms did
 not fully converge.
 %
 This means that in practice a larger number of
 iterations is needed, which would yield an even higher difference in fitting time
-between methods using no atlas and methods using the optimal atlas.
+between methods using no atlas and methods using an optimal atlas.
 %
 
 
@@ -1000,7 +1000,7 @@ choices for left-out subjects.
 % 
 The mean accuracy is reported in Figure~\ref{fig:srm:timesegment} (top).
 %
-When the optimal atlas is used, the accuracy is the same as when no
+When an optimal atlas is used, the accuracy is the same as when no
 atlas is used but the fitting time is reduced by a factor 10 to 100
 and so is the memory usage (see Figure~\ref{fig:srm:timesegment},
 bottom).
@@ -1035,7 +1035,15 @@ are not strong dependencies and FastSRM only needs numpy ($\geq 1.12$), scipy
 ($\geq 0.18.0$), matplotlib ($\geq 2.0.0$), scikit-learn ($geq 0.23$), pytest
 ($\geq 6.2.5$) , joblib ($\geq 1.1.0).
 
-The package comes with a documentation (and working examples.
+The package comes with a documentation and a tutorial that reproduces, at a
+smaller scale, the experiment available in Figure~\ref{fig:srm:synthetic_gradient}.
+These are found at \url{https://hugorichard.github.io/FastSRM/index.html}.
+The instructions to fully reproduce the experiments presented in the papers are
+available in the README:
+\url{https://github.com/hugorichard/FastSRM/blob/master/README.md}.
+
+A set of tests reduces the risk of introducing a bug. These tests are run any
+time a pull request or a merged is performed on the main codebase.
 
 \section{Conclusion}
 As studies using naturalistic stimuli will tend to become more common and large
@@ -1051,10 +1059,13 @@ This is what FastSRM provides.
 FastSRM is an efficient implementation of SRM
 that uses optimal atlases to speed up computations and reduce memory requirements
 with provably no loss of performance. 
+Note that the new memory requirements do not depend on the number of subjects.
+This is really interesting as it would make it possible to apply FastSRM on
+datasets with a very large number of subjects that do not hold in memory.
 
 
 We show on synthetic and real data that FastSRM is much faster and more memory
-efficient that implementations not using the optimal atlas.
+efficient that implementations not using an optimal atlas.
 Furthermore, FastSRM is identifiable. On real data, we show that compared to
 Brainiak's implementation (which is not identifiable), FastSRM provides more
 stable estimates of the shared components.
@@ -1067,11 +1078,22 @@ remains to be seen whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
 %
-Our optimal atlas apprach shows that SRM-like methods do not need the
+Our optimal atlas approach shows that SRM-like methods do not need the
 full data to provide accurate estimates of shared components. We believe such
 insights may guide the design of future methods.
-\bt{Add a paragraph on implementation, sofwtare quality, documentation, examples, availability...}
-\bt{Discuss the use for other brain imaging modelities (MEEG) if relevant ?}
+%
+
+Lastly, FastSRM is useful when the number of features is much larger than the
+number of samples. This setting is common in fMRI but less common in MEG/EEG where
+the number of samples is usually much larger than the number of features. Even
+in this case, it is possible to considerably speed up SRM. Indeed, SRM only
+depends on second order statistics.
+These statistics can be pre-computed making the rest of the
+pipeline insensitive to the number of samples in the dataset. An implementation
+of this simple idea would make SRM easily applicable to other modalities.
+We live it to future work.
+% \bt{Add a paragraph on implementation, sofwtare quality, documentation, examples, availability...}
+% \bt{Discuss the use for other brain imaging modelities (MEEG) if relevant ?}
 
 \bibliographystyle{plain}
 \bibliography{utils/biblio}
