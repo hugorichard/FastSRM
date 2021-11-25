@@ -17,9 +17,6 @@ where
 
 In practice we observe n samples of <img src="https://latex.codecogs.com/svg.image?\mathbf{x}_i" title="\mathbf{x}_i" />. When the number of samples is much lower than the number of features v, the SRM model can be fitted efficiently. This is what this repository provides. We also assume that the covariance of the shared response is diagonal to obtain identifiability.
 
-
-See https://arxiv.org/pdf/1909.12537.pdf
-
 Install
 ---------
 Clone the repository
