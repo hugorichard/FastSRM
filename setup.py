@@ -5,8 +5,9 @@ import sys
 import setuptools
 from copy import deepcopy
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="fastsrm",
@@ -18,13 +19,14 @@ setup(
         "matplotlib>=2.0.0"
         "pytest>=6.2.5"
     ],
-    version="0.0.3",
+    version="0.0.4",
     license="MIT",
     author="Hugo RICHARD",
-    download_url="https://github.com/hugorichard/FastSRM/archive/v_002.tar.gz",
+    download_url="https://github.com/hugorichard/FastSRM/archive/v_004.tar.gz",
     author_email="hugo.richard@inria.fr",
     url="https://github.com/hugorichard/FastSRM",
     long_description=long_description,
+    long_description_content_type='text/markdown',
     description="Fast Shared response model",
     keywords="Component analysis, fMRI",
     packages=find_packages(),

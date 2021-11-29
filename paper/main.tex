@@ -589,7 +589,7 @@ We have the following result:
   $\xb_i$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM on
   data $\zb_i = U_{\xb_i}^{\top} \xb_i$ but where updates:
   \begin{align}
-    \sigma_i^2 \leftarrow \frac1{k} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+    \sigma_i^2 \leftarrow \frac1{t} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
   are replaced by updates
   \begin{align}
@@ -1032,8 +1032,8 @@ response from the learned parameters and the data passed as the argument of the 
 
 While brainiak and nilearn are useful to reproduce some of our experiments, they
 are not strong dependencies and FastSRM only needs numpy ($\geq 1.12$), scipy
-($\geq 0.18.0$), matplotlib ($\geq 2.0.0$), scikit-learn ($geq 0.23$), pytest
-($\geq 6.2.5$) , joblib ($\geq 1.1.0).
+($\geq 0.18.0$), matplotlib ($\geq 2.0.0$), scikit-learn ($\geq 0.23$), pytest
+($\geq 6.2.5$) , joblib ($\geq 1.1.0$).
 
 The package comes with a documentation and a tutorial that reproduces, at a
 smaller scale, the experiment available in Figure~\ref{fig:srm:synthetic_gradient}.
