@@ -43,24 +43,25 @@
 and computational power, which limits its use in practice.
 %
 Furthermore, SRM is
-not identifiable which makes the shared response difficult to interpret.
+not identifiable, which makes the shared response difficult to interpret.
 
 
 In this work, we implement an identifiable version of SRM and show on real data
 that it improves the stability of the recovered shared response.
 %
 We then introduce the FastSRM that relies on a dimension reduction step that we
-prove to be optimal in the sense that working with reduced data does not induce any change in the
-algorithm trajectory.
+prove to yield the same solution as the original algorithm.
+% be optimal in the sense that working with reduced data does not induce any change in the
+% algorithm trajectory.
 %
 We show experimentally using synthetic and real fMRI data
 that FastSRM is considerably faster and more memory efficient
-than competitive implementations.
+than current implementations.
 
 
 The experiments performed in the paper are \emph{fully} reproducible: our
-code available at \url{https://github.com/hugorichard/FastSRM} downloads the
-data, runs the experiments and plot the figures.
+code available at \url{https://github.com/hugorichard/FastSRM} allows to download the
+data, run the experiments and plot the figures.
 %
 
 \end{abstract}
@@ -79,7 +80,7 @@ features of interest in the stimuli.
 %
 Without a design matrix, models such as the general linear
 model~\cite{poline2012general} cannot be used. Although some works have used
-natural annotations~\cite{huth2012continuous} or deep neural
+natural annotations~\cite{huth2012continuous}, see also \url{https://neuroscout.org} or deep neural
 networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing} to create an
 estimate of the design matrix of naturalistic
 stimuli it is by no means a simple task.
@@ -137,23 +138,22 @@ performance.
 FastSRM gains identifiability by imposing that the covariance of the shared
 components is diagonal (see ~\cite{richard2020modeling} Appendix D for a proof).
 %
-The gains in speed and memory usage are based on the intuition that a compressed
-representation of the input should be good enough to find a suitable estimate of
-the shared components as they live in reduced space.
+The gains in speed and memory usage are based on the observation that a low-dimensional, yet distance-preserving
+representation of the images yields the same result as the full data.
 %
-It turns out that there
-exists an optimal atlas that reduces the data in a such a way that the obtained
-shared components (and other parameters) are the same as if they were computed
-on full data.
+Such a representation can be interpreted as an initial spatial  decomposition of the data.
+% that reduces the data in a such a way that the obtained
+% shared components (and other parameters) are the same as if they were computed
+% on full data.
 %
 We show that FastSRM brings several practical benefits: on real data, it produces more stable
-estimates of the shared components than its non-identifiable counter-part and 
+estimates of the shared components than its non-identifiable counterpart and 
  it is much faster and more memory
 efficient than other implementations that do not make use of an optimal atlas.
 % on synthetic as well as on real data,
 
 
-Our python implementation is available at
+A Python implementation is available at
 \url{https://github.com/hugorichard/FastSRM}.
 %
 All our experiments are fully reproducible.
@@ -177,11 +177,13 @@ The data $\xb_1 \dots \xb_m$ are modeled as random vectors following the model:
   &A_i^{\top}A_i = I_p
   \label{eq:model:srm}
 \end{align}
-where $\xb_i \in \RR^v$ is the data of view $i$, $A_i \in \RR^{p \times v}$ is the
+where $\xb_i \in \RR^v$ is the data of subject $i$, called view $i$, $A_i \in \RR^{p \times v}$ is the
 mixing matrix of view $i$, $\nb_i$ is the noise of view $i$ and $\sbb \in \RR^p$ are the
 shared components referred to as the \emph{shared response} in fMRI
 applications.
 %
+$p$ is the number of time frames, $v$ is the number of voxels and $m$
+is the number of subjects.
 
 The mixing matrices
 $A_i$ are assumed to be orthogonal so that $A_i^{\top}A_i = I_p$.
@@ -201,14 +203,12 @@ number of components $p$: $v \gg p$.
 The conceptual figure~\ref{fig:srm:conceptual_figure} illustrates an 
 application of the shared response model to fMRI data.
 %
-The mixing
-matrices are spatial topographies specific to each subjects while the shared
-components give the common timecourses.
+The mixing matrices are spatial topographies specific to each subject
+while the shared components represent the common timecourses.
 %
-In~\cite{chen2015reduced, anderson2016enabling}, two versions of the shared
-response model are introduced which we now present.
-% 
-
+In~\cite{chen2015reduced, anderson2016enabling}, two versions of the
+shared response model are introduced, namely the deterministic and
+probabilistic models.
 
 \begin{figure}
   \centering
@@ -243,7 +243,7 @@ The model is optimized by maximizing the log-likelihood, assuming that
 the noise is Gaussian distributed.
 %
 The likelihood is then given by: $p(\xb) = \prod_i \Ncal(\xb_i; A_i \sbb, \sigma^2 I)$ and
-therefore the empirical expected negative log-likelihood is given up to a constant independent of
+therefore the empirical expected \textbf{XXX why expected ?} negative log-likelihood is given up to a constant independent of
 $A_i$ and $S$ by:
 \begin{align}
   \loss = \frac1{n} \sum_i \|A_i S - X_i \|^2 = \frac1{n} \big(\| S \|^2 -2 \dotp{ A_i S}{ X_i } + \| X_i \|^2 \big)
@@ -258,8 +258,7 @@ the loss and can therefore be ignored.
 
 
 The gradient with respect to $S$ is given by $\sum_i A_i^{\top}(A_i S -
-X_i) = \sum_i (S -
-A_i^{\top} X_i)$
+X_i) = \sum_i (S - A_i^{\top} X_i)$
 yielding the closed form updates:
 \begin{equation}
   S \leftarrow  \frac1m \sum_i (A_i^{\top} X_i)
@@ -270,7 +269,7 @@ From \eqref{eq:detsrmloss}, minimizing $\loss$ with respect to $A_i$ is
 equivalent to maximizing $\dotp{ A_i}{ X_i S^{\top} }$ and therefore we
 have:
 \begin{equation}
-  A_i \leftarrow  \Pcal(\frac1{n}X_i S^{\top})
+  A_i \leftarrow  \Pcal \left(\frac1{n}X_i S^{\top} \right)
   \label{eq:detsrm:Aiupdate}
 \end{equation}
 where $\Pcal$ is the projection on the Stiefel manifold: $\Pcal(M) = M
@@ -287,7 +286,7 @@ gradient.
 Note that we can monitor the gradient without any increase in complexity.
 %
 Indeed, after the updates with respect to each mixing matrix have been
-carried out, only the gradient with respect to $S$ remains: $\sum_i
+carried out, only the gradient with respect to $S$ remains \textbf{XXX WDYM ?}: $\sum_i
 (S - A_i^{\top}\xb_i)$.
 %
 The algorithm is stopped when the
@@ -304,7 +303,7 @@ components are assumed to be Gaussian $\sbb \sim \Ncal(0, \Sigma_s)$.
 In~\cite{chen2015reduced} and~\cite{anderson2016enabling}, $\Sigma_s$ is only assumed to be definite positive.
 %
 As already highlighted in introduction, this causes the model to be
-unidentifiable (see~\cite{richard2020modeling} Appendix D for a proof). Enforcing a diagonal $\Sigma_s$ ensures identifiability (provided the diagonal values are different).
+unidentifiable (see~\cite{richard2020modeling} Appendix D for a proof). Enforcing a diagonal $\Sigma_s$ ensures identifiability, provided that the diagonal values are different.
 %
 So we assume here that $\Sigma_s$ is diagonal (and refer the interested reader
 to~\cite{chen2015reduced} and~\cite{anderson2016enabling} for the original formulation of Probabilistic SRM
@@ -383,8 +382,11 @@ $\bigO(mvn)$ which simply means that the dataset needs to hold in memory.
 
 \section{The FastSRM algorithm}
 
-\subsection{Reducing the computational burden by use of atlases}
-SRM algorithms use different set of parameters $\theta$ to represent the data.
+\subsection{Reducing the computational burden by the use of spatial decompositions}
+
+\textbf{XXX Sorry but we can't call $U$ and atlas: it does not define regions, it has no sign constraints, it is not sparse etc. It is actually closer to a random projection matrix than two an atlas ! So I propose to systematically remove the term atlas, and use spatial decompositions}
+
+SRM algorithms use different sets of parameters $\theta$ to represent the data.
 %
 In deterministic SRM $\theta = \left((A_i)_{i=1}^m, S \right)$ where $(A_i)_{i=1}^m$ are the
 mixing matrices and $S$ is the shared response, while in probabilistic SRM $\theta
@@ -416,7 +418,7 @@ $U_i^{\top}U_i = I_r$ where $r$ is the number of regions in the atlas.
 Data are reduced using $\zb_i = U_i^{\top} \xb_i$ and an SRM algorithm is applied
 on data $\zb_i$ yielding parameters $\theta'$.
 %
-The figure~\ref{fig:srm:conceptual} illustrates this process.
+Figure~\ref{fig:srm:conceptual} illustrates this process.
 %
 
 
@@ -491,7 +493,7 @@ addressed in the following section.
 %
 
 
-\subsection{An optimal atlas}
+\subsection{A class of optimal spatial decompositions}
 \label{sec:optimal_atlas}
 In principle, FastSRM can be used with any atlas.
 %
@@ -523,7 +525,7 @@ Therefore $U_{\xb_i}$ constitutes a possible choice of subject specific atlas.
 %
 As the next property shows, $U_{\xb_i}$ is an optimal atlas for deterministic
 FastSRM. Note that this optimal atlas is not unique: any orthogonal matrix with
-the same span as $X_i$ would also work.
+the same span as the columns of $X_i$ would also work.
 %
 
 \begin{proposition}[Optimal atlas for deterministic FastSRM]
@@ -580,11 +582,11 @@ This concludes the proof.
 In the case of probabilistic SRM we can obtain very similar results.
 %
 However the
-algorithm applied on reduced data need to be slightly modified.
+algorithm applied on reduced data needs to be slightly modified.
 %
 
 We have the following result:
-\begin{proposition}[Optimal atlas for probabilistic FastSRM]
+\begin{proposition}[Optimal spatial decomposition for probabilistic FastSRM]
   Let $(A_i)_i, \sigma_i, \Sigma_s$ be the solution obtained by probabilistic SRM on data
   $\xb_i$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM on
   data $\zb_i = U_{\xb_i}^{\top} \xb_i$ but where updates:
@@ -661,10 +663,10 @@ generative model of the data.
 %
 
 
-A complexity analysis shows that finding an optimal atlas becomes the limiting
+A complexity analysis shows that finding an optimal spatial decomposition becomes the limiting
 step of the pipeline.
 %
-Even with fast implementations, the subject specific PCA
+Even with fast implementations, subject specific PCA
 is costly.
 %
 However FastSRM only works on $\zb_i$ so we do not need to know the value of
@@ -679,7 +681,7 @@ $Z_i = D_i^{\frac12} V_i^{\top}$.
 %
 Although computing the product $X_i^{\top} X_i$ has time complexity
 $\bigO(vt^2)$ (the same as a PCA) the constant in the $\bigO$ is exactly one so
-this operation costs a lot less than the PCA
+this operation costs a lot less than a PCA
 on full data.
 %
 When estimates of the mixing matrices are needed, they can be obtained by
@@ -699,11 +701,11 @@ computed in parallel.
 \section{Related work}
 The implementation of SRM proposed in~\cite{chen2015reduced} is quadratic in the
 number of features which prevent its application to full brain data.
-In~\cite{anderson2016enabling}, the authors address this issue by using the
+In~\cite{anderson2016enabling}, this issue is addressed by using the
 inversion lemma to remove the quadratic dependence. Their implementation is now the most widely used one.
 In our work, we propose to reduce further the computation time and memory usage
 compared to the implementation in~\cite{anderson2016enabling} by the use of
-optimal atlases.
+optimal spatial decompositions.
 
 Other popular methods used to speed up SRM are searchlight~\cite{zhang2016searchlight} or piecewise~\cite{bazeille2021empirical}
 approaches. While these methods are efficient, they do not optimize the same
@@ -769,14 +771,14 @@ Note that in this section, the identifiable implementation of deterministic SRM
 and probabilistic SRM described in section~\ref{sec:probabilisticsrm}
 and~\ref{sec:deterministicsrm} is used. 
 %
-Algorithms are designated by the atlas they use and therefore SRM algorithms are refered to
+Algorithms are designated by the atlas they use and therefore SRM algorithms are referred to
 as \emph{None} because no atlas is used and FastSRM algorithms will have the
 label \emph{Optimal}.
 %
 Note that it would be possible to use FastSRM with sub-optimal
 atlases (there exists a wide variety of brain atlases
 ~\cite{schaefer2017local, bellec2010multi, mensch2018extracting}) but
-using them does not brain any guarantee that the performance is the same as SRM.
+using them does not bring any guarantee that the performance is the same as SRM.
 %
 
 
@@ -895,18 +897,17 @@ computational resources.
 
 \subsection{Identifiability increases stability}
 Assuming that the data follow the model, identifiability ensures that the
-problem is well posed since the parameters of the model are not ambiguous. Note however that SRM
-stays non-convex so there is no guarantee that the optimal solution is found.
+problem is well posed since the solutions are well-characterized. Note however that SRM
+remains non-convex so there is no guarantee that the optimal solution is found.
 %
 % \bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
 %
 In real fMRI data, the model cannot be expected to hold perfectly, but we can
 hope for greater stability in the parameters recovered than if an unidentifiable
 model is used.
-%
 
 
-To measure the stability of the common components obtained from the Sherlock
+To measure the stability of the shared components obtained from the Sherlock
 dataset, we divide the subjects into two roughly equal groups and extract the
 common components in each group.
 %
@@ -914,11 +915,11 @@ The components are then matched using the Hungarian algorithm and the stability
 measure is obtained from the average correlation of the matched components.
 %
 The procedure is repeated 9 times using the Brainiak implementation (that is not
-identifiable) and our
+identifiable since the shared components covariance is unconstrained) and our
 FastSRM implementation.
 %
 We plot the results as a scatter plot in Figure~\ref{exp:identifiability}, where, for each repetition , the x-axis indicates the stability measure obtained with Brainiak's implementation
-(not identifiable since the shared components covariance is unconstrained) and the y-axis the stability measure
+ and the y-axis the stability measure
 obtained with FastSRM (identifiable since the shared components covariance is diagonal).
 %
 We see that introducing a diagonal source covariance improves stability.
@@ -1067,13 +1068,13 @@ datasets with a very large number of subjects that do not hold in memory.
 We show on synthetic and real data that FastSRM is much faster and more memory
 efficient that implementations not using an optimal atlas.
 Furthermore, FastSRM is identifiable. On real data, we show that compared to
-Brainiak's implementation (which is not identifiable), FastSRM provides more
+Brainiak's implementation, that is not identifiable, FastSRM provides more
 stable estimates of the shared components.
 
 
 %
 FastSRM inherits from all the weaknesses of SRM including the fact that
-mixing matrices are assumed to be orthogonal which is rather unrealistic. It
+mixing matrices are assumed to be orthogonal, which is rather unrealistic. It
 remains to be seen whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
@@ -1091,7 +1092,7 @@ depends on second order statistics.
 These statistics can be pre-computed making the rest of the
 pipeline insensitive to the number of samples in the dataset. An implementation
 of this simple idea would make SRM easily applicable to other modalities.
-We live it to future work.
+We leave it to future work.
 % \bt{Add a paragraph on implementation, sofwtare quality, documentation, examples, availability...}
 % \bt{Discuss the use for other brain imaging modelities (MEEG) if relevant ?}
 
