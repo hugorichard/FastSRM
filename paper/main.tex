@@ -243,7 +243,12 @@ The model is optimized by maximizing the log-likelihood, assuming that
 the noise is Gaussian distributed.
 %
 The likelihood is then given by: $p(\xb) = \prod_i \Ncal(\xb_i; A_i \sbb, \sigma^2 I)$ and
-therefore the empirical expected \textbf{XXX why expected ?} negative log-likelihood is given up to a constant independent of
+therefore the empirical
+%
+% \textbf{XXX why expected ?} It was for empirical expectation but it may be
+% confusing so I removed it.
+%
+negative log-likelihood is given up to a constant independent of
 $A_i$ and $S$ by:
 \begin{align}
   \loss = \frac1{n} \sum_i \|A_i S - X_i \|^2 = \frac1{n} \big(\| S \|^2 -2 \dotp{ A_i S}{ X_i } + \| X_i \|^2 \big)
@@ -286,8 +291,10 @@ gradient.
 Note that we can monitor the gradient without any increase in complexity.
 %
 Indeed, after the updates with respect to each mixing matrix have been
-carried out, only the gradient with respect to $S$ remains \textbf{XXX WDYM ?}: $\sum_i
-(S - A_i^{\top}\xb_i)$.
+carried out, the gradient with respect to $(W_i)_{i=1}^m$ is zero and therefore
+to compute the $\ell_{\infty}$ norm of the gradient we only need the gradient
+with respect to $S$: $m S - \sum_i A_i^{\top}\xb_i$ where the right hand side is
+used in the updates of $S$.
 %
 The algorithm is stopped when the
 gradient falls below a chosen tolerance.
