@@ -16,6 +16,7 @@
 \usepackage{longtable}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{amsmath}
+\usepackage{thmtools, thm-restate}
 \usepackage{utils/kky}
 \usepackage{subcaption}
 \usepackage{afterpage}
@@ -27,6 +28,7 @@
 
 \usepackage[colorinlistoftodos,textwidth=2.1cm]{todonotes}
 \newcommand{\bt}[1]{\todo[color=orange, inline=True]{BT: #1}}
+
 
 
 \begin{document}
@@ -92,7 +94,7 @@ In the case where the dataset contains only one subject
 independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
 %
 ICA assumes that components are independent, a rather realistic assumption which
-ensures identifiability up to permutation and scaling of the model and can be fit efficiently.
+ensures identifiability up to permutation and scaling of the model and can be fitted efficiently.
 %
 
 But when the dataset contains multiple subjects, a natural assumption is to
@@ -132,7 +134,7 @@ interpret the extracted shared components as they are defined up to a rotation.
 
 
 In this work, we introduce FastSRM, an identifiable model that uses an optimal
-atlas-based decomposition to speed up the computations with provably no loss of
+spatial decomposition to speed up the computations with provably no loss of
 performance.
 %
 FastSRM gains identifiability by imposing that the covariance of the shared
@@ -149,7 +151,7 @@ Such a representation can be interpreted as an initial spatial  decomposition of
 We show that FastSRM brings several practical benefits: on real data, it produces more stable
 estimates of the shared components than its non-identifiable counterpart and 
  it is much faster and more memory
-efficient than other implementations that do not make use of an optimal atlas.
+efficient than other implementations that do not make use of an optimal spatial decomposition.
 % on synthetic as well as on real data,
 
 
@@ -391,7 +393,7 @@ $\bigO(mvn)$ which simply means that the dataset needs to hold in memory.
 
 \subsection{Reducing the computational burden by the use of spatial decompositions}
 
-\textbf{XXX Sorry but we can't call $U$ and atlas: it does not define regions, it has no sign constraints, it is not sparse etc. It is actually closer to a random projection matrix than two an atlas ! So I propose to systematically remove the term atlas, and use spatial decompositions}
+% \textbf{XXX Sorry but we can't call $U$ and atlas: it does not define regions, it has no sign constraints, it is not sparse etc. It is actually closer to a random projection matrix than two an atlas ! So I propose to systematically remove the term atlas, and use spatial decompositions}
 
 SRM algorithms use different sets of parameters $\theta$ to represent the data.
 %
@@ -403,24 +405,23 @@ components variance.
 %
 
 
-In fMRI, the classical approach used to reduce the data is to apply an atlas.
+In fMRI, spatial decompositions are often used to reduce the dimensionality of
+the data.
 %
-A deterministic atlas such as~\cite{bellec2010multi} is a parcellation of the
+A classical approach is to apply a deterministic atlas such
+as~\cite{bellec2010multi} which is a parcellation of the
 brain into $r$ regions.
 %
-Reducing an image using a deterministic atlas corresponds to
-averaging the signal within each region of the atlas.
-%
-A probabilistic atlases such
-as~\cite{dadi_fine-grain_2020} describes each region as a set of weights across
-the full brain.
-%
-Therefore, the image reduction can be done with a matrix product.
+There also exists probabilistic atlases
+such as~\cite{dadi_fine-grain_2020} that describes each region as a set of weights across
+the full brain. 
 %
 
-
-In FastSRM we consider a set of view-specific atlases $U_i \in \RR^{v \times r}$ such that
-$U_i^{\top}U_i = I_r$ where $r$ is the number of regions in the atlas.
+Deterministic and probabilistic atlases are spatial decompositions that do not
+depend on the view at hand. In FastSRM, we consider a set of view-specific
+spatial decompositions
+$U_i \in \RR^{v \times r}$ such that
+$U_i^{\top}U_i = I_r$ where $r$ is the number of components in the spatial decompositions.
 %
 Data are reduced using $\zb_i = U_i^{\top} \xb_i$ and an SRM algorithm is applied
 on data $\zb_i$ yielding parameters $\theta'$.
@@ -434,7 +435,7 @@ from the parameters obtained with the corresponding SRM algorithm $\theta$ (the
 unmixing matrices in $\theta'$ do not even have the same shape as the unmixing
 matrices in $\theta$).
 %
-However, as we will see in the next section, there exists atlases such that the
+However, as we will see in the next section, there exists spatial decompositions such that the
 models parametrized by $\theta$ and
 $\theta'$ are equivalent.
 %
@@ -443,8 +444,8 @@ $\theta'$ are equivalent.
 \begin{figure}
   \centering
   \includegraphics[scale=0.34]{figures/srm/conceptual_figure2.pdf}
-  \caption{\textbf{FastSRM algorithm} In step 1, data $\xb_i$ are projected onto an
-    atlas $U_i$ that may depend on the subject $i$ (top).
+  \caption{\textbf{FastSRM algorithm} In step 1, data $\xb_i$ are projected onto a
+    spatial decomposition $U_i$ that may depend on the subject $i$ (top).
     %
     In step 2 a SRM algorithm is applied on reduced data to compute the shared
     response.
@@ -458,7 +459,7 @@ a large reduction in memory usage.
 %
 Indeed as the original data are seen only
 once, it is no longer necessary to keep the full dataset in memory (we can load
-data $X_i$ one after the other and similarly for the atlases $U_i$).
+data $X_i$ one after the other and similarly for the spatial decomposition $U_i$).
 %
 Therefore
 the memory consumption is only in $\bigO(vn)$ (where $v$ is the number of voxels
@@ -491,7 +492,7 @@ the pre-processing is performed only once and the apparent complexity becomes
 $\bigO(\mathrm{n_{iter}} mpnr)$ which is faster than SRM by
 a factor of $\frac{v}{r}$.
 %
-The number of regions in large atlases is about $r=1000$ and in full brain data,
+The number of components in large spatial decompositions is about $r=1000$ and in full brain data,
 the number of voxels is about $300~000$ so that $\frac{v}{r}$ is typically about
 $300$.
 %
@@ -502,15 +503,15 @@ addressed in the following section.
 
 \subsection{A class of optimal spatial decompositions}
 \label{sec:optimal_atlas}
-In principle, FastSRM can be used with any atlas.
+In principle, FastSRM can be used with any spatial decomposition.
 %
 However, in general, working with reduced data induces a loss of information
-that can be minimized if the atlas is carefully chosen.
+that can be minimized if the spatial decomposition is carefully chosen.
 %
 In any case, there is little hope to recover the parameters that would have been
 obtained from SRM from the parameters of FastSRM.
 %
-Yet, we show that there exists an optimal atlas in the
+Yet, we show that there exists an optimal spatial decomposition in the
 sense that SRM and FastSRM yield the same results.
 
 
@@ -528,17 +529,17 @@ samples $n$ is lower than the number of features, $U_{\xb_i} \in \RR^{v \times
 %
 We also have $U_{\xb_i}^{\top}U_{\xb_i} = I$.
 %
-Therefore $U_{\xb_i}$ constitutes a possible choice of subject specific atlas.
+Therefore $U_{\xb_i}$ constitutes a possible choice of subject specific spatial decomposition.
 %
-As the next property shows, $U_{\xb_i}$ is an optimal atlas for deterministic
-FastSRM. Note that this optimal atlas is not unique: any orthogonal matrix with
+As the next property shows, $U_{\xb_i}$ is an optimal spatial decomposition for deterministic
+FastSRM. Note that this optimal spatial decomposition is not unique: any orthogonal matrix with
 the same span as the columns of $X_i$ would also work.
 %
 
-\begin{proposition}[Optimal atlas for deterministic FastSRM]
+\begin{proposition}[Optimal spatial decomposition for deterministic FastSRM]
   Let $(A_i)_i, S$ be the solution obtained by deterministic SRM on data
   $(X_i)_i$ and $(A_i')_i, S'$ the solution obtained by deterministic FastSRM on
-  data $(X_i)_i$ using atlases $(U_{X_i})_i$ where $X_i = U_{\xb_i} Z_i$ is a PCA
+  data $(X_i)_i$ using spatial decompositions $(U_{X_i})_i$ where $X_i = U_{\xb_i} Z_i$ is a PCA
   of $X_i$.
   %
   Then $A_i = U_{X_i}A_i'$ and $S = S'$.
@@ -546,46 +547,7 @@ the same span as the columns of $X_i$ would also work.
   
 \label{prop:optimaldetsrm}
 \end{proposition}
-\begin{proof}
-Updates of the mixing matrices $A_i$ in deterministic SRM
-equation~\eqref{eq:detsrm:Aiupdate} can be written:
-\begin{align}
-  A_i &\leftarrow \Pcal \left(\frac1{n}X_i S^{\top} \right)= U_{X_i}\Pcal \left(\frac1{n}Z_i S^{\top} \right)
-  \label{eq:fastdetsrm:Aiupdate}
-\end{align}
-where $\Pcal$ is the projection on the Stiefel manifold: $\Pcal(M) = M
-(M^{\top}M)^{-\frac12}$.
-%
-
-Therefore we can look for $A_i$ as $A_i = U_{X_i} \tilde{A}_i$.
-%
-We can show that $\tilde{A}_i$ is orthogonal.
-%
-Indeed,
-\begin{align}
-  &A_i^{\top} A_i = I_p \\
-  & \implies \tilde{A}_i^{\top}U_{X_i}^{\top} U_{X_i} \tilde{A}_i = I_p \\
-  & \implies \tilde{A}_i^{\top} \tilde{A}_i = I_p
-\end{align}
-
-Then, we use the fact that
-\begin{align}
-  \|X_i - A_i S \|^2 = \| U_{X_i}Z_i - U_{X_i}\tilde{A}_i S\|^2 = \| Z_i - \tilde{A}_i S \|^2
-  \label{eq:equality:xy}
-\end{align}
-so that $A_i' = \tilde{A}_i$.
-%
-
-
-Therefore, the solution of deterministic SRM on data $(\zb_i)_{i=1}^m$ and
-$(\xb_i)_{i=1}^m$ are linked by the change of parameters $A_i = U_{\xb_i}A_i'$ and
-$S = S'$.
-%
-This concludes the proof.
-%
-
-\end{proof}
-
+The proof is available in appendix~\ref{proof:deterministic}.
 In the case of probabilistic SRM we can obtain very similar results.
 %
 However the
@@ -604,7 +566,6 @@ We have the following result:
   \begin{align}
     \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
-  .
   %
   Then $A_i = U_{\xb_i}A_i'$, $\sigma_i =
   \sigma_i'$ and $\Sigma_s = \Sigma_s'$.
@@ -612,53 +573,7 @@ We have the following result:
   
   \label{prop:optimalprobsrm}
 \end{proposition}
-\begin{proof}
-  Updates of the mixing matrices $A_i$ in probabilistic SRM
-  equation~\eqref{eq:psrm:Aiupdate} can be written:
-  \begin{align}
-    A_i &\leftarrow U_{\xb_i}\Pcal(\EE[\zb_i \EE[\sbb| \xb_i]^T])
-    \label{eq:fastprobsrm:Aiupdate}
-  \end{align}
-  so we can look for $A_i$ as $A_i = U_{\xb_i} \tilde{A}_i$ and, as in the
-  deterministic case, $\tilde{A}_i$ is orthogonal.
-  %
-  Therefore equality~\eqref{eq:equality:xy} holds.
-  %
-  
-  
-  Then we consider the expected negative log-likelihood of probabilistic srm:
-  \begin{align}
-    \loss &= \sum_i \frac12 v\log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) + \EE[\int_{\sbb} \sum_i \frac1{2 \sigma_i^{2}} \|\xb_i - A_i \sbb \|^2 \nonumber \\& \enspace \enspace \enspace \enspace+ \frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb }  d\sbb] \\
-          &= \sum_i \frac12 v \log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) + \EE[\int_{\sbb} \sum_i \frac1{2 \sigma_i^{2}}\|\zb_i - \tilde{A}_i \sbb \|^2 \nonumber \\& \enspace \enspace \enspace \enspace+ \frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb }  d\sbb]
-  \end{align}
-  where we use equality~\eqref{eq:equality:xy}.
-  %
-  
-  Optimizing the log-likelihood via expectation maximization yields the exact
-  same updates as probabilistic SRM on data $\zb_i$
-  except that updates
-  \begin{align}
-    \sigma_i^2 \leftarrow \frac1{t} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
-  \end{align}
-  are replaced by updates
-  \begin{align}
-    \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
-  \end{align}
-  so that $\tilde{A}_i = A'_i$.
-  %
-  
-
-  Therefore, the updates in both algorithms are linked  by $A_i = U_{\xb_i}A_i'$,
-  $\sigma_i' =
-  \sigma_i$ and $\Sigma_s'  = \Sigma_s$.
-  %
-  
-
-  This concludes the proof.
-  %
-  
-\end{proof}
-
+  The proof is available in appendix~\ref{proof:prob}.
 Proposition~\ref{prop:optimaldetsrm} and Proposition~\ref{prop:optimalprobsrm} show that
 no information is lost by replacing $\xb_i \in \RR^v$ by its reduced
 representation $\zb_i \in \RR^n$.
@@ -778,12 +693,12 @@ Note that in this section, the identifiable implementation of deterministic SRM
 and probabilistic SRM described in section~\ref{sec:probabilisticsrm}
 and~\ref{sec:deterministicsrm} is used. 
 %
-Algorithms are designated by the atlas they use and therefore SRM algorithms are referred to
-as \emph{None} because no atlas is used and FastSRM algorithms will have the
+Algorithms are designated by the spatial decomposition they use and therefore SRM algorithms are referred to
+as \emph{None} because no spatial decomposition is used and FastSRM algorithms will have the
 label \emph{Optimal}.
 %
 Note that it would be possible to use FastSRM with sub-optimal
-atlases (there exists a wide variety of brain atlases
+spatial decompositions (there exists a wide variety of brain spatial decompositions
 ~\cite{schaefer2017local, bellec2010multi, mensch2018extracting}) but
 using them does not bring any guarantee that the performance is the same as SRM.
 %
@@ -814,7 +729,7 @@ use the distance between consecutive values of the loss for ProbSRM.
 Results are plotted in Figure~\ref{fig:srm:synthetic_gradient}.
 %
 
-We empirically see that the optimal approach is equivalent to using no atlas in
+We empirically see that the optimal approach is equivalent to using no spatial decompositions in
 terms of performance.
 %
 This is predicted by the theory in section~\ref{sec:optimal_atlas} where we demonstrate that these two algorithms yield exactly the same output
@@ -833,16 +748,17 @@ This shows the superiority of likelihood based methods.
 In terms of fitting time, FastSRM is about a thousand time faster than SRM after
 100 iterations.
 %
-When no atlas is used, the number
+When no spatial decompositions is used, the number
 of iterations has a very strong impact on performance while it has a small impact
-when an optimal atlas is used.
+when an optimal spatial decomposition is used.
 %
 Lastly, looking at the convergence curves, we see that even after $100$ iterations, algorithms did
 not fully converge.
 %
 This means that in practice a larger number of
 iterations is needed, which would yield an even higher difference in fitting time
-between methods using no atlas and methods using an optimal atlas.
+between methods using no spatial decomposition and methods using an optimal
+spatial decomposition.
 %
 
 
@@ -853,8 +769,8 @@ between methods using no atlas and methods using an optimal atlas.
     fitting time and convergence of SRM algorithms in the deterministic (left)
     or probabilistic (right) case.
     %
-    As expected, when optimal atlases are used,
-    the performance is the same as if no atlas is used but the fitting time is
+    As expected, when optimal spatial decompositions are used,
+    the performance is the same as if no spatial decomposition is used but the fitting time is
     much lower.
     %
     This is even more pronounced when the number of iterations is
@@ -896,7 +812,7 @@ experiments.
 We first show that identifiability is a desirable property as it increases
 stability.
 %
-Then we show that our FastSRM algorithm (that works with optimal atlases)
+Then we show that our FastSRM algorithm (that works with optimal spatial decompositions)
 matches the performance of SRM (that works on full data) but use much less
 computational resources.
 %
@@ -1008,8 +924,8 @@ choices for left-out subjects.
 % 
 The mean accuracy is reported in Figure~\ref{fig:srm:timesegment} (top).
 %
-When an optimal atlas is used, the accuracy is the same as when no
-atlas is used but the fitting time is reduced by a factor 10 to 100
+When an optimal spatial decomposition is used, the accuracy is the same as when no
+spatial decomposition is used but the fitting time is reduced by a factor 10 to 100
 and so is the memory usage (see Figure~\ref{fig:srm:timesegment},
 bottom).
 %
@@ -1021,7 +937,8 @@ bottom).
   \includegraphics[width=0.8\textwidth]{../figures/timesegment_matching_sherlock.pdf}
   \caption{\textbf{Benchmark of SRM algorithms on fMRI data} (top) Timesegment
     matching accuracy (middle) Fitting time (bottom) Memory usage. When the
-    optimal atlas is used, the accuracy is the same as when no atlas is used but
+    optimal spatial decomposition is used, the accuracy is the same as when no
+    spatial decomposition is used but
     the fitting time is reduced by a factor 10 to 100 and so is the memory usage.
     %
   }
@@ -1065,7 +982,7 @@ This is what FastSRM provides.
 
 %
 FastSRM is an efficient implementation of SRM
-that uses optimal atlases to speed up computations and reduce memory requirements
+that uses optimal spatial decompositions to speed up computations and reduce memory requirements
 with provably no loss of performance. 
 Note that the new memory requirements do not depend on the number of subjects.
 This is really interesting as it would make it possible to apply FastSRM on
@@ -1073,7 +990,7 @@ datasets with a very large number of subjects that do not hold in memory.
 
 
 We show on synthetic and real data that FastSRM is much faster and more memory
-efficient that implementations not using an optimal atlas.
+efficient that implementations not using an optimal spatial decomposition.
 Furthermore, FastSRM is identifiable. On real data, we show that compared to
 Brainiak's implementation, that is not identifiable, FastSRM provides more
 stable estimates of the shared components.
@@ -1086,7 +1003,7 @@ remains to be seen whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
 %
-Our optimal atlas approach shows that SRM-like methods do not need the
+Our approach based on optimal spatial decomposition shows that SRM-like methods do not need the
 full data to provide accurate estimates of shared components. We believe such
 insights may guide the design of future methods.
 %
@@ -1105,4 +1022,101 @@ We leave it to future work.
 
 \bibliographystyle{plain}
 \bibliography{utils/biblio}
+
+
+\newpage
+\appendix
+
+\section{Proofs of Proposition~\ref{prop:optimaldetsrm}}
+\label{proof:deterministic}
+
+\begin{proof}
+Updates of the mixing matrices $A_i$ in deterministic SRM
+equation~\eqref{eq:detsrm:Aiupdate} can be written:
+\begin{align}
+  A_i &\leftarrow \Pcal \left(\frac1{n}X_i S^{\top} \right)= U_{X_i}\Pcal \left(\frac1{n}Z_i S^{\top} \right)
+  \label{eq:fastdetsrm:Aiupdate}
+\end{align}
+where $\Pcal$ is the projection on the Stiefel manifold: $\Pcal(M) = M
+(M^{\top}M)^{-\frac12}$.
+%
+
+Therefore we can look for $A_i$ as $A_i = U_{X_i} \tilde{A}_i$.
+%
+We can show that $\tilde{A}_i$ is orthogonal.
+%
+Indeed,
+\begin{align}
+  &A_i^{\top} A_i = I_p \\
+  & \implies \tilde{A}_i^{\top}U_{X_i}^{\top} U_{X_i} \tilde{A}_i = I_p \\
+  & \implies \tilde{A}_i^{\top} \tilde{A}_i = I_p
+\end{align}
+
+Then, we use the fact that
+\begin{align}
+  \|X_i - A_i S \|^2 = \| U_{X_i}Z_i - U_{X_i}\tilde{A}_i S\|^2 = \| Z_i - \tilde{A}_i S \|^2
+  \label{eq:equality:xy}
+\end{align}
+so that $A_i' = \tilde{A}_i$.
+%
+
+
+Therefore, the solution of deterministic SRM on data $(\zb_i)_{i=1}^m$ and
+$(\xb_i)_{i=1}^m$ are linked by the change of parameters $A_i = U_{\xb_i}A_i'$ and
+$S = S'$.
+%
+This concludes the proof.
+%
+
+\end{proof}
+
+
+\section{Proofs of Proposition~\ref{prop:optimalprobsrm}}
+\label{proof:prob}
+\begin{proof}
+  Updates of the mixing matrices $A_i$ in probabilistic SRM
+  equation~\eqref{eq:psrm:Aiupdate} can be written:
+  \begin{align}
+    A_i &\leftarrow U_{\xb_i}\Pcal(\EE[\zb_i \EE[\sbb| \xb_i]^T])
+    \label{eq:fastprobsrm:Aiupdate}
+  \end{align}
+  so we can look for $A_i$ as $A_i = U_{\xb_i} \tilde{A}_i$ and, as in the
+  deterministic case, $\tilde{A}_i$ is orthogonal.
+  %
+  Therefore equality~\eqref{eq:equality:xy} holds.
+  %
+  
+  
+  Then we consider the expected negative log-likelihood of probabilistic srm:
+  \begin{align}
+    \loss &= \sum_i \frac12 v\log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) + \EE[\int_{\sbb} \sum_i \frac1{2 \sigma_i^{2}} \|\xb_i - A_i \sbb \|^2 \nonumber \\& \enspace \enspace \enspace \enspace+ \frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb }  d\sbb] \\
+          &= \sum_i \frac12 v \log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) + \EE[\int_{\sbb} \sum_i \frac1{2 \sigma_i^{2}}\|\zb_i - \tilde{A}_i \sbb \|^2 \nonumber \\& \enspace \enspace \enspace \enspace+ \frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb }  d\sbb]
+  \end{align}
+  where we use equality~\eqref{eq:equality:xy}.
+  %
+  
+  Optimizing the log-likelihood via expectation maximization yields the exact
+  same updates as probabilistic SRM on data $\zb_i$
+  except that updates
+  \begin{align}
+    \sigma_i^2 \leftarrow \frac1{t} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+  \end{align}
+  are replaced by updates
+  \begin{align}
+    \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+  \end{align}
+  so that $\tilde{A}_i = A'_i$.
+  %
+  
+
+  Therefore, the updates in both algorithms are linked  by $A_i = U_{\xb_i}A_i'$,
+  $\sigma_i' =
+  \sigma_i$ and $\Sigma_s'  = \Sigma_s$.
+  %
+  
+
+  This concludes the proof.
+  %
+  
+\end{proof}
 \end{document}
