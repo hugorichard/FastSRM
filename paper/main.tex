@@ -51,7 +51,7 @@ not identifiable, which makes the shared response difficult to interpret.
 In this work, we implement an identifiable version of SRM and show on real data
 that it improves the stability of the recovered shared response.
 %
-We then introduce the FastSRM that relies on a dimension reduction step that we
+We then introduce FastSRM, that relies on a dimension reduction step that we
 prove to yield the same solution as the original algorithm.
 % be optimal in the sense that working with reduced data does not induce any change in the
 % algorithm trajectory.
@@ -74,26 +74,29 @@ data, run the experiments and plot the figures.
 Complex stimulations such as movie-watching, story or music listening are more
 and more popular in the neuro-scientific community. Indeed such naturalistic
 paradigms are unconstrained from behavioral manipulations and thus, more
-ecological with respect to real-world conditions.
+ecological with respect to every-day cognitive conditions.
 %
-However and in contrast to more traditional designs, these so-called
+Yet, in contrast to standard designs, these so-called
 naturalistic stimuli do not come with a design matrix that quantifies the
 features of interest in the stimuli.
 %
 Without a design matrix, models such as the general linear
-model~\cite{poline2012general} cannot be used. Although some works have used
-natural annotations~\cite{huth2012continuous}, see also \url{https://neuroscout.org} or deep neural
-networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing} to create an
-estimate of the design matrix of naturalistic
-stimuli it is by no means a simple task.
+model~\cite{poline2012general} cannot be used.
+%
+Although some works have used manual
+annotations~\cite{huth2012continuous}, see also
+\url{https://neuroscout.org} or deep neural
+networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing} to
+create an estimate of the design matrix of naturalistic stimuli it is
+a hard task.
 
 Another approach is to learn jointly the design matrix and the spatial maps in
 an unsupervised way.
 %
-In the case where the dataset contains only one subject
+In the case where the dataset contains only one subject,
 independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
 %
-ICA assumes that components are independent, a rather realistic assumption which
+ICA assumes that components are independent, a defendible assumption which
 ensures identifiability up to permutation and scaling of the model and can be fitted efficiently.
 %
 
@@ -101,18 +104,22 @@ But when the dataset contains multiple subjects, a natural assumption is to
 assume that the design matrix is shared across subjects.
 %
 Many different methods
-can produce shared components from different subjects. Some assume independent
-components~\cite{richard2021model}~\cite{richard2020modeling}~\cite{varoquaux2009canica}~\cite{calhoun2001method}.
-while others are only based on second order information such as Multiset
-Canonical Correlation Analysis~\cite{via2011joint} or the Shared Response Model (SRM)~\cite{chen2015reduced}.
+can produce shared components from different subjects.
+%
+Some assume independent
+components~\cite{richard2021model}~\cite{richard2020modeling}~\cite{varoquaux2009canica}~\cite{calhoun2001method},
+while others are only based on second order information such as
+Multiset Canonical Correlation Analysis~\cite{via2011joint} or the
+Shared Response Model (SRM)~\cite{chen2015reduced}.
 %
 
-This work focuses on the SRM. Because of its
-simplicity and its built-in dimension reduction, this model is widely
-used~\cite{baldassano2017discovering}~\cite{cohen2017computational}~\cite{baldassano2018representation}~\cite{jolly2020custom}~\cite{lee2021anticipation}
-including as a preprocessing step for source
+This work focuses on the SRM. Because of its simplicity and its
+built-in dimension reduction, this model is widely
+used~\cite{baldassano2017discovering}~\cite{cohen2017computational}~\cite{baldassano2018representation}~\cite{jolly2020custom}~\cite{lee2021anticipation},
+in particular, as a preprocessing step for source
 identification~\cite{richard2021model}~\cite{richard2020modeling},
-classification~\cite{turek2018capturing}~\cite{chen2017shared}\cite{zhang2016searchlight} or as a basis for transfer learning~\cite{zhang2018transfer}. 
+classification~\cite{turek2018capturing}~\cite{chen2017shared}\cite{zhang2016searchlight}
+or as a basis for transfer learning~\cite{zhang2018transfer}.
 
 
 What makes the analysis of fMRI data particularly difficult is that
@@ -149,7 +156,7 @@ Such a representation can be interpreted as an initial spatial  decomposition of
 % on full data.
 %
 We show that FastSRM brings several practical benefits: on real data, it produces more stable
-estimates of the shared components than its non-identifiable counterpart and 
+estimates of the shared components than its non-identifiable counterpart, and 
  it is much faster and more memory
 efficient than other implementations that do not make use of an optimal spatial decomposition.
 % on synthetic as well as on real data,
@@ -229,10 +236,9 @@ probabilistic models.
 
 \subsection{Deterministic shared response model}
 \label{sec:deterministicsrm}
-Let us consider $n$ observations of $\xb_i$ and $\sbb$ that we stack into
+Let us consider $n$ observations (scans) of $\xb_i$ and $\sbb$ that we stack into
 matrices $X_i \in \RR^{v, n}$ and $S \in \RR^{p, n}$.
-
-
+%
 The deterministic shared response model considers both the mixing matrices $A_i$ and
 the $n$ observations of the shared response $S$ as parameters to be
 estimated.
@@ -284,10 +290,10 @@ where $\Pcal$ is the projection on the Stiefel manifold: $\Pcal(M) = M
 %
 
 
-The complexity of Deterministic SRM is in $\bigO(\mathrm{n_{iter}} mpvn)$ where
-$n$ is the number of samples and $\mathrm{n_{iter}}$ the number of iterations.
+The complexity of Deterministic SRM is in $\bigO(\mathrm{n_{iter}} mpvn)$, where
+ $\mathrm{n_{iter}}$ is the number of iterations.
 %
-We monitor the convergence by looking at the $\ell_{\infty}$ norm of the
+We monitor the convergence by computing the $\ell_{\infty}$ norm of the
 gradient.
 %
 Note that we can monitor the gradient without any increase in complexity.
@@ -338,9 +344,7 @@ where
 \end{align}
 and
 \begin{align}
-  c_2(\xb) = c_1 \exp \left( -\frac12( \sum_i
-  \frac1{\sigma_i^2}\|\xb_i\|^2 - \dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1}
-  \EE[\sbb | \xb] }) \right)
+  c_2(\xb) = c_1 \exp \left( -\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - \dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] } \right) \right)
 \end{align}
 are independent from $\sbb$.
 %
@@ -496,7 +500,7 @@ The number of components in large spatial decompositions is about $r=1000$ and i
 the number of voxels is about $300~000$ so that $\frac{v}{r}$ is typically about
 $300$.
 %
-It remains to be shown how to draw a correspondence between FastSRM and SRM which is
+It remains to be shown how to draw a correspondence between FastSRM and SRM, which is
 addressed in the following section.
 %
 
@@ -611,18 +615,18 @@ applying equation~\eqref{eq:fastdetsrm:Aiupdate} in the deterministic SRM case a
 equation~\eqref{eq:fastprobsrm:Aiupdate} in the probabilistic SRM case which only costs
 $\bigO(mvp^2)$.
 %
-In practice the cost of the matrix products $X_i^{\top} X_i$ is often still the
+In practice the cost of the matrix products $X_i^{\top} X_i$ is often the
 limiting step of the pipeline (this depends on the number of iterations) but as
 we show next, it is much more efficient than performing SRM on
 the full data.
 %
-Note that if memory allows it, these matrix products can be
+Note that if large  memory resources are available, these matrix products can be
 computed in parallel.
 %
 
 \section{Related work}
 The implementation of SRM proposed in~\cite{chen2015reduced} is quadratic in the
-number of features which prevent its application to full brain data.
+number of features, which prevents its application to full brain data.
 In~\cite{anderson2016enabling}, this issue is addressed by using the
 inversion lemma to remove the quadratic dependence. Their implementation is now the most widely used one.
 In our work, we propose to reduce further the computation time and memory usage
@@ -634,7 +638,7 @@ approaches. While these methods are efficient, they do not optimize the same
 objective as the original SRM algorithm and are arguably less principled since the
 searchlights or pieces are chosen a priori.
 
-We see SRM as a well principled formulation of the hyperalignment
+We consider SRM as a well principled formulation of the hyperalignment
 method~\cite{haxby2011common}.
 %
 Many methods exist to perform hyperalignment: deep
@@ -645,15 +649,15 @@ MultiViewICA~\cite{richard2020modeling} optimal
 transport~\cite{bazeille2019local} and many more.
 %
 In this work, we do not discuss the merit of FastSRM with respect to
-other methods. We only see that SRM is widely used and aim to provide
+other methods. We simply observe that SRM is widely used and aim to provide
 a faster, more memory efficient and identifiable implementation.  In
-our view FastSRM should be seen as a plugin replacement for SRM.
+our view FastSRM, should be used as a plugin replacement for SRM.
 
 
 \section{Experiments}
 We make several experiments on both synthetic and real data.
 %
-We used nilearn~\cite{abraham2014machine} (version 0.8.1) for fMRI data preprocessing,
+We used Nilearn~\cite{abraham2014machine} (version 0.8.1) for fMRI data preprocessing,
 Brainiak~\cite{kumar2020brainiak2} (version 0.9) for the non-identifiable version of SRM that
 implements the work of~\cite{chen2015reduced} and~\cite{anderson2016enabling},
 Numpy~\cite{harris2020array} (version 1.19.0) for
@@ -826,7 +830,7 @@ remains non-convex so there is no guarantee that the optimal solution is found.
 % \bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
 %
 In real fMRI data, the model cannot be expected to hold perfectly, but we can
-hope for greater stability in the parameters recovered than if an unidentifiable
+hope for greater stability in the parameters recovered than if an non-identifiable
 model is used.
 
 
@@ -956,9 +960,9 @@ Then, a \emph{transform()} method computes the shared
 response from the learned parameters and the data passed as the argument of the \emph{transform()} method.
 
 While brainiak and nilearn are useful to reproduce some of our experiments, they
-are not strong dependencies and FastSRM only needs numpy ($\geq 1.12$), scipy
-($\geq 0.18.0$), matplotlib ($\geq 2.0.0$), scikit-learn ($\geq 0.23$), pytest
-($\geq 6.2.5$) , joblib ($\geq 1.1.0$).
+are not strong dependencies and FastSRM only needs Numpy ($\geq 1.12$), Scipy
+($\geq 0.18.0$), Matplotlib ($\geq 2.0.0$), Scikit-learn ($\geq 0.23$), Pytest
+($\geq 6.2.5$) , and Joblib ($\geq 1.1.0$).
 
 The package comes with a documentation and a tutorial that reproduces, at a
 smaller scale, the experiment available in Figure~\ref{fig:srm:synthetic_gradient}.
@@ -978,7 +982,7 @@ and memory usage.
 This is particularly related to the development of deep phenotyping
 models such as the Courtois project on Neural Modeling (see \url{https://docs.cneuromod.ca}).
 %
-This is what FastSRM provides.
+This is precisely what FastSRM provides.
 
 %
 FastSRM is an efficient implementation of SRM
@@ -998,7 +1002,7 @@ stable estimates of the shared components.
 
 %
 FastSRM inherits from all the weaknesses of SRM including the fact that
-mixing matrices are assumed to be orthogonal, which is rather unrealistic. It
+mixing matrices are assumed to be orthogonal, which is debattable in practice. It
 remains to be seen whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
@@ -1094,7 +1098,7 @@ This concludes the proof.
   \end{align}
   where we use equality~\eqref{eq:equality:xy}.
   %
-  
+  %
   Optimizing the log-likelihood via expectation maximization yields the exact
   same updates as probabilistic SRM on data $\zb_i$
   except that updates
@@ -1107,16 +1111,11 @@ This concludes the proof.
   \end{align}
   so that $\tilde{A}_i = A'_i$.
   %
-  
-
   Therefore, the updates in both algorithms are linked  by $A_i = U_{\xb_i}A_i'$,
   $\sigma_i' =
   \sigma_i$ and $\Sigma_s'  = \Sigma_s$.
   %
-  
-
   This concludes the proof.
   %
-  
 \end{proof}
 \end{document}
