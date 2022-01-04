@@ -84,11 +84,10 @@ Without a design matrix, models such as the general linear
 model~\cite{poline2012general} cannot be used.
 %
 Although some works have used manual
-annotations~\cite{huth2012continuous}, see also
-\url{https://neuroscout.org} or deep neural
-networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing} to
-create an estimate of the design matrix of naturalistic stimuli it is
-a hard task.
+annotations~\cite{huth2012continuous} or deep neural
+networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing},
+see also \url{https://neuroscout.org}, to create an estimate of the
+design matrix of naturalistic stimuli, it is a hard task.
 
 Another approach is to learn jointly the design matrix and the spatial maps in
 an unsupervised way.
@@ -96,15 +95,16 @@ an unsupervised way.
 In the case where the dataset contains only one subject,
 independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
 %
-ICA assumes that components are independent, a defendible assumption which
-ensures identifiability up to permutation and scaling of the model and can be fitted efficiently.
+ICA assumes that components are independent, a defendible assumption
+which ensures identifiability up to permutation and scaling of the
+model and can be fitted efficiently.
 %
-
-But when the dataset contains multiple subjects, a natural assumption is to
-assume that the design matrix is shared across subjects.
+When the dataset contains multiple subjects undergoing the same
+protocol, a natural assumption is to assume that the design matrix is
+shared across subjects.
 %
-Many different methods
-can produce shared components from different subjects.
+Many different methods can produce shared components from different
+subjects.
 %
 Some assume independent
 components~\cite{richard2021model}~\cite{richard2020modeling}~\cite{varoquaux2009canica}~\cite{calhoun2001method},
@@ -329,35 +329,11 @@ without the diagonal constraint)
 
 The model is optimized via the expectation maximization algorithm.
 %
+We give all details on the formulation and derivation of update rules in section \ref{details:probsrm}.
+%
 Denoting $\VV[\sbb | \xb] = (\sum_i \frac1{\sigma_i^2} I +
 \Sigma_s^{-1})^{-1}$ and $\EE[\sbb | \xb] = \VV[\sbb | \xb] \sum_i \frac1{\sigma_i^2}
-A_i^{\top}\xb_i$, we have
-\begin{align}
-  p(\xb, \sbb) &= \prod_i \frac{\exp \left(-\frac{\|\xb_i - A_i \sbb \|^2}{2 \sigma_i^2} \right) }{(2 \pi \sigma_i^{2v})^{\frac12}} \frac{\exp(-\frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb } )}{(2 \pi | \Sigma_s|)^{\frac12}} \\
-               &= c_1 \exp (-\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - 2  \dotp{ \sum_i \frac1{\sigma_i^2} A_i^{\top}\xb_i}{ \sbb } \right. \\& \left.+ \sum_i \frac1{\sigma_i^2} \| \sbb \|^2 + \dotp{ \sbb}{ \Sigma_s^{-1} \sbb }  \right)) \\
-               &= c_2(\xb) \exp(-\frac12 \left( \dotp{  \sbb - \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} ( \sbb - \EE[\sbb | \xb])  } \right)) \label{probsrmcompleted}
-\end{align}
-where
-\begin{align}
-  c_1 = \frac1{(2 \pi \sigma_i^{2v})^{\frac12}}\frac1{(2 \pi |
-  \Sigma_s|)^{\frac12}}
-\end{align}
-and
-\begin{align}
-  c_2(\xb) = c_1 \exp \left( -\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - \dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] } \right) \right)
-\end{align}
-are independent from $\sbb$.
-%
-Therefore,
-\begin{align}
-  \sbb| \xb \sim \Ncal(\EE[\sbb | \xb], \VV[\sbb, \xb])
-\end{align}
-
-The negative expected completed log-likelihood is given by
-\begin{align}
-	\loss = \sum_i \frac12 v \log(\sigma_i^2) + \frac1{2 \sigma_i^2} \EE[\| \xb_i - A_i \sbb \|^2]
-\end{align}
-updates are therefore given by:
+A_i^{\top}\xb_i$, the updates are given by:
 \begin{align}
   &\sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|) \\
   % no square here, right ?
@@ -365,26 +341,11 @@ updates are therefore given by:
   & \Sigma_s \leftarrow \VV[\sbb | \xb] + \EE[\EE[\sbb | \xb] \EE[\sbb | \xb]^{\top}]
 \end{align}
 
-It is useful to access the log-likelihood to check the implementation of the
-algorithm and monitor the convergence.
-%
-From equation~\eqref{probsrmcompleted},
-the likelihood is given by:
-\begin{align}
-  p(\xb) &= c_2(\xb) \int_{\sbb} \exp(-\frac12 \left( \dotp{  \sbb - \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} ( \sbb - \EE[\sbb | \xb])  } \right)) d\sbb \\
-         &= c_2(\xb) (2 \pi |\VV[\sbb | \xb]|)^{\frac12}
-\end{align}
-replacing $c_2(\xb)$ by its expression and taking the log, the expected negative
-log-likelihood is (up to constants) given by:
-\begin{align}
-  \EE[-\log(&p(\xb))] = \sum_i \frac{v}{2} \log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) - \frac12 \log(|\VV[\sbb | \xb]|) \nonumber \\ &+ \sum_i
-  \frac12 \frac1{\sigma_i^2} \EE[\|\xb_i\|^2] - \frac12 \EE[\dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] }]
-\end{align}
 
 The complexity of Probabilistic SRM is $\bigO(\mathrm{n_{iter}} mpvn)$, the same as in
 Deterministic SRM.
 %
-We can monitor the convergence by looking at the log-likelihood decrease at each iteration
+We can monitor the convergence by computing the log-likelihood decrease at each iteration
 and stop the algorithm when the magnitude of the decrease is below some
 tolerance.
 %
@@ -416,7 +377,7 @@ A classical approach is to apply a deterministic atlas such
 as~\cite{bellec2010multi} which is a parcellation of the
 brain into $r$ regions.
 %
-There also exists probabilistic atlases
+There also exist probabilistic atlases
 such as~\cite{dadi_fine-grain_2020} that describes each region as a set of weights across
 the full brain. 
 %
@@ -439,7 +400,7 @@ from the parameters obtained with the corresponding SRM algorithm $\theta$ (the
 unmixing matrices in $\theta'$ do not even have the same shape as the unmixing
 matrices in $\theta$).
 %
-However, as we will see in the next section, there exists spatial decompositions such that the
+However, as we will see in the next section, there exist spatial decompositions such that the
 models parametrized by $\theta$ and
 $\theta'$ are equivalent.
 %
@@ -500,8 +461,8 @@ The number of components in large spatial decompositions is about $r=1000$ and i
 the number of voxels is about $300~000$ so that $\frac{v}{r}$ is typically about
 $300$.
 %
-It remains to be shown how to draw a correspondence between FastSRM and SRM, which is
-addressed in the following section.
+It remains to be shown how to draw a correspondence between FastSRM
+and SRM, which we do in the following section.
 %
 
 
@@ -557,7 +518,6 @@ In the case of probabilistic SRM we can obtain very similar results.
 However the
 algorithm applied on reduced data needs to be slightly modified.
 %
-
 We have the following result:
 \begin{proposition}[Optimal spatial decomposition for probabilistic FastSRM]
   Let $(A_i)_i, \sigma_i, \Sigma_s$ be the solution obtained by probabilistic SRM on data
@@ -651,7 +611,7 @@ transport~\cite{bazeille2019local} and many more.
 In this work, we do not discuss the merit of FastSRM with respect to
 other methods. We simply observe that SRM is widely used and aim to provide
 a faster, more memory efficient and identifiable implementation.  In
-our view FastSRM, should be used as a plugin replacement for SRM.
+our view, FastSRM should be used as a plugin replacement for SRM.
 
 
 \section{Experiments}
@@ -736,8 +696,9 @@ Results are plotted in Figure~\ref{fig:srm:synthetic_gradient}.
 We empirically see that the optimal approach is equivalent to using no spatial decompositions in
 terms of performance.
 %
-This is predicted by the theory in section~\ref{sec:optimal_atlas} where we demonstrate that these two algorithms yield exactly the same output
-from the same input.
+This is predicted by the theory in section~\ref{sec:optimal_atlas},
+where we demonstrate that these two algorithms yield exactly the same
+output from a given input and initialization.
 %
 % %
 % Among approximate methods, the projection
@@ -752,7 +713,7 @@ This shows the superiority of likelihood based methods.
 In terms of fitting time, FastSRM is about a thousand time faster than SRM after
 100 iterations.
 %
-When no spatial decompositions is used, the number
+When no spatial decomposition is used, the number
 of iterations has a very strong impact on performance while it has a small impact
 when an optimal spatial decomposition is used.
 %
@@ -805,8 +766,7 @@ More information including the preprocessing pipeline is available in
 % 
 Subject 5 is removed because of missing data, leaving us with 16 participants.
 %
-% 
-Although SHERLOCK data contains originally only 1 run, we split it into 4 blocks
+Although SHERLOCK originally data contain 1 run only, we split them into 4 blocks
 of 395 time frames and one block of 396 time frames for the needs of our
 experiments.
 %
@@ -824,7 +784,7 @@ computational resources.
 
 \subsection{Identifiability increases stability}
 Assuming that the data follow the model, identifiability ensures that the
-problem is well posed since the solutions are well-characterized. Note however that SRM
+problem is well-posed since the solutions are well-characterized. Note however that SRM
 remains non-convex so there is no guarantee that the optimal solution is found.
 %
 % \bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
@@ -845,9 +805,12 @@ The procedure is repeated 9 times using the Brainiak implementation (that is not
 identifiable since the shared components covariance is unconstrained) and our
 FastSRM implementation.
 %
-We plot the results as a scatter plot in Figure~\ref{exp:identifiability}, where, for each repetition , the x-axis indicates the stability measure obtained with Brainiak's implementation
- and the y-axis the stability measure
-obtained with FastSRM (identifiable since the shared components covariance is diagonal).
+We plot the results as a scatter plot in
+Figure~\ref{exp:identifiability}, where, for each repetition, the
+x-axis indicates the stability measure obtained with Brainiak's
+implementation and the y-axis the stability measure obtained with
+FastSRM (identifiable since the shared components covariance is
+diagonal).
 %
 We see that introducing a diagonal source covariance improves stability.
 %
@@ -907,7 +870,7 @@ training set, we apply the unmixing matrices $W_i=A_i^{-1}$ of each subject on
 the test set yielding individual components matrices.
 %
 We estimate the shared responses by averaging the individual components of each
-subjects but one.
+subject but one.
 %
 We select a target time-segment (9 consecutive time frames) in the shared
 responses and try to localize the corresponding time segment in the components
@@ -975,7 +938,7 @@ A set of tests reduces the risk of introducing a bug. These tests are run any
 time a pull request or a merged is performed on the main codebase.
 
 \section{Conclusion}
-As studies using naturalistic stimuli will tend to become more common and large
+As studies using naturalistic stimuli will tend to become more common
 within and across subjects, we need scalable models in terms of computation time
 and memory usage.
 %
@@ -984,7 +947,6 @@ models such as the Courtois project on Neural Modeling (see \url{https://docs.cn
 %
 This is precisely what FastSRM provides.
 
-%
 FastSRM is an efficient implementation of SRM
 that uses optimal spatial decompositions to speed up computations and reduce memory requirements
 with provably no loss of performance. 
@@ -992,27 +954,24 @@ Note that the new memory requirements do not depend on the number of subjects.
 This is really interesting as it would make it possible to apply FastSRM on
 datasets with a very large number of subjects that do not hold in memory.
 
-
 We show on synthetic and real data that FastSRM is much faster and more memory
 efficient that implementations not using an optimal spatial decomposition.
 Furthermore, FastSRM is identifiable. On real data, we show that compared to
 Brainiak's implementation, that is not identifiable, FastSRM provides more
 stable estimates of the shared components.
 
-
-%
 FastSRM inherits from all the weaknesses of SRM including the fact that
-mixing matrices are assumed to be orthogonal, which is debattable in practice. It
-remains to be seen whether dimension reduction and learning of the shared
+mixing matrices are assumed to be orthogonal, which is debattable in practice.
+%
+It is open question whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
 mixing matrices.
 %
 Our approach based on optimal spatial decomposition shows that SRM-like methods do not need the
-full data to provide accurate estimates of shared components. We believe such
+full data to provide accurate estimates of shared components. We believe that such
 insights may guide the design of future methods.
-%
 
-Lastly, FastSRM is useful when the number of features is much larger than the
+Last, FastSRM is useful when the number of features is much larger than the
 number of samples. This setting is common in fMRI but less common in MEG/EEG where
 the number of samples is usually much larger than the number of features. Even
 in this case, it is possible to considerably speed up SRM. Indeed, SRM only
@@ -1030,6 +989,65 @@ We leave it to future work.
 
 \newpage
 \appendix
+
+\section{Detailed derivation of the Probabilistic SRM algorithm}
+\label{details:probsrm}
+Here we describe in detail the log-likeihood underlying the
+Probabilistic SRM and derive the update rules.
+%
+Denoting $\VV[\sbb | \xb] = (\sum_i \frac1{\sigma_i^2} I +
+\Sigma_s^{-1})^{-1}$ and $\EE[\sbb | \xb] = \VV[\sbb | \xb] \sum_i \frac1{\sigma_i^2}
+A_i^{\top}\xb_i$, we have
+
+\begin{align}
+  p(\xb, \sbb) &= \prod_i \frac{\exp \left(-\frac{\|\xb_i - A_i \sbb \|^2}{2 \sigma_i^2} \right) }{(2 \pi \sigma_i^{2v})^{\frac12}} \frac{\exp(-\frac12 \dotp{ \sbb }{ \Sigma_s^{-1} \sbb } )}{(2 \pi | \Sigma_s|)^{\frac12}} \\
+               &= c_1 \exp (-\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - 2  \dotp{ \sum_i \frac1{\sigma_i^2} A_i^{\top}\xb_i}{ \sbb } \right. \\& \left.+ \sum_i \frac1{\sigma_i^2} \| \sbb \|^2 + \dotp{ \sbb}{ \Sigma_s^{-1} \sbb }  \right)) \\
+               &= c_2(\xb) \exp(-\frac12 \left( \dotp{  \sbb - \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} ( \sbb - \EE[\sbb | \xb])  } \right)) \label{probsrmcompleted}
+\end{align}
+where
+\begin{align}
+  c_1 = \frac1{(2 \pi \sigma_i^{2v})^{\frac12}}\frac1{(2 \pi |
+  \Sigma_s|)^{\frac12}}
+\end{align}
+and
+\begin{align}
+  c_2(\xb) = c_1 \exp \left( -\frac12 \left( \sum_i \frac1{\sigma_i^2}\|\xb_i\|^2 - \dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] } \right) \right)
+\end{align}
+are independent from $\sbb$.
+%
+Therefore,
+\begin{align}
+  \sbb| \xb \sim \Ncal(\EE[\sbb | \xb], \VV[\sbb, \xb])
+\end{align}
+
+The negative expected completed log-likelihood is given by
+\begin{align}
+	\loss = \sum_i \frac12 v \log(\sigma_i^2) + \frac1{2 \sigma_i^2} \EE[\| \xb_i - A_i \sbb \|^2]
+\end{align}
+updates are therefore given by:
+\begin{align}
+  &\sigma_i^2 \leftarrow \frac1{v} (\EE[\| \xb_i - A_i \EE[\sbb|\xb]\|^2] + \| \diag(\VV[\sbb | \xb]) \|) \\
+  % no square here, right ?
+  &A_i \leftarrow \Pcal(\EE[\xb_i \EE[\sbb|\xb]^{\top}]) \label{eq:psrm:Aiupdate} \\
+  & \Sigma_s \leftarrow \VV[\sbb | \xb] + \EE[\EE[\sbb | \xb] \EE[\sbb | \xb]^{\top}]
+\end{align}
+
+It is useful to access the log-likelihood to check the implementation of the
+algorithm and monitor the convergence.
+%
+From equation~\eqref{probsrmcompleted},
+the likelihood is given by:
+\begin{align}
+  p(\xb) &= c_2(\xb) \int_{\sbb} \exp(-\frac12 \left( \dotp{  \sbb - \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} ( \sbb - \EE[\sbb | \xb])  } \right)) d\sbb \\
+         &= c_2(\xb) (2 \pi |\VV[\sbb | \xb]|)^{\frac12}
+\end{align}
+replacing $c_2(\xb)$ by its expression and taking the log, the expected negative
+log-likelihood is (up to constants) given by:
+\begin{align}
+  \EE[-\log(&p(\xb))] = \sum_i \frac{v}{2} \log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) - \frac12 \log(|\VV[\sbb | \xb]|) \nonumber \\ &+ \sum_i
+  \frac12 \frac1{\sigma_i^2} \EE[\|\xb_i\|^2] - \frac12 \EE[\dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] }]
+\end{align}
+
 
 \section{Proofs of Proposition~\ref{prop:optimaldetsrm}}
 \label{proof:deterministic}
