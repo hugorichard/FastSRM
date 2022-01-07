@@ -352,6 +352,7 @@ def test_use_pca(method):
         srm2 = IdentifiableFastSRM(
             n_components=5,
             use_pca=True,
+            method=method
         )
         B = srm2.fit_transform(X_train)
         np.testing.assert_array_almost_equal(A, B, 4)
