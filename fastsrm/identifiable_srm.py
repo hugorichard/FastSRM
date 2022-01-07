@@ -139,7 +139,7 @@ Fast shared response model for fMRI data (https://arxiv.org/pdf/1909.12537.pdf)
         self,
         method="prob",
         n_components=20,
-        n_iter=1,
+        n_iter=1000,
         temp_dir=None,
         n_jobs=1,
         verbose="warn",
