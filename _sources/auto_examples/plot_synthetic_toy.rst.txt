@@ -55,8 +55,6 @@ of shared components but without any loss of accuracy.
     ProbSRM did not converge. Current diff is 2.456504
     /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4486: RuntimeWarning: invalid value encountered in subtract
       diff_b_a = subtract(b, a)
-    /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4486: RuntimeWarning: invalid value encountered in subtract
-      diff_b_a = subtract(b, a)
     Done
 
 
@@ -244,7 +242,7 @@ of shared components but without any loss of accuracy.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.336 seconds)
+   **Total running time of the script:** ( 0 minutes  5.363 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_synthetic_toy.py:
