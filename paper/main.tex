@@ -135,7 +135,7 @@ In addition, memory requirements are difficult to meet since the full dataset
 needs to hold in memory.
 %
 Lastly, another issue of SRM is its non-identifiability (see the proof
-in~\cite{richard2020modeling} Appendix D) which makes it challenging to
+in~\cite{richard2020modeling} Appendix D also reported in Appendix~\ref{app:unidentifiability} for completness) which makes it challenging to
 interpret the extracted shared components as they are defined up to a rotation.
 %
 
@@ -145,7 +145,7 @@ spatial decomposition to speed up the computations with provably no loss of
 performance.
 %
 FastSRM gains identifiability by imposing that the covariance of the shared
-components is diagonal (see ~\cite{richard2020modeling} Appendix D for a proof).
+components is diagonal (see ~\cite{richard2020modeling} Appendix D or Appendix~\ref{app:unidentifiability} of this paper for a proof).
 %
 The gains in speed and memory usage are based on the observation that a low-dimensional, yet distance-preserving
 representation of the images yields the same result as the full data.
@@ -318,11 +318,11 @@ components are assumed to be Gaussian $\sbb \sim \Ncal(0, \Sigma_s)$.
 In~\cite{chen2015reduced} and~\cite{anderson2016enabling}, $\Sigma_s$ is only assumed to be definite positive.
 %
 As already highlighted in introduction, this causes the model to be
-unidentifiable (see~\cite{richard2020modeling} Appendix D for a proof). Enforcing a diagonal $\Sigma_s$ ensures identifiability, provided that the diagonal values are different.
+unidentifiable (see~\cite{richard2020modeling} Appendix D or Appendix~\ref{app:unidentifiability} of this paper for a proof). Enforcing a diagonal $\Sigma_s$ ensures identifiability, provided that the diagonal values are different.
 %
 So we assume here that $\Sigma_s$ is diagonal (and refer the interested reader
 to~\cite{chen2015reduced} and~\cite{anderson2016enabling} for the original formulation of Probabilistic SRM
-without the diagonal constraint)
+without the diagonal constraint). The following paragraph gives update rules for $\lambda_i$ and $A_i$ and $\Sigma_s$. We highlight that the derivations used to obtain these updates are not new. They are obtained following the strategy introduced in~\cite{anderson2016enabling} and~\cite{chen2015reduced}.
 %
 
 
@@ -408,7 +408,7 @@ $\theta'$ are equivalent.
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.34]{figures/srm/conceptual_figure2.pdf}
+  \includegraphics[scale=0.34]{figures/srm/conceptual_figure2_revised.pdf}
   \caption{\textbf{FastSRM algorithm} In step 1, data $\xb_i$ are projected onto a
     spatial decomposition $U_i$ that may depend on the subject $i$ (top).
     %
@@ -521,16 +521,18 @@ algorithm applied on reduced data needs to be slightly modified.
 We have the following result:
 \begin{proposition}[Optimal spatial decomposition for probabilistic FastSRM]
   Let $(A_i)_i, \sigma_i, \Sigma_s$ be the solution obtained by probabilistic SRM on data
-  $\xb_i$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM on
-  data $\zb_i = U_{\xb_i}^{\top} \xb_i$ but where updates:
+  $\xb_i \in \RR^v$ and $(A_i')_i, \sigma_i', \Sigma_s'$ the solution obtained by ProbSRM on
+  data $\zb_i = U_{\xb_i}^{\top} \xb_i$, $\zb_i \in \RR^n$ but where updates:
   \begin{align}
-    \sigma_i^2 \leftarrow \frac1{t} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+    \sigma_i^2 \leftarrow \frac1{n} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
   are replaced by updates
   \begin{align}
     \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
   %
+  where $t$ is the number of samples and $v$ is the number of voxels.
+
   Then $A_i = U_{\xb_i}A_i'$, $\sigma_i =
   \sigma_i'$ and $\Sigma_s = \Sigma_s'$.
   %
@@ -608,8 +610,7 @@ analysis~\cite{li2009joint}, ShICA~\cite{richard2021model},
 MultiViewICA~\cite{richard2020modeling} optimal
 transport~\cite{bazeille2019local} and many more.
 %
-In this work, we do not discuss the merit of FastSRM with respect to
-other methods. We simply observe that SRM is widely used and aim to provide
+SRM has been introduced after hyper-alignment in~\cite{chen2015reduced} and has been shown to outperform hyperalignment in many different settings. A recent work has come to a similar conclusion~\cite{bazeille2021empirical}. In this article, we do not discuss further the merit of FastSRM with respect to other methods. We simply observe that SRM is widely used and aim to provide
 a faster, more memory efficient and identifiable implementation.  In
 our view, FastSRM should be used as a plugin replacement for SRM.
 
@@ -949,10 +950,7 @@ This is precisely what FastSRM provides.
 
 FastSRM is an efficient implementation of SRM
 that uses optimal spatial decompositions to speed up computations and reduce memory requirements
-with provably no loss of performance. 
-Note that the new memory requirements do not depend on the number of subjects.
-This is really interesting as it would make it possible to apply FastSRM on
-datasets with a very large number of subjects that do not hold in memory.
+with provably no loss of performance.
 
 We show on synthetic and real data that FastSRM is much faster and more memory
 efficient that implementations not using an optimal spatial decomposition.
@@ -962,6 +960,8 @@ stable estimates of the shared components.
 
 FastSRM inherits from all the weaknesses of SRM including the fact that
 mixing matrices are assumed to be orthogonal, which is debattable in practice.
+Another desirable property of such decompositions is the spatial smoothness of the components. While it is often observed that SRM components are smooth, nothing imposes such a constraint in the model. We highlight that the optimal spatial decomposition is only optimal for the model we consider. Whether this representation is interpretable or not is irrelevant as it is only an intermediate step produced used during training.
+
 %
 It is an open question whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
@@ -994,6 +994,8 @@ We leave it to future work.
 \label{details:probsrm}
 Here we describe in detail the log-likeihood underlying the
 Probabilistic SRM and derive the update rules.
+We highlight that the derivations used to obtain these updates are not new. They are obtained following the strategy introduced in~\cite{anderson2016enabling} and~\cite{chen2015reduced}.
+
 %
 Denoting $\VV[\sbb | \xb] = (\sum_i \frac1{\sigma_i^2} I +
 \Sigma_s^{-1})^{-1}$ and $\EE[\sbb | \xb] = \VV[\sbb | \xb] \sum_i \frac1{\sigma_i^2}
@@ -1047,6 +1049,61 @@ log-likelihood is (up to constants) given by:
   \EE[-\log(&p(\xb))] = \sum_i \frac{v}{2} \log(\sigma_i^2) + \frac12 \log(|\Sigma_s|) - \frac12 \log(|\VV[\sbb | \xb]|) \nonumber \\ &+ \sum_i
   \frac12 \frac1{\sigma_i^2} \EE[\|\xb_i\|^2] - \frac12 \EE[\dotp{  \EE[\sbb }{ \xb], \VV[\sbb | \xb]^{-1} \EE[\sbb | \xb] }]
 \end{align}
+
+
+\section{Identifiability results on Probabilistic SRM available in~\cite{richard2020modeling} appendix D}
+\label{app:unidentifiability}
+\begin{proposition}
+Probabilistic SRM with positive definite $\Sigma_s$ is not identifiable
+\end{proposition}
+\begin{proof}
+Let us assume the data $\xb_i \enspace i=1, \dots, m$ follow the Probabilistic SRM model with parameters $\Sigma_s, A_i, \sigma_i^2 \enspace i=1, \dots, m$ and $\Sigma_s$ definite positive.
+
+Let us consider an orthogonal matrix $O \in \Ocal_k$.
+We call $A'_i = A_i O$ and $\Sigma'_s = O^{\top} \Sigma_s O$.
+$\Sigma'_s$ is trivially symmetric positive definite.
+
+Then the data also follows the SRM model with different parameters $\Sigma'_s, A'_i, \sigma_i^2 \enspace i=1, \dots, m$.
+\end{proof}
+
+\begin{proposition}
+We consider the Probabillistic SRM model where $\Sigma_s$ is a positive \emph{diagonal} matrix. We further assume that the values in $\Sigma$ are all distinct and ranked in ascending order.
+Then, the Probabilistic SRM model is identifiable up to sign indeterminacies on the columns of
+$\begin{bmatrix}
+A^1 \\
+\vdots \\
+A^m
+\end{bmatrix}
+$.
+\end{proposition}
+\begin{proof}
+The Probabilistic SRM can be written
+\begin{align*}
+    &\xb_i \sim \Ncal(0, A_i \Sigma_s {A_i}^{\top} + \sigma_i^2 I_v) \enspace \text{with}\enspace  {A_i}^{\top}A_i = I_p
+\end{align*}
+where $\Sigma_s$ is a positive diagonal matrix with distincts values ranked in ascending order.
+
+Let us assume the data $\xb^i \enspace i=1, \dots, m$ follow the Probabilistic SRM model with parameters $\Sigma_s, A_i, {\sigma_i}^2 \enspace i=1, \dots, m$. Let us further assume that the data $\xb^i \enspace i=1, \dots, m$ follow the Probabilistic SRM model with an other set of parameters $\Sigma'_s, A'_i, {\sigma'_i}^2 \enspace i=1, \dots, m$.
+
+Since the model is Gaussian, we look at the covariances.
+We have for $i \neq j$
+\begin{align*}
+    \bbE[\xb_i\left(\xb_j\right)^{\top}] = A_i\Sigma_s {A_j}^{\top} = A'_i \Sigma'_s{A'_j}^{\top} \enspace,
+\end{align*}
+The singular value decomposition is unique up to sign flips and permutation. Since eigenvalues are positive and ranked the only indeterminacies left are on the eigenvectors. For each eigenvalue a sign flip can occur simultaneously on the corresponding left and right eigenvector.
+
+Therefore we have $\Sigma'_s = \Sigma_s$, $A_i = A'_i D_{ij}$ and $A_j = A'_j D_{ij}$ where $D_{ij} \in \bbR^{k, k}$ is a diagonal matrix with values in $\{-1, 1\}$. This analysis holds for every $j \neq i$ and therefore $D_{ij} = D$ is the same for all subjects.
+
+We also have for all $i$
+\begin{align*}
+    \bbE[\xb_i \left(\xb_i\right)^{\top}] = A_i \Sigma_s {A_i}^{\top} + \sigma_i^2 I_v =  A'_i \Sigma'_s {A'_i}^{\top}  + {\sigma}_i^2 I_v\\
+\end{align*}
+We therefore conclude ${\sigma}_i^2 = \sigma_i^2, i=1 \dots m$.
+
+Note that if the diagonal subject specific noise covariance $\sigma_i^2 I_v$ is replaced by any positive definite matrix, the model still enjoys identifiability.
+\end{proof}
+
+
 
 
 \section{Proofs of Proposition~\ref{prop:optimaldetsrm}}
@@ -1121,7 +1178,7 @@ This concludes the proof.
   same updates as probabilistic SRM on data $\zb_i$
   except that updates
   \begin{align}
-    \sigma_i^2 \leftarrow \frac1{t} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
+    \sigma_i^2 \leftarrow \frac1{n} (\EE[\| \zb_i - \tilde{A}_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
   are replaced by updates
   \begin{align}
