@@ -38,8 +38,6 @@ of shared components but without any loss of accuracy.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Starting FastSRM example
@@ -53,7 +51,7 @@ of shared components but without any loss of accuracy.
     ProbSRM did not converge. Current diff is 2.767339
     ProbSRM did not converge. Current diff is 129.790836
     ProbSRM did not converge. Current diff is 2.456504
-    /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4486: RuntimeWarning: invalid value encountered in subtract
+    /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4527: RuntimeWarning: invalid value encountered in subtract
       diff_b_a = subtract(b, a)
     Done
 
@@ -242,28 +240,23 @@ of shared components but without any loss of accuracy.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.363 seconds)
+   **Total running time of the script:** ( 0 minutes  4.463 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_synthetic_toy.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_synthetic_toy.py <plot_synthetic_toy.py>`
 
-     :download:`Download Python source code: plot_synthetic_toy.py <plot_synthetic_toy.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_synthetic_toy.ipynb <plot_synthetic_toy.ipynb>`
+      :download:`Download Jupyter notebook: plot_synthetic_toy.ipynb <plot_synthetic_toy.ipynb>`
 
 
 .. only:: html

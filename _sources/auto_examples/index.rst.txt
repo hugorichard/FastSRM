@@ -1,9 +1,5 @@
 :orphan:
 
-
-
-.. _sphx_glr_auto_examples:
-
 Examples Gallery
 ================
 
@@ -14,14 +10,25 @@ can be done with the FastSRM library.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates on a very small dataset that the optimal atlas used in FastSRM speeds...">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_synthetic_toy_thumb.png
-     :alt: FastSRM : running time and convergence
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_synthetic_toy_thumb.png
+    :alt: FastSRM : running time and convergence
 
-     :ref:`sphx_glr_auto_examples_plot_synthetic_toy.py`
+  :ref:`sphx_glr_auto_examples_plot_synthetic_toy.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">FastSRM : running time and convergence</div>
+    </div>
+
 
 .. raw:: html
 
@@ -32,27 +39,19 @@ can be done with the FastSRM library.
    :hidden:
 
    /auto_examples/plot_synthetic_toy
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
 
 
+.. only:: html
 
-.. only :: html
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
 
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
