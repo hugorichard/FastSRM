@@ -53,8 +53,6 @@ that it improves the stability of the recovered shared response.
 %
 We then introduce FastSRM, which relies on a dimension reduction step that we
 prove to yield the same solution as the original algorithm.
-% be optimal in the sense that working with reduced data does not induce any change in the
-% algorithm trajectory.
 %
 We show experimentally using synthetic and real fMRI data
 that FastSRM is considerably faster and more memory efficient
@@ -76,21 +74,32 @@ and more popular in the neuro-scientific community. Indeed such naturalistic
 paradigms are unconstrained from behavioral manipulations and thus, more
 ecological with respect to every-day cognitive conditions.
 %
-Yet, in contrast to standard designs, these so-called
-naturalistic stimuli do not come with a design matrix that quantifies the
-features of interest in the stimuli.
+If one wants to use data acquired under naturalistic conditions to map
+functional responses to the brain, i.e. in an encoding setting
+\cite{naselaris2011}, one has to deal with the fact that no design matrix is
+specified for naturalistic stimuli.
 %
-Without a design matrix, models such as the general linear
-model~\cite{poline2012general} cannot be used.
+Such a design matrix encodes the temporal events that affect brain
+signal during an experiment; these events typically reflect the occurrence
+of some features of interest in the stimuli.
 %
 Although some works have used manual
 annotations~\cite{huth2012continuous} or deep neural
 networks~\cite{gucclu2017increasingly}~\cite{richard2018optimizing},
 see also \url{https://neuroscout.org}, to create an estimate of the
 design matrix of naturalistic stimuli, it is a hard task.
+%
+Without a design matrix, models such as the general linear
+model~\cite{poline2012general} cannot be used.
 
-Another approach is to learn jointly the design matrix and the spatial maps in
+
+
+Another approach is to learn jointly a set of reference time courses  and the spatial maps in
 an unsupervised way.
+%
+These reference time courses formally replace the design matrix in the
+spatio-temporal decomposition of the data, but cannot be considered as
+a formal design matrix.
 %
 In the case where the dataset contains only one subject,
 independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
@@ -100,7 +109,7 @@ which ensures identifiability up to permutation and scaling of the
 model and can be fitted efficiently.
 %
 When the dataset contains multiple subjects undergoing the same
-protocol, a natural assumption is to assume that the design matrix is
+protocol, a natural assumption is to assume that the temporal reference is
 shared across subjects.
 %
 Many different methods can produce shared components from different
