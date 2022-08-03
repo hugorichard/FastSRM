@@ -540,7 +540,7 @@ We have the following result:
     \sigma_i^2 \leftarrow \frac1{v} (\EE[\| \zb_i - A_i \EE[\sbb|\zb]\|^2] + \| \diag(\VV[\sbb | \zb]) \|^2)
   \end{align}
   %
-  where $t$ is the number of samples and $v$ is the number of voxels.
+  where $n$ is the number of samples and $v$ is the number of voxels.
 
   Then $A_i = U_{\xb_i}A_i'$, $\sigma_i =
   \sigma_i'$ and $\Sigma_s = \Sigma_s'$.
@@ -619,10 +619,7 @@ analysis~\cite{li2009joint}, ShICA~\cite{richard2021model},
 MultiViewICA~\cite{richard2020modeling} optimal
 transport~\cite{bazeille2019local} and many more.
 %
-SRM has been introduced after hyper-alignment in~\cite{chen2015reduced} and has been shown to outperform hyperalignment in many different settings. A recent work has come to a similar conclusion~\cite{bazeille2021empirical}. In this article, we do not discuss further the merit of FastSRM with respect to other methods. We simply observe that SRM is widely used and aim to provide
-a faster, more memory efficient and identifiable implementation.  In
-our view, FastSRM should be used as a plugin replacement for SRM.
-
+SRM has been introduced after hyper-alignment in~\cite{chen2015reduced} and has been shown to outperform hyperalignment in many different settings. Specifically, SRM is natively a group model, which hyperalignment is not, it is more computationally efficient, with the avoidance of searchlight loops, and sometimes obtains higher accuracy than Procrustes hyperalignment~\cite{bazeille2021empirical}. In this article, we do not discuss further the merit of FastSRM with respect to other methods. We simply observe that SRM is widely used and aim to provide a faster, more memory efficient and identifiable implementation.  In our view, FastSRM should be used as a plugin replacement for SRM.
 
 \section{Experiments}
 We make several experiments on both synthetic and real data.
@@ -715,10 +712,7 @@ output from a given input and initialization.
 % method yields the best results but are quite far away from optimal results.
 %
 % %
-In general probabilistic methods give much better results than their deterministic
-counterpart.
-%
-This shows the superiority of likelihood based methods.
+We also see that ProbSRM gives much better results than DetSRM.
 %
 In terms of fitting time, FastSRM is about a thousand time faster than SRM after
 100 iterations.
@@ -794,8 +788,9 @@ computational resources.
 
 \subsection{Identifiability increases stability}
 Assuming that the data follow the model, identifiability ensures that the
-problem is well-posed since the solutions are well-characterized. Note however that SRM
+problem is well-posed since the solutions are well-characterized. More precisely, if the data are generated according to an identifiable model, in the limit of infinite samples, a perfect optimization algorithm is guaranteed to recover the parameters used to generate the data. In contrast, in an unidentifiable model, there are more than one set of parameters that can generate the same data making the search for the good parameters ill-defined. In practice, unidentifiable models have a more complex optimization landscape with many more local minima than identifiable models (any local minima in the identifiable model produces as many local minimas as they are indeterminacies in the corresponding unidentifiable model). This is why the unidentifiable models are therefore expected to be more sensitive to initialization and less robust to small changes in the data than their identifiable counterparts. Note however that SRM
 remains non-convex so there is no guarantee that the optimal solution is found.
+
 %
 % \bt{I find this a bit ambiguous: you give te impression that you gurantee that the optimal solution is used. Rephrase.}
 %
@@ -808,7 +803,7 @@ To measure the stability of the shared components obtained from the Sherlock
 dataset, we divide the subjects into two roughly equal groups and extract the
 common components in each group.
 %
-The components are then matched using the Hungarian algorithm and the stability
+The components are then matched using the Hungarian algorithm~\cite{kuhn1955hungarian} and the stability
 measure is obtained from the average correlation of the matched components.
 %
 The procedure is repeated 9 times using the Brainiak implementation (that is not
@@ -969,8 +964,7 @@ stable estimates of the shared components.
 
 FastSRM inherits from all the weaknesses of SRM including the fact that
 mixing matrices are assumed to be orthogonal, which is debattable in practice.
-Another desirable property of such decompositions is the spatial smoothness of the components. While it is often observed that SRM components are smooth, nothing imposes such a constraint in the model. We highlight that the optimal spatial decomposition is only optimal for the model we consider. Whether this representation is interpretable or not is irrelevant as it is only an intermediate step produced used during training.
-
+Another desirable property of such decompositions is the spatial smoothness of the components. While it is often observed that SRM components are smooth, nothing imposes such a constraint in the model. We highlight that the optimal spatial decomposition is only optimal with respect to the SRM model. More precisely, it gives a reduced representation such that applying the SRM model on the reduced representation or on the full data gives the same result. Whether this representation is interpretable or not is irrelevant to us, since it is only a means to accelerate the SRM algorithm. However, as this representation is not unique, it may be interesting to find the “most interpretable” optimal spatial decomposition. Note that this would not change the end result of the SRM algorithm but could be of interest for interpretation purposes.
 %
 It is an open question whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
