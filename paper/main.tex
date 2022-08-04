@@ -40,7 +40,6 @@
   %
   However when the number
   of subjects or runs is large,
-  % \bt{True, but we the experiments don't make it so explicit ?}
   fitting the model requires a large amount of memory
 and computational power, which limits its use in practice.
 %
@@ -51,8 +50,7 @@ not identifiable, which makes the shared response difficult to interpret.
 In this work, we implement an identifiable version of SRM and show on real data
 that it improves the stability of the recovered shared response.
 %
-We then introduce FastSRM, which relies on a dimension reduction step that we
-prove to yield the same solution as the original algorithm.
+We then introduce FastSRM, that relies on a dimension reduction step and yields the same solution as the original algorithm.
 %
 We show experimentally using synthetic and real fMRI data
 that FastSRM is considerably faster and more memory efficient
@@ -99,9 +97,9 @@ an unsupervised way.
 %
 These reference time courses formally replace the design matrix in the
 spatio-temporal decomposition of the data, but cannot be considered as
-a formal design matrix.
+a design matrix, as it is data-driven.
 %
-In the case where the dataset contains only one subject,
+In the case where the dataset only contains  one subject,
 independent component analysis~\cite{jutten1991blind} (ICA) is the method of choice.
 %
 ICA assumes that components are independent, a defendible assumption
@@ -144,7 +142,7 @@ In addition, memory requirements are difficult to meet since the full dataset
 needs to hold in memory.
 %
 Lastly, another issue of SRM is its non-identifiability (see the proof
-in~\cite{richard2020modeling} Appendix D also reported in Appendix~\ref{app:unidentifiability} for completness) which makes it challenging to
+in~\cite{richard2020modeling} Appendix D also reported in Appendix~\ref{app:unidentifiability} for completeness) which makes it challenging to
 interpret the extracted shared components as they are defined up to a rotation.
 %
 
@@ -230,7 +228,7 @@ probabilistic models.
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.3]{figures/srm/conceptual_figure33.png}
+  \includegraphics[scale=0.4]{figures/srm/conceptual_figure33.png}
   \caption{\textbf{Shared response model}: The raw fMRI data are modeled as a
     weighted combination of subject-specific spatial components with additive
     noise.
@@ -308,7 +306,7 @@ gradient.
 Note that we can monitor the gradient without any increase in complexity.
 %
 Indeed, after the updates with respect to each mixing matrix have been
-carried out, the gradient with respect to $(W_i)_{i=1}^m$ is zero and therefore
+carried out, the gradient with respect to $(W_i)_{i=1}^m$ \textbf{XXX $(W_i)_{i=1}^m$ not introduced so far} is zero and therefore
 to compute the $\ell_{\infty}$ norm of the gradient we only need the gradient
 with respect to $S$: $m S - \sum_i A_i^{\top}\xb_i$ where the right hand side is
 used in the updates of $S$.
@@ -467,8 +465,8 @@ $\bigO(\mathrm{n_{iter}} mpnr)$ which is faster than SRM by
 a factor of $\frac{v}{r}$.
 %
 The number of components in large spatial decompositions is about $r=1000$ and in full brain data,
-the number of voxels is about $300~000$ so that $\frac{v}{r}$ is typically about
-$300$.
+the number of voxels is typically in the  $50~000 - 400~000$ range, so that $\frac{v}{r}$ is typically about
+$50$ to $400$.
 %
 It remains to be shown how to draw a correspondence between FastSRM
 and SRM, which we do in the following section.
@@ -700,7 +698,7 @@ use the distance between consecutive values of the loss for ProbSRM.
 Results are plotted in Figure~\ref{fig:srm:synthetic_gradient}.
 %
 
-We empirically see that the optimal approach is equivalent to using no spatial decompositions in
+We empirically see that the optimal approach is equivalent to using no spatial decomposition in
 terms of performance.
 %
 This is predicted by the theory in section~\ref{sec:optimal_atlas},
@@ -919,7 +917,7 @@ bottom).
 
 \section{Implementation and reproducibility}
 Our work is fully reproducible and our code is tested and well documented. All
-material is available in our github repository \url{https://github.com/hugorichard/FastSRM}.
+material is available in the \url{https://github.com/hugorichard/FastSRM} Github repository.
 
 The API is reminiscent of the scikit-learn one where the model object is
 instantiated with its parameters and then fitted on data via a method
@@ -927,7 +925,7 @@ instantiated with its parameters and then fitted on data via a method
 Then, a \emph{transform()} method computes the shared
 response from the learned parameters and the data passed as the argument of the \emph{transform()} method.
 
-While brainiak and nilearn are useful to reproduce some of our experiments, they
+While Brainiak and Nilearn are useful to reproduce some of our experiments, they
 are not strong dependencies and FastSRM only needs Numpy ($\geq 1.12$), Scipy
 ($\geq 0.18.0$), Matplotlib ($\geq 2.0.0$), Scikit-learn ($\geq 0.23$), Pytest
 ($\geq 6.2.5$) , and Joblib ($\geq 1.1.0$).
@@ -964,7 +962,15 @@ stable estimates of the shared components.
 
 FastSRM inherits from all the weaknesses of SRM including the fact that
 mixing matrices are assumed to be orthogonal, which is debattable in practice.
-Another desirable property of such decompositions is the spatial smoothness of the components. While it is often observed that SRM components are smooth, nothing imposes such a constraint in the model. We highlight that the optimal spatial decomposition is only optimal with respect to the SRM model. More precisely, it gives a reduced representation such that applying the SRM model on the reduced representation or on the full data gives the same result. Whether this representation is interpretable or not is irrelevant to us, since it is only a means to accelerate the SRM algorithm. However, as this representation is not unique, it may be interesting to find the “most interpretable” optimal spatial decomposition. Note that this would not change the end result of the SRM algorithm but could be of interest for interpretation purposes.
+Another desirable property of such decompositions is the spatial smoothness of the components. While it is often observed that SRM components are smooth, nothing imposes such a constraint in the model.
+%
+We highlight that the optimal spatial decomposition is only optimal with respect to the SRM model.
+%
+More precisely, it gives a reduced representation such that applying the SRM model on the reduced representation or on the full data gives the same result.
+%
+Whether this representation is interpretable or not is irrelevant here, since we only focus on accelerating the SRM algorithm.
+%
+However, as this representation is not unique, it may be interesting to find the “most interpretable” optimal spatial decomposition. Note that this would not change the end result of the SRM algorithm but could be of interest for interpretation purposes.
 %
 It is an open question whether dimension reduction and learning of the shared
 components could be done jointly and efficiently without assuming orthogonal
