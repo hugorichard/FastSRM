@@ -29,7 +29,9 @@
 \usepackage[colorinlistoftodos,textwidth=2.1cm]{todonotes}
 \newcommand{\bt}[1]{\todo[color=orange, inline=True]{BT: #1}}
 
-
+\makeatletter % Reference list option change
+\renewcommand\@biblabel[1]{#1} % from [1] to 1
+\makeatother %
 
 \begin{document}
 \maketitle
@@ -992,7 +994,7 @@ We leave it to future work.
 % \bt{Add a paragraph on implementation, sofwtare quality, documentation, examples, availability...}
 % \bt{Discuss the use for other brain imaging modelities (MEEG) if relevant ?}
 
-\bibliographystyle{plain}
+\bibliographystyle{vancouver}
 \bibliography{utils/biblio}
 
 
