@@ -19,7 +19,7 @@ setup(
         "matplotlib>=2.0.0",
         "pytest>=6.2.5",
     ],
-    version="0.0.4",
+    version="0.0.5",
     license="MIT",
     author="Hugo RICHARD",
     download_url="https://github.com/hugorichard/FastSRM/archive/v_004.tar.gz",
