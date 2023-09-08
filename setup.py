@@ -12,12 +12,12 @@ long_description = (this_directory / "README.md").read_text()
 setup(
     name="fastsrm",
     install_requires=[
-        "scipy>=0.18.0"
-        "numpy>=1.12"
-        "scikit-learn>=0.23"
-        "joblib>=1.1.0"
-        "matplotlib>=2.0.0"
-        "pytest>=6.2.5"
+        "scipy>=0.18.0",
+        "numpy>=1.12",
+        "scikit-learn>=0.23",
+        "joblib>=1.1.0",
+        "matplotlib>=2.0.0",
+        "pytest>=6.2.5",
     ],
     version="0.0.4",
     license="MIT",
@@ -27,7 +27,7 @@ setup(
     url="https://github.com/hugorichard/FastSRM",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    description="Fast Shared response model",
+    description="Fast Shared Response Model",
     keywords="Component analysis, fMRI",
     packages=find_packages(),
     python_requires=">=3",
