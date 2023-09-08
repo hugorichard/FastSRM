@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Examples Gallery &mdash; FastSRM  documentation</title>
@@ -15,11 +15,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -32,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> FastSRM
+
+          
+          
+          <a href="#" class="icon icon-home">
+            FastSRM
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -59,8 +63,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Examples Gallery</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples Gallery</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,7 +78,7 @@
 <h1>Examples Gallery<a class="headerlink" href="#examples-gallery" title="Permalink to this heading"></a></h1>
 <p>The examples gallery provides working code samples demonstrating what
 can be done with the FastSRM library.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates on a very small dataset that the optimal atlas used in FastSRM speeds..."><img alt="FastSRM : running time and convergence" src="_images/sphx_glr_plot_synthetic_toy_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates on a very small dataset that the optimal atlas used in FastSRM speeds..."><img alt="" src="_images/sphx_glr_plot_synthetic_toy_thumb.png" />
 <p><a class="reference internal" href="auto_examples/plot_synthetic_toy.html#sphx-glr-auto-examples-plot-synthetic-toy-py"><span class="std std-ref">FastSRM : running time and convergence</span></a></p>
   <div class="sphx-glr-thumbnail-title">FastSRM : running time and convergence</div>
 </div></div><div class="toctree-wrapper compound">
@@ -101,7 +105,7 @@ can be done with the FastSRM library.</p>
 <div class="math notranslate nohighlight">
 \[X_i \approx W_i S, \forall i=1 \dots N\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>method</strong> (<em>str</em><em>, </em><em>default=&quot;prob&quot;</em>) – if “prob”, uses Probabilistic SRM
 if “det”, uses Deterministic SRM</p></li>
@@ -127,7 +131,7 @@ if n_iter &gt; 1 and n_voxels &gt; 10 * n_timeframes.</p></li>
 <li><p>if basis is a list of str, element i is the path to the basis of subject i that is loaded with np.load yielding an array of shape [n_components, n_voxels].</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of array, element i has shape=[n_components, n_voxels] or list of str</p>
 </dd>
 </dl>
@@ -150,13 +154,13 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 <span class="sig-name descname"><span class="pre">add_subjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.add_subjects" title="Permalink to this definition"></a></dt>
 <dd><p>Add subjects to the current fit. Each new basis will be appended at the end of the list of basis (which can be accessed using self.basis)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<li><p><strong>imgs</strong> (<em>array</em><em> of </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>list</em><em> of </em><em>arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
 <p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
 <p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
 </p></li>
-<li><p><strong>shared_response</strong> (<em>list of arrays</em><em>, </em><em>list of list of arrays</em><em> or </em><em>array</em>) – <ul>
+<li><p><strong>shared_response</strong> (<em>list</em><em> of </em><em>arrays</em><em>, </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>array</em>) – <ul>
 <li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
 <li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
 <li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
@@ -179,16 +183,16 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Computes basis across subjects from input imgs</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>imgs</strong> (<em>array</em><em> of </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>list</em><em> of </em><em>arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
 <p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
 <p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
 </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>self</strong> – Returns the instance itself. Contains attributes listed at the object level.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>object</p>
 </dd>
 </dl>
@@ -200,16 +204,16 @@ H. Richard, L. Martin, A. Pinho, J. Pillow, B. Thirion, 2019: Fast shared respon
 <dd><p>Computes basis across subjects and shared response from input imgs
 return shared response.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<li><p><strong>imgs</strong> (<em>array</em><em> of </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>list</em><em> of </em><em>arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
 <p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
 <p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
 </p></li>
 <li><p><strong>subjects_indexes</strong> (<em>list</em><em> or </em><em>None:</em>) – if None imgs[i] will be transformed using basis_list[i]. Otherwise imgs[i] will be transformed using basis_list[subjects_index[i]]</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p><strong>shared_response</strong> –</p>
 <ul class="simple">
 <li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
@@ -219,7 +223,7 @@ return shared response.</p>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of arrays, list of list of arrays or array</p>
 </dd>
 </dl>
@@ -231,9 +235,9 @@ return shared response.</p>
 <dd><p>From shared response and basis from training data
 reconstruct subject’s data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shared_response</strong> (<em>list of arrays</em><em>, </em><em>list of list of arrays</em><em> or </em><em>array</em>) – <ul>
+<li><p><strong>shared_response</strong> (<em>list</em><em> of </em><em>arrays</em><em>, </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>array</em>) – <ul>
 <li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
 <li><p>if imgs is a list of array and self.aggregate=None: shared response is a list of array, element i is the projection of data of subject i in shared space.</p></li>
 <li><p>if imgs is an array or a list of list of array and self.aggregate=”mean”: shared response is a list of array, element j is the shared response during session j</p></li>
@@ -244,7 +248,7 @@ reconstruct subject’s data</p>
 <li><p><strong>sessions_indexes</strong> (<em>list</em><em> or </em><em>None</em>) – if None reconstructs data of all sessions. Otherwise uses reconstructs data of sessions specified by sessions_indexes.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p><strong>reconstructed_data</strong> –</p>
 <ul class="simple">
 <li><p>if reconstructed_data is a list of list : element i, j is the reconstructed data for subject subjects_indexes[i] and session sessions_indexes[j] as an np array of shape n_voxels, n_timeframes</p></li>
@@ -252,8 +256,135 @@ reconstruct subject’s data</p>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of list of arrays or list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastsrm.identifiable_srm.IdentifiableFastSRM.set_fit_request">
+<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="fastsrm.identifiable_srm.IdentifiableFastSRM"><span class="pre">IdentifiableFastSRM</span></a></span></span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.set_fit_request" title="Permalink to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code>).
+Please see <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.Pipeline</span></code>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>imgs</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">imgs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – The updated object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastsrm.identifiable_srm.IdentifiableFastSRM.set_inverse_transform_request">
+<span class="sig-name descname"><span class="pre">set_inverse_transform_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sessions_indexes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects_indexes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="fastsrm.identifiable_srm.IdentifiableFastSRM"><span class="pre">IdentifiableFastSRM</span></a></span></span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.set_inverse_transform_request" title="Permalink to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code>).
+Please see <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.Pipeline</span></code>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sessions_indexes</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">sessions_indexes</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code>.</p></li>
+<li><p><strong>shared_response</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">shared_response</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code>.</p></li>
+<li><p><strong>subjects_indexes</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">subjects_indexes</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">inverse_transform</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – The updated object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fastsrm.identifiable_srm.IdentifiableFastSRM.set_transform_request">
+<span class="sig-name descname"><span class="pre">set_transform_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subjects_indexes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fastsrm.identifiable_srm.IdentifiableFastSRM" title="fastsrm.identifiable_srm.IdentifiableFastSRM"><span class="pre">IdentifiableFastSRM</span></a></span></span><a class="headerlink" href="#fastsrm.identifiable_srm.IdentifiableFastSRM.set_transform_request" title="Permalink to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">transform</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code>).
+Please see <span class="xref std std-ref">User Guide</span> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">transform</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">transform</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.Pipeline</span></code>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>imgs</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">imgs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">transform</span></code>.</p></li>
+<li><p><strong>subjects_indexes</strong> (<em>str</em><em>, </em><em>True</em><em>, </em><em>False</em><em>, or </em><em>None</em><em>,                     </em><em>default=sklearn.utils.metadata_routing.UNCHANGED</em>) – Metadata routing for <code class="docutils literal notranslate"><span class="pre">subjects_indexes</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">transform</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – The updated object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,16 +395,16 @@ reconstruct subject’s data</p>
 <dd><p>From data in imgs and basis from training data,
 computes shared response.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
+<li><p><strong>imgs</strong> (<em>array</em><em> of </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>list</em><em> of </em><em>arrays</em>) – <p>Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1</p>
 <p>imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.</p>
 <p>imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p>
 </p></li>
 <li><p><strong>subjects_indexes</strong> (<em>list</em><em> or </em><em>None:</em>) – if None imgs[i] will be transformed using basis_list[i]. Otherwise imgs[i] will be transformed using basis[subjects_index[i]]</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p><strong>shared_response</strong> –</p>
 <ul class="simple">
 <li><p>if imgs is a list of array and self.aggregate=”mean”: shared response is an array of shape (n_components, n_timeframes)</p></li>
@@ -283,7 +414,7 @@ computes shared response.</p>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of arrays, list of list of arrays or array</p>
 </dd>
 </dl>
@@ -303,9 +434,9 @@ much larger than the number of samples:
 Reduces the data by PCA and apply an SRM
 algorithm one reduced data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>imgs</strong> (<em>array of str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list of list of arrays</em><em> or </em><em>list of arrays</em>) – Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1
+<li><p><strong>imgs</strong> (<em>array</em><em> of </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_subjects</em><em>, </em><em>n_sessions</em><em>] or </em><em>list</em><em> of </em><em>list</em><em> of </em><em>arrays</em><em> or </em><em>list</em><em> of </em><em>arrays</em>) – Element i, j of the array is a path to the data of subject i collected during session j. Data are loaded with numpy.load and expected shape is [n_voxels, n_timeframes] n_timeframes and n_voxels are assumed to be the same across subjects n_timeframes can vary across sessions. Each voxel’s timecourse is assumed to have mean 0 and variance 1
 imgs can also be a list of list of arrays where element i, j of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i collected during session j.
 imgs can also be a list of arrays where element i of the array is a numpy array of shape [n_voxels, n_timeframes] that contains the data of subject i (number of sessions is implicitly 1)</p></li>
 <li><p><strong>n_components</strong> (<em>int</em>) – Number of timecourses of the shared coordinates</p></li>
@@ -324,7 +455,7 @@ time. The result is saved in a list <cite>record</cite>.
 If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>W</strong> (<em>list of n_subjects numpy array of shape (n_voxels, n_components)         or path to np array of shape (n_voxels, n_components)</em>) – Subject specific basis</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
@@ -346,9 +477,9 @@ To be used when data hold in memory and the number
 of features is not much larger than the number
 of samples (in which case fastsrm is preferable)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>np array of shape</em><em> (</em><em>n_views</em><em>, </em><em>n_features</em><em>, </em><em>n_samples</em><em>)</em>) – Input data</p></li>
+<li><p><strong>X</strong> (<em>np array</em><em> of </em><em>shape</em><em> (</em><em>n_views</em><em>, </em><em>n_features</em><em>, </em><em>n_samples</em><em>)</em>) – Input data</p></li>
 <li><p><strong>n_components</strong> (<em>int</em>) – Number of timecourses of the shared coordinates</p></li>
 <li><p><strong>n_iter</strong> (<em>int</em>) – Number of iterations to perform</p></li>
 <li><p><strong>random_state</strong> (<em>int</em><em>, </em><em>RandomState instance</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Controls the randomness of the initialization.</p></li>
@@ -361,7 +492,7 @@ time. The result is saved in a list <cite>record</cite>.
 If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>W</strong> (<em>np array of shape     (n_views, n_features, n_components)</em>) – Subject specific basis</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>
@@ -381,9 +512,9 @@ To be used when data hold in memory and the number
 of features is not much larger than the number
 of samples (in which case fastsrm is preferable)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<em>np array of shape</em><em> (</em><em>n_views</em><em>, </em><em>n_features</em><em>, </em><em>n_samples</em><em>)</em>) – Input data</p></li>
+<li><p><strong>X</strong> (<em>np array</em><em> of </em><em>shape</em><em> (</em><em>n_views</em><em>, </em><em>n_features</em><em>, </em><em>n_samples</em><em>)</em>) – Input data</p></li>
 <li><p><strong>n_components</strong> (<em>int</em>) – Number of timecourses of the shared coordinates</p></li>
 <li><p><strong>n_iter</strong> (<em>int</em>) – Number of iterations to perform</p></li>
 <li><p><strong>random_state</strong> (<em>int</em><em>, </em><em>RandomState instance</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Controls the randomness of the initialization.</p></li>
@@ -396,7 +527,7 @@ time. The result is saved in a list <cite>record</cite>.
 If callback is None, nothing is done.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>W</strong> (<em>np array of shape     (n_views, n_features, n_components)</em>) – Subject specific basis</p></li>
 <li><p><strong>S</strong> (<em>np array of shape (n_components, n_timeframes)</em>) – Shared response</p></li>

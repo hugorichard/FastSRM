@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_synthetic_toy.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_synthetic_toy.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -51,7 +51,9 @@ of shared components but without any loss of accuracy.
     ProbSRM did not converge. Current diff is 2.767339
     ProbSRM did not converge. Current diff is 129.790836
     ProbSRM did not converge. Current diff is 2.456504
-    /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4527: RuntimeWarning: invalid value encountered in subtract
+    /home/circleci/project/examples/plot_synthetic_toy.py:100: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
+      vir = get_cmap("Set2", len(algos_det))
+    /home/circleci/miniconda3/envs/testenv/lib/python3.8/site-packages/numpy/lib/function_base.py:4573: RuntimeWarning: invalid value encountered in subtract
       diff_b_a = subtract(b, a)
     Done
 
@@ -240,7 +242,7 @@ of shared components but without any loss of accuracy.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.990 seconds)
+   **Total running time of the script:** (0 minutes 4.572 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_synthetic_toy.py:
@@ -248,6 +250,8 @@ of shared components but without any loss of accuracy.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python
